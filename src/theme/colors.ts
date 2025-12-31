@@ -111,9 +111,9 @@ export const colors = {
   
   // Common color shorthands
   white: '#ffffff',
-  background: '#f8f9fa',     // background.secondary
   primaryLight: '#e6f0ff',   // primary[50]
   warningLight: '#fff3cd',   // warning.light
+  successLight: '#d4edda',   // success.light
 } as const;
 
 /**

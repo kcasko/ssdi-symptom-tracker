@@ -156,7 +156,7 @@ export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.secondary,
   },
   header: {
     padding: spacing.lg,
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
     margin: spacing.lg,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: colors.warning,
+    borderLeftColor: colors.warning.main,
     gap: spacing.xs,
   },
   warningTitle: {
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.bold as any,
-    color: colors.warning,
+    color: colors.warning.main,
   },
   warningText: {
     fontSize: typography.sizes.sm,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: typography.sizes.sm,
-    color: colors.error,
+    color: colors.error.main,
     fontWeight: typography.weights.semibold as any,
   },
   section: {

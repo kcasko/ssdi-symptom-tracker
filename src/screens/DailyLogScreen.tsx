@@ -195,7 +195,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.secondary,
   },
   header: {
     padding: spacing.lg,

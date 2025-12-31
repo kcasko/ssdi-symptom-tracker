@@ -27,7 +27,7 @@ export const LimitationsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: colors.background.secondary },
   header: { padding: spacing.lg, backgroundColor: colors.white, gap: spacing.xs },
   title: { fontSize: typography.sizes.xxl, fontWeight: typography.weights.bold as any, color: colors.gray900 },
   subtitle: { fontSize: typography.sizes.md, color: colors.gray600 },

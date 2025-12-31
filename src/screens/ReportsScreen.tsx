@@ -142,7 +142,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.secondary,
   },
   header: {
     padding: spacing.lg,
