@@ -183,3 +183,91 @@ function parseDate(dateStr: string): Date | null {
   return date;
 }
 
+/**
+ * Flare summary statistics
+ */
+export interface FlareSummary {
+  totalFlares: number;
+  averageDuration: number;
+  totalDaysInFlare: number;
+  flaresPerMonth: number;
+  peakPainAverage: number;
+  longestFlare: Flare | null;
+  recentFlares: Flare[]; // Last 5 flares
+}
+
+/**
+ * Calculate comprehensive flare summary statistics
+ * 
+ * @param flares Array of detected flares
+ * @param dateRange Optional date range for calculating flares per month
+ * @returns Summary statistics about flares
+ */
+export function calculateFlareSummary(
+  flares: Flare[],
+  dateRange?: { start: string; end: string }
+): FlareSummary {
+  if (flares.length === 0) {
+    return {
+      totalFlares: 0,
+      averageDuration: 0,
+      totalDaysInFlare: 0,
+      flaresPerMonth: 0,
+      peakPainAverage: 0,
+      longestFlare: null,
+      recentFlares: [],
+    };
+  }
+
+  // Calculate total days in flare
+  const totalDaysInFlare = flares.reduce((sum, flare) => sum + flare.durationDays, 0);
+
+  // Calculate average duration
+  const averageDuration = totalDaysInFlare / flares.length;
+
+  // Calculate average peak pain
+  const peakPainAverage = flares.reduce((sum, flare) => sum + flare.peakPain, 0) / flares.length;
+
+  // Find longest flare
+  const longestFlare = flares.reduce((longest, current) => 
+    current.durationDays > longest.durationDays ? current : longest
+  );
+
+  // Get recent flares (last 5, sorted by end date descending)
+  const recentFlares = [...flares]
+    .sort((a, b) => b.endDate.localeCompare(a.endDate))
+    .slice(0, 5);
+
+  // Calculate flares per month
+  let flaresPerMonth = 0;
+  if (dateRange) {
+    const startDate = parseDate(dateRange.start);
+    const endDate = parseDate(dateRange.end);
+    
+    if (startDate && endDate) {
+      const months = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+      flaresPerMonth = months > 0 ? flares.length / months : 0;
+    }
+  } else {
+    // Use first and last flare dates to calculate range
+    const sortedFlares = [...flares].sort((a, b) => a.startDate.localeCompare(b.startDate));
+    const firstDate = parseDate(sortedFlares[0].startDate);
+    const lastDate = parseDate(sortedFlares[sortedFlares.length - 1].endDate);
+    
+    if (firstDate && lastDate) {
+      const months = (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+      flaresPerMonth = months > 0 ? flares.length / months : 0;
+    }
+  }
+
+  return {
+    totalFlares: flares.length,
+    averageDuration,
+    totalDaysInFlare,
+    flaresPerMonth,
+    peakPainAverage,
+    longestFlare,
+    recentFlares,
+  };
+}
+
