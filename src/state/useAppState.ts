@@ -128,10 +128,9 @@ export function useAppState(): AppState {
         // Load profiles
         await profileStore.loadProfiles();
         
-        // If we have an active profile, load its data
+        // Store the active profile ID for later sync, but DON'T load data yet
+        // Data will be loaded by the sync effect after init completes
         if (profileStore.activeProfileId) {
-          logStore.setCurrentProfile(profileStore.activeProfileId);
-          reportStore.setCurrentProfile(profileStore.activeProfileId);
           lastSyncedProfileId.current = profileStore.activeProfileId;
         }
         
@@ -155,10 +154,12 @@ export function useAppState(): AppState {
 
   // Keep stores in sync when active profile changes
   useEffect(() => {
+    // Don't sync until initialization is complete
+    if (!initComplete) return;
+    
     const profileId = profileStore.activeProfileId;
     
-    // Only sync if profile actually changed and we've already initialized
-    if (!hasInitialized.current) return;
+    // Only sync if profile actually changed
     if (lastSyncedProfileId.current === profileId) return;
     
     lastSyncedProfileId.current = profileId;
@@ -170,7 +171,7 @@ export function useAppState(): AppState {
     if (reportStore.currentProfileId !== profileId) {
       reportStore.setCurrentProfile(profileId);
     }
-  }, [profileStore.activeProfileId]);
+  }, [initComplete, profileStore.activeProfileId]); // Don't include store objects
 
   const initializeApp = async (): Promise<void> => {
     try {
