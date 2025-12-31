@@ -4,6 +4,7 @@
  */
 
 export { ProfilePickerScreen } from './ProfilePickerScreen';
+export { ProfileCreationScreen } from './ProfileCreationScreen';
 export { DashboardScreen } from './DashboardScreen';
 export { DailyLogScreen } from './DailyLogScreen';
 export { ActivityLogScreen } from './ActivityLogScreen';

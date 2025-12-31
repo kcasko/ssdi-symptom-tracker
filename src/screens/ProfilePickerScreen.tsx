@@ -32,12 +32,7 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
   };
 
   const handleCreateProfile = async () => {
-    const name = `Profile ${profiles.length + 1}`;
-    const profileId = await createProfile(name);
-    if (profileId) {
-      await setActiveProfile(profileId);
-      navigation.replace('Dashboard');
-    }
+    navigation.navigate('ProfileCreation');
   };
 
   return (

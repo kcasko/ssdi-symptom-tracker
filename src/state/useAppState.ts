@@ -29,7 +29,7 @@ interface AppState {
   
   // Profile actions
   setActiveProfile: (profileId: string | null) => Promise<void>;
-  createProfile: (name: string) => Promise<string | null>;
+  createProfile: (name: string, options?: any) => Promise<string | null>;
   
   // Log data
   dailyLogs: any[];

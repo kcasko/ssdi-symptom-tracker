@@ -21,7 +21,7 @@ interface ProfileState {
   // Actions
   loadProfiles: () => Promise<void>;
   setActiveProfile: (profileId: string | null) => Promise<void>;
-  createProfile: (name: string) => Promise<string | null>;
+  createProfile: (name: string, options?: Partial<Profile>) => Promise<string | null>;
   updateProfile: (profile: Profile) => Promise<void>;
   deleteProfile: (profileId: string) => Promise<void>;
   clearError: () => void;
@@ -82,12 +82,26 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     }
   },
 
-  createProfile: async (name: string) => {
+  createProfile: async (name: string, options: Partial<Profile> = {}) => {
     set({ loading: true, error: null });
     
     try {
       const profileId = ids.profile();
-      const newProfile = createProfile(name, profileId);
+      const baseProfile = createProfile(name, profileId);
+      
+      // Merge in any additional options
+      const newProfile: Profile = {
+        ...baseProfile,
+        ...options,
+        id: profileId,
+        name,
+        createdAt: baseProfile.createdAt,
+        updatedAt: baseProfile.updatedAt,
+        settings: {
+          ...baseProfile.settings,
+          ...options.settings,
+        },
+      };
       
       const { profiles } = get();
       const updatedProfiles = [...profiles, newProfile];

@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
   OnboardingScreen,
   ProfilePickerScreen,
+  ProfileCreationScreen,
   DashboardScreen,
   DailyLogScreen,
   ActivityLogScreen,
@@ -23,6 +24,7 @@ import {
 export type RootStackParamList = {
   Onboarding: undefined;
   ProfilePicker: undefined;
+  ProfileCreation: undefined;
   Dashboard: undefined;
   DailyLog: undefined;
   ActivityLog: undefined;
@@ -46,6 +48,7 @@ export function AppNavigator() {
       >
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
         <Stack.Screen name="ProfilePicker" component={ProfilePickerScreen} />
+        <Stack.Screen name="ProfileCreation" component={ProfileCreationScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
         <Stack.Screen name="DailyLog" component={DailyLogScreen} />
         <Stack.Screen name="ActivityLog" component={ActivityLogScreen} />
