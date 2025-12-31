@@ -96,12 +96,16 @@ export function useAppState(): AppState {
       if (hasInitialized.current) return;
       hasInitialized.current = true;
       
+      console.log('Starting initialization...');
+      
       try {
         // Check if first launch
         const isFirstLaunch = await SettingsStorage.isFirstLaunch();
+        console.log('First launch check:', isFirstLaunch);
         
         // Check if migration needed
         const needsMigration = await MigrationManager.needsMigration();
+        console.log('Migration needed:', needsMigration);
         
         if (needsMigration) {
           console.log('Running migrations...');
@@ -112,13 +116,17 @@ export function useAppState(): AppState {
         }
         
         // Load settings first
-        await settingsStore.loadSettings();
+        console.log('Loading settings...');
+        await useSettingsStore.getState().loadSettings();
+        
+        // Get fresh settings from store (not the stale closure value!)
+        const currentSettings = useSettingsStore.getState().settings;
+        console.log('Settings loaded, appLockEnabled:', currentSettings.appLockEnabled);
         
         // Check app lock if enabled
-        if (settingsStore.settings.appLockEnabled) {
-          const authenticated = await settingsStore.authenticateUser();
+        if (currentSettings.appLockEnabled) {
+          const authenticated = await useSettingsStore.getState().authenticateUser();
           if (!authenticated) {
-            // Handle authentication failure - still mark as complete
             console.log('Authentication required but failed');
             setInitComplete(true);
             return;
@@ -126,12 +134,16 @@ export function useAppState(): AppState {
         }
         
         // Load profiles
-        await profileStore.loadProfiles();
+        console.log('Loading profiles...');
+        await useProfileStore.getState().loadProfiles();
         
-        // Store the active profile ID for later sync, but DON'T load data yet
-        // Data will be loaded by the sync effect after init completes
-        if (profileStore.activeProfileId) {
-          lastSyncedProfileId.current = profileStore.activeProfileId;
+        // Get fresh profile state (not the stale closure value!)
+        const currentActiveProfileId = useProfileStore.getState().activeProfileId;
+        console.log('Profiles loaded, activeProfileId:', currentActiveProfileId);
+        
+        // Store the active profile ID for later sync
+        if (currentActiveProfileId) {
+          lastSyncedProfileId.current = currentActiveProfileId;
         }
         
         // Mark first launch complete if needed
@@ -142,9 +154,8 @@ export function useAppState(): AppState {
         console.log('App initialized successfully');
       } catch (error) {
         console.error('App initialization failed:', error);
-        // Still mark as complete even on error so app doesn't hang
       } finally {
-        // ALWAYS mark initialization as complete
+        console.log('Setting initComplete to true');
         setInitComplete(true);
       }
     };
