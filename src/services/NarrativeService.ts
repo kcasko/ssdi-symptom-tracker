@@ -135,12 +135,9 @@ export class NarrativeService {
     lines.push(`Duration: ${activityLog.duration} minutes`);
     lines.push('');
 
-    // TODO: Implement impact narrative once impact tracking is implemented
-    // ActivityLog uses immediateImpact/delayedImpact, not impacts array
-    /*
-    // Impact
-    if (activityLog.impacts.length > 0) {
-      const maxImpact = Math.max(...activityLog.impacts.map(i => i.severity));
+    // Impact assessment
+    if (activityLog.immediateImpact.symptoms.length > 0) {
+      const maxImpact = activityLog.immediateImpact.overallImpact;
       
       if (maxImpact >= 7) {
         lines.push('Activity resulted in severe symptom exacerbation:');
@@ -150,13 +147,35 @@ export class NarrativeService {
         lines.push('Activity impact:');
       }
 
-      activityLog.impacts.forEach(impact => {
-        lines.push(`- ${impact.symptomName}: severity ${impact.severity}/10`);
+      activityLog.immediateImpact.symptoms.forEach(symptom => {
+        const symptomData = getSymptomById(symptom.symptomId);
+        const symptomName = symptomData?.name || symptom.symptomId;
+        lines.push(`- ${symptomName}: severity ${symptom.severity}/10 (${symptom.onsetTiming.replace('_', ' ')})`);
       });
+
+      if (activityLog.immediateImpact.notes) {
+        lines.push(`Notes: ${activityLog.immediateImpact.notes}`);
+      }
 
       lines.push('');
     }
-    */
+
+    // Delayed impact
+    if (activityLog.delayedImpact) {
+      lines.push(`Delayed impact (${activityLog.delayedImpact.hoursAfter} hours later):`);
+      
+      activityLog.delayedImpact.symptoms.forEach(symptom => {
+        const symptomData = getSymptomById(symptom.symptomId);
+        const symptomName = symptomData?.name || symptom.symptomId;
+        lines.push(`- ${symptomName}: severity ${symptom.severity}/10`);
+      });
+
+      if (activityLog.delayedImpact.notes) {
+        lines.push(`Notes: ${activityLog.delayedImpact.notes}`);
+      }
+
+      lines.push('');
+    }
 
     // Stopped early
     if (activityLog.stoppedEarly) {
@@ -164,22 +183,25 @@ export class NarrativeService {
       lines.push('');
     }
 
-    // TODO: Implement recovery narrative once recovery tracking is implemented
-    // ActivityLog uses recoveryActions array, not recovery
-    /*
-    // Recovery
-    if (activityLog.recovery) {
-      const totalRecovery = activityLog.recovery.reduce((sum, r) => sum + r.durationMinutes, 0);
+    // Recovery actions
+    if (activityLog.recoveryActions.length > 0) {
+      const totalRecovery = activityLog.recoveryDuration || 
+        activityLog.recoveryActions.reduce((sum, a) => sum + (a.duration || 0), 0);
       
       lines.push(`Recovery required: ${totalRecovery} minutes`);
       
-      activityLog.recovery.forEach(r => {
-        lines.push(`- ${r.actionName}: ${r.durationMinutes} minutes`);
+      activityLog.recoveryActions.forEach(action => {
+        const helpfulText = action.helpful ? ' (helpful)' : ' (not helpful)';
+        const durationText = action.duration ? ` - ${action.duration} minutes` : '';
+        lines.push(`- ${action.actionName}${durationText}${helpfulText}`);
+        
+        if (action.notes) {
+          lines.push(`  Notes: ${action.notes}`);
+        }
       });
 
       lines.push('');
     }
-    */
 
     // Notes
     if (activityLog.notes) {

@@ -94,7 +94,11 @@ export class LimitationAnalyzer {
   /**
    * Analyze a single functional limitation
    */
-  static analyzeLimitation(limitation: Limitation): LimitationSummary {
+  static analyzeLimitation(
+    limitation: Limitation,
+    dailyLogs: DailyLog[] = [],
+    activityLogs: ActivityLog[] = []
+  ): LimitationSummary {
     // Determine threshold
     let threshold: LimitationSummary['threshold'];
     
@@ -158,6 +162,10 @@ export class LimitationAnalyzer {
       else severity = 'mild';
     }
 
+    // Find supporting logs for this limitation
+    const supportingLogs = this.findSupportingLogs(limitation, dailyLogs, activityLogs);
+    const evidenceCount = supportingLogs.length;
+
     return {
       category: limitation.category,
       categoryLabel: getLimitationCategoryLabel(limitation.category),
@@ -166,8 +174,8 @@ export class LimitationAnalyzer {
       frequencyScore,
       primaryConsequences: limitation.consequences.slice(0, 3),
       severity,
-      supportingLogs: [], // TODO: Track supporting log IDs when logs reference limitations
-      evidenceCount: 0,
+      supportingLogs,
+      evidenceCount,
     };
   }
 
@@ -438,6 +446,82 @@ export class LimitationAnalyzer {
       'self_care': ['showering', 'dressing', 'grooming', 'eating'],
     };
 
+    return mapping[category] || [];
+  }
+
+  /**
+   * Find logs that support a specific limitation
+   */
+  private static findSupportingLogs(
+    limitation: Limitation,
+    dailyLogs: DailyLog[],
+    activityLogs: ActivityLog[]
+  ): string[] {
+    const supportingLogs: string[] = [];
+    
+    // Get relevant activities for this limitation category
+    const relevantActivities = this.getRelevantActivities(limitation.category);
+    
+    // Find activity logs that show impact matching this limitation
+    activityLogs.forEach(log => {
+      // Check if activity is relevant to limitation category
+      const isRelevantActivity = relevantActivities.some(actId => 
+        log.activityId === actId || log.activityName.toLowerCase().includes(actId)
+      );
+      
+      if (isRelevantActivity) {
+        // Check if activity showed significant impact
+        const hasSignificantImpact = log.immediateImpact.overallImpact >= 5 || 
+          (log.delayedImpact && log.delayedImpact.overallImpact >= 5);
+        
+        // Check if activity was stopped early or required recovery
+        const wasLimited = log.stoppedEarly || 
+          log.recoveryActions.length > 0 || 
+          (log.recoveryDuration && log.recoveryDuration > 0);
+        
+        if (hasSignificantImpact || wasLimited) {
+          supportingLogs.push(log.id);
+        }
+      }
+    });
+    
+    // Find daily logs with high severity symptoms related to limitation
+    dailyLogs.forEach(log => {
+      const hasRelevantHighSymptoms = log.symptoms.some(symptom => {
+        // Map limitation categories to relevant symptom types
+        const relevantSymptomIds = this.getRelevantSymptomIds(limitation.category);
+        return relevantSymptomIds.includes(symptom.symptomId) && symptom.severity >= 6;
+      });
+      
+      if (hasRelevantHighSymptoms) {
+        supportingLogs.push(log.id);
+      }
+    });
+    
+    return supportingLogs;
+  }
+  
+  /**
+   * Get symptom IDs relevant to a limitation category
+   */
+  private static getRelevantSymptomIds(category: string): string[] {
+    const mapping: Record<string, string[]> = {
+      'sitting': ['back_pain', 'hip_pain', 'stiffness'],
+      'standing': ['back_pain', 'leg_pain', 'balance'],
+      'walking': ['leg_pain', 'shortness_of_breath', 'balance', 'coordination'],
+      'lifting': ['back_pain', 'arm_pain', 'weakness'],
+      'carrying': ['arm_pain', 'weakness', 'balance'],
+      'reaching': ['arm_pain', 'shoulder_pain', 'stiffness'],
+      'bending': ['back_pain', 'stiffness', 'balance'],
+      'climbing': ['shortness_of_breath', 'leg_pain', 'balance'],
+      'concentration': ['brain_fog', 'headache', 'confusion'],
+      'memory': ['brain_fog', 'confusion', 'forgetfulness'],
+      'fine_motor': ['tremor', 'weakness', 'coordination'],
+      'gross_motor': ['weakness', 'balance', 'coordination'],
+      'social': ['anxiety', 'depression', 'brain_fog'],
+      'self_care': ['weakness', 'fatigue', 'coordination'],
+    };
+    
     return mapping[category] || [];
   }
 }

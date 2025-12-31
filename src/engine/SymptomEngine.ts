@@ -86,8 +86,8 @@ export class SymptomEngine {
     const maxSeverity = Math.max(...severities);
     const minSeverity = Math.min(...severities);
 
-    // TODO: Implement consistency evaluation
-    const consistencyResult = { consistent: true, variability: 'low' as const };
+    // Implement consistency evaluation
+    const consistencyResult = this.evaluateConsistency(severities);
 
     // Analyze trend (compare first half to second half)
     let trend: SymptomSummary['trend'] = 'stable';
@@ -418,5 +418,39 @@ export class SymptomEngine {
       clusters,
       dayRatio,
     };
+  }
+
+  /**
+   * Evaluate consistency of symptom severity scores
+   */
+  private static evaluateConsistency(severities: number[]): {
+    consistent: boolean;
+    variability: 'low' | 'moderate' | 'high';
+  } {
+    if (severities.length < 3) {
+      return { consistent: true, variability: 'low' };
+    }
+
+    // Calculate standard deviation
+    const mean = severities.reduce((sum, s) => sum + s, 0) / severities.length;
+    const variance = severities.reduce((sum, s) => sum + Math.pow(s - mean, 2), 0) / severities.length;
+    const standardDeviation = Math.sqrt(variance);
+
+    // Calculate variability based on standard deviation
+    let variability: 'low' | 'moderate' | 'high';
+    let consistent: boolean;
+
+    if (standardDeviation <= 1.5) {
+      variability = 'low';
+      consistent = true;
+    } else if (standardDeviation <= 2.5) {
+      variability = 'moderate';
+      consistent = true;
+    } else {
+      variability = 'high';
+      consistent = false;
+    }
+
+    return { consistent, variability };
   }
 }

@@ -153,31 +153,42 @@ export class LogService {
     // Set duration
     log.duration = input.duration;
 
-    // TODO: Implement impact and recovery tracking
-    // The ActivityLog model uses immediateImpact/delayedImpact/recoveryActions
-    // Need to map from input.impacts to these properties
-    /*
-    // Add impacts
-    if (input.impacts) {
-      input.impacts.forEach(impact => {
+    // Add impacts to immediate impact assessment
+    if (input.impacts && input.impacts.length > 0) {
+      const symptoms = input.impacts.map(impact => {
         const symptom = getSymptomById(impact.symptomId);
-        if (symptom) {
-          log = addImpact(log, {
-            symptomId: impact.symptomId,
-            symptomName: symptom.name,
-            severity: impact.severity,
-          });
+        if (!symptom) {
+          throw new Error(`Invalid symptom ID: ${impact.symptomId}`);
         }
+        return {
+          symptomId: impact.symptomId,
+          severity: impact.severity,
+          onsetTiming: 'immediately_after' as const
+        };
       });
+      
+      const maxSeverity = Math.max(...input.impacts.map(i => i.severity));
+      
+      log.immediateImpact = {
+        symptoms,
+        overallImpact: maxSeverity,
+        notes: input.notes
+      };
     }
 
     // Add recovery actions
-    if (input.recovery) {
-      input.recovery.forEach(r => {
-        log = addRecovery(log, r.actionName, r.durationMinutes);
-      });
+    if (input.recovery && input.recovery.length > 0) {
+      log.recoveryActions = input.recovery.map(r => ({
+        actionId: generateId(),
+        actionName: r.actionName,
+        duration: r.durationMinutes,
+        helpful: true, // Default to helpful
+        notes: undefined
+      }));
+      
+      // Calculate total recovery duration
+      log.recoveryDuration = input.recovery.reduce((sum, r) => sum + r.durationMinutes, 0);
     }
-    */
 
     // Set stopped early flag
     if (input.stoppedEarly !== undefined) {
@@ -206,31 +217,42 @@ export class LogService {
       updatedLog.duration = updates.duration;
     }
 
-    // TODO: Implement impact and recovery updates
-    /*
     // Update impacts
     if (updates.impacts) {
-      updatedLog.impacts = [];
-      updates.impacts.forEach(impact => {
+      const symptoms = updates.impacts.map(impact => {
         const symptom = getSymptomById(impact.symptomId);
-        if (symptom) {
-          updatedLog = addImpact(updatedLog, {
-            symptomId: impact.symptomId,
-            symptomName: symptom.name,
-            severity: impact.severity,
-          });
+        if (!symptom) {
+          throw new Error(`Invalid symptom ID: ${impact.symptomId}`);
         }
+        return {
+          symptomId: impact.symptomId,
+          severity: impact.severity,
+          onsetTiming: 'immediately_after' as const
+        };
       });
+      
+      const maxSeverity = Math.max(...updates.impacts.map(i => i.severity));
+      
+      updatedLog.immediateImpact = {
+        symptoms,
+        overallImpact: maxSeverity,
+        notes: updates.notes
+      };
     }
 
-    // Update recovery
+    // Update recovery actions
     if (updates.recovery) {
-      updatedLog.recovery = [];
-      updates.recovery.forEach(r => {
-        updatedLog = addRecovery(updatedLog, r.actionName, r.durationMinutes);
-      });
+      updatedLog.recoveryActions = updates.recovery.map(r => ({
+        actionId: generateId(),
+        actionName: r.actionName,
+        duration: r.durationMinutes,
+        helpful: true,
+        notes: undefined
+      }));
+      
+      // Calculate total recovery duration
+      updatedLog.recoveryDuration = updates.recovery.reduce((sum, r) => sum + r.durationMinutes, 0);
     }
-    */
 
     // Update stopped early
     if (updates.stoppedEarly !== undefined) {
@@ -399,5 +421,63 @@ export class LogService {
     profileId: string
   ): T[] {
     return logs.filter(log => log.profileId === profileId);
+  }
+
+  /**
+   * Add delayed impact assessment to an activity log
+   */
+  static addDelayedImpact(
+    log: ActivityLog, 
+    hoursAfter: number, 
+    impacts: Array<{ symptomId: string; severity: number }>,
+    notes?: string
+  ): ActivityLog {
+    const symptoms = impacts.map(impact => {
+      const symptom = getSymptomById(impact.symptomId);
+      if (!symptom) {
+        throw new Error(`Invalid symptom ID: ${impact.symptomId}`);
+      }
+      return {
+        symptomId: impact.symptomId,
+        severity: impact.severity,
+        onsetTiming: 'later' as const
+      };
+    });
+    
+    const maxSeverity = Math.max(...impacts.map(i => i.severity));
+    
+    return {
+      ...log,
+      delayedImpact: {
+        assessedAt: new Date().toISOString(),
+        hoursAfter,
+        symptoms,
+        overallImpact: maxSeverity,
+        notes
+      },
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  /**
+   * Update recovery action helpfulness
+   */
+  static updateRecoveryAction(
+    log: ActivityLog, 
+    actionId: string, 
+    helpful: boolean, 
+    notes?: string
+  ): ActivityLog {
+    const updatedActions = log.recoveryActions.map(action => 
+      action.actionId === actionId 
+        ? { ...action, helpful, notes }
+        : action
+    );
+    
+    return {
+      ...log,
+      recoveryActions: updatedActions,
+      updatedAt: new Date().toISOString()
+    };
   }
 }
