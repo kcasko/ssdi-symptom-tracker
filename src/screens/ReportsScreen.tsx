@@ -26,7 +26,7 @@ import { formatDateShort } from '../utils/dates';
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
 export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, activityLogs, limitations, reportDrafts, addReportDraft } =
+  const { activeProfile, dailyLogs, activityLogs, limitations, reportDrafts, updateReportDraft } =
     useAppState();
 
   const now = new Date();
