@@ -325,13 +325,10 @@ export class LogService {
       errors.push('Invalid duration');
     }
 
-    // TODO: Re-enable once impact tracking is implemented
-    /*
     // Check if stopped early has impacts
-    if (log.stoppedEarly && log.impacts.length === 0) {
+    if (log.stoppedEarly && log.immediateImpact.symptoms.length === 0) {
       warnings.push('Activity stopped early but no impacts recorded');
     }
-    */
 
     // Check if high impact has recovery
     const worstImpact = getWorstImpact(log);
