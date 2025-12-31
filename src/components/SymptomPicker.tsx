@@ -15,7 +15,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { symptoms, SymptomCategory } from '../data/symptoms';
+import { SYMPTOMS as symptoms, SymptomCategory } from '../data/symptoms';
 
 interface SymptomPickerProps {
   selectedSymptomIds: string[];

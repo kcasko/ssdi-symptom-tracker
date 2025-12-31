@@ -15,7 +15,7 @@ import {
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { activities, ActivityCategory } from '../data/activities';
+import { ACTIVITIES as activities, ActivityCategory } from '../data/activities';
 
 interface ActivityPickerProps {
   selectedActivityId: string | null;
