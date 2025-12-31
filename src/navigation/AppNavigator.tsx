@@ -18,6 +18,8 @@ import {
   ReportsScreen,
   ReportEditorScreen,
   SettingsScreen,
+  TrendsScreen,
+  VoiceLogScreen,
 } from '../screens';
 
 // Type definitions
@@ -33,6 +35,8 @@ export type RootStackParamList = {
   Reports: undefined;
   ReportEditor: { reportId: string };
   Settings: undefined;
+  Trends: undefined;
+  VoiceLog: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -56,6 +60,8 @@ export function AppNavigator() {
         <Stack.Screen name="MedsAppointments" component={MedsAppointmentsScreen} />
         <Stack.Screen name="Reports" component={ReportsScreen} />
         <Stack.Screen name="ReportEditor" component={ReportEditorScreen} />
+        <Stack.Screen name="Trends" component={TrendsScreen} />
+        <Stack.Screen name="VoiceLog" component={VoiceLogScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>

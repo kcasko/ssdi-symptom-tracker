@@ -11,6 +11,8 @@ export { ActivityLogScreen } from './ActivityLogScreen';
 export { ReportsScreen } from './ReportsScreen';
 export { ReportEditorScreen } from './ReportEditorScreen';
 export { SettingsScreen } from './SettingsScreen';
+export { TrendsScreen } from './TrendsScreen';
+export { VoiceLogScreen } from './VoiceLogScreen';
 
 // Placeholder exports for screens not yet implemented
 export { LimitationsScreen } from './LimitationsScreen';

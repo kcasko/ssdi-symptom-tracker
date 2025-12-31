@@ -135,6 +135,20 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           />
 
           <BigButton
+            label="🎤 Voice Log Symptoms"
+            onPress={() => navigation.navigate('VoiceLog')}
+            variant="secondary"
+            fullWidth
+          />
+
+          <BigButton
+            label="View Symptom Trends"
+            onPress={() => navigation.navigate('Trends')}
+            variant="secondary"
+            fullWidth
+          />
+
+          <BigButton
             label="Update Limitations"
             onPress={() => navigation.navigate('Limitations')}
             variant="secondary"

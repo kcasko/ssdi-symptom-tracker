@@ -182,6 +182,13 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       <View style={styles.footer}>
         <BigButton
+          label="🎤 Voice Log Symptoms"
+          onPress={() => navigation.navigate('VoiceLog')}
+          variant="secondary"
+          fullWidth
+          style={{ marginBottom: spacing.sm }}
+        />
+        <BigButton
           label={existingLog ? 'Update Log' : 'Save Log'}
           onPress={handleSave}
           variant="primary"
