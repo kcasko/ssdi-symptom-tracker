@@ -44,11 +44,11 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
   useEffect(() => {
     if (existingLog) {
-      const ids = existingLog.symptoms.map((s) => s.symptomId);
+      const ids = existingLog.symptoms.map((s: { symptomId: string }) => s.symptomId);
       setSelectedSymptomIds(ids);
       
       const entries: Record<string, SymptomEntry> = {};
-      existingLog.symptoms.forEach((s) => {
+      existingLog.symptoms.forEach((s: { symptomId: string; severity: number; notes?: string }) => {
         entries[s.symptomId] = {
           symptomId: s.symptomId,
           severity: s.severity,

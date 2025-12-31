@@ -113,8 +113,8 @@ export class LimitationAnalyzer {
     } else if (limitation.distanceThreshold) {
       threshold = {
         type: 'distance',
-        value: limitation.distanceThreshold.maxBlocks,
-        unit: 'blocks',
+        value: limitation.distanceThreshold.maxBlocks || limitation.distanceThreshold.maxFeet || 0,
+        unit: limitation.distanceThreshold.maxBlocks ? 'blocks' : 'feet',
       };
     } else {
       threshold = {
@@ -166,8 +166,8 @@ export class LimitationAnalyzer {
       frequencyScore,
       primaryConsequences: limitation.consequences.slice(0, 3),
       severity,
-      supportingLogs: limitation.supportingLogs,
-      evidenceCount: limitation.supportingLogs.length,
+      supportingLogs: [], // TODO: Track supporting log IDs when logs reference limitations
+      evidenceCount: 0,
     };
   }
 

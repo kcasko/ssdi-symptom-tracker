@@ -29,17 +29,17 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   const getVariantColor = () => {
     switch (variant) {
       case 'success':
-        return colors.success;
+        return colors.successMain;
       case 'warning':
-        return colors.warning;
+        return colors.warningMain;
       case 'error':
-        return colors.error;
+        return colors.errorMain;
       default:
-        return colors.primary;
+        return colors.primaryMain;
     }
   };
 
-  const Container = onPress ? TouchableOpacity : View;
+  const Container = (onPress ? TouchableOpacity : View) as any;
 
   return (
     <Container

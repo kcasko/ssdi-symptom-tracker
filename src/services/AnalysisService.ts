@@ -9,7 +9,7 @@ import { Limitation } from '../domain/models/Limitation';
 import { SymptomEngine, SymptomSummary, DailyOverview } from '../engine/SymptomEngine';
 import { ActivityImpactEngine, ActivityImpactAnalysis, OverallFunctionalCapacity } from '../engine/ActivityImpactEngine';
 import { LimitationAnalyzer, LimitationSummary, RFCAssessment } from '../engine/LimitationAnalyzer';
-import { PatternDetector, SymptomPattern, ActivityPattern, TimeOfDayPattern, TriggerPattern, RecoveryPattern } from '../engine/PatternDetector';
+import { PatternDetector, SymptomPattern, ActivityPattern, TimePattern, TriggerPattern, RecoveryPattern } from '../engine/PatternDetector';
 
 export interface ComprehensiveAnalysis {
   // Date range
@@ -41,7 +41,7 @@ export interface ComprehensiveAnalysis {
   
   // Pattern detection
   patterns: {
-    timeOfDay: TimeOfDayPattern[];
+    timeOfDay: TimePattern[];
     triggers: TriggerPattern[];
     recovery: RecoveryPattern[];
   };
@@ -77,7 +77,7 @@ export class AnalysisService {
 
     // Symptom analysis
     const symptomReport = SymptomEngine.generateSymptomReport(filteredDailyLogs, dateRange);
-    const symptomPatterns = PatternDetector.detectSymptomPatterns(filteredDailyLogs);
+    const symptomPatterns = PatternDetector.analyzeSymptomPatterns(filteredDailyLogs);
 
     // Activity analysis
     const activityIds = Array.from(
@@ -88,7 +88,7 @@ export class AnalysisService {
       .map(id => ActivityImpactEngine.analyzeActivity(id, filteredActivityLogs))
       .filter((a): a is ActivityImpactAnalysis => a !== null);
 
-    const activityPatterns = PatternDetector.detectActivityImpactPatterns(filteredActivityLogs);
+    const activityPatterns = PatternDetector.analyzeActivityPatterns(filteredActivityLogs);
     const functionalCapacity = ActivityImpactEngine.analyzeFunctionalCapacity(
       filteredActivityLogs,
       filteredDailyLogs,
@@ -108,9 +108,9 @@ export class AnalysisService {
     );
 
     // Pattern detection
-    const timeOfDayPatterns = PatternDetector.analyzeTimeOfDayPatterns(filteredDailyLogs);
-    const triggers = PatternDetector.identifyTriggers(filteredDailyLogs, filteredActivityLogs);
-    const recovery = PatternDetector.analyzeRecoveryPatterns(filteredDailyLogs);
+    const timeOfDayPatterns = PatternDetector.analyzeTimePatterns(filteredDailyLogs);
+    const triggers = PatternDetector.analyzeTriggerPatterns(filteredDailyLogs);
+    const recovery = PatternDetector.analyzeRecoveryPatterns(filteredActivityLogs);
 
     // Overall assessment
     const totalDays = filteredDailyLogs.length;

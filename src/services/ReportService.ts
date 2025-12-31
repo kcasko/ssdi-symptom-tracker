@@ -3,20 +3,81 @@
  * Coordinates report generation, drafts, and exports
  */
 
-import { ReportDraft, createReportDraft } from '../domain/models/ReportDraft';
+import { 
+  ReportDraft, 
+  ReportSection,
+  ReportType,
+  TextBlock,
+  BlockType,
+  createReportDraft, 
+  SourceReference 
+} from '../domain/models/ReportDraft';
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
 import { AnalysisService, ComprehensiveAnalysis } from './AnalysisService';
 import { NarrativeService, FullNarrative } from './NarrativeService';
 import { PatternDetector } from '../engine/PatternDetector';
-import { getReportTemplateById } from '../data/reportTemplates';
+import { getReportTemplate } from '../data/reportTemplates';
+import { generateId } from '../utils/ids';
 
 export interface ReportGenerationOptions {
   profileId: string;
   dateRange: { start: string; end: string };
   templateId: string;
   includeSections: string[];
+}
+
+/**
+ * Parse narrative text into TextBlock array
+ * Converts string content into structured blocks for editing
+ */
+function parseNarrativeToBlocks(content: string, sourceLogId?: string): TextBlock[] {
+  if (!content || content.trim().length === 0) {
+    return [];
+  }
+
+  const blocks: TextBlock[] = [];
+  const lines = content.split('\n');
+  let order = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    
+    // Skip empty lines
+    if (trimmed.length === 0) continue;
+
+    let blockType: BlockType = 'paragraph';
+    let blockContent = trimmed;
+
+    // Detect block types based on patterns
+    if (trimmed.startsWith('# ')) {
+      blockType = 'heading';
+      blockContent = trimmed.substring(2);
+    } else if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+      blockType = 'bullet_point';
+      blockContent = trimmed.substring(2);
+    } else if (trimmed.startsWith('> ')) {
+      blockType = 'quote';
+      blockContent = trimmed.substring(2);
+    } else if (/^\d+%/.test(trimmed) || /\d+\s+(days?|times?|hours?)/.test(trimmed)) {
+      blockType = 'statistic';
+    } else if (/^\d{1,2}\/\d{1,2}\/\d{2,4}/.test(trimmed)) {
+      blockType = 'date_entry';
+    }
+
+    blocks.push({
+      id: generateId(),
+      type: blockType,
+      content: blockContent,
+      originalContent: blockContent,
+      edited: false,
+      order: order++,
+      sourceLogId,
+    });
+  }
+
+  return blocks;
 }
 
 export interface ReportExportOptions {
@@ -44,10 +105,10 @@ export class ReportService {
     );
 
     // Detect patterns
-    const symptomPatterns = PatternDetector.detectSymptomPatterns(dailyLogs);
-    const activityPatterns = PatternDetector.detectActivityImpactPatterns(activityLogs);
-    const triggers = PatternDetector.identifyTriggers(dailyLogs, activityLogs);
-    const recovery = PatternDetector.analyzeRecoveryPatterns(dailyLogs);
+    const symptomPatterns = PatternDetector.analyzeSymptomPatterns(dailyLogs);
+    const activityPatterns = PatternDetector.analyzeActivityPatterns(activityLogs);
+    const triggers = PatternDetector.analyzeTriggerPatterns(dailyLogs);
+    const recovery = PatternDetector.analyzeRecoveryPatterns(activityLogs);
 
     // Generate narrative
     const narrative = await NarrativeService.generateFullNarrative(
@@ -62,77 +123,79 @@ export class ReportService {
     );
 
     // Get template
-    const template = getReportTemplateById(options.templateId);
+    const template = getReportTemplate(options.templateId as ReportType);
     if (!template) {
       throw new Error(`Template not found: ${options.templateId}`);
     }
 
     // Create sections based on template
-    const sections = template.sections.map(sectionTemplate => {
+    const sections: ReportSection[] = template.sections.map((sectionTemplate, index) => {
       let content = '';
 
       // Map template sections to narrative sections
-      switch (sectionTemplate.id) {
-        case 'overview':
+      switch (sectionTemplate.type) {
+        case 'summary':
           content = narrative.sections.overview;
           break;
-        case 'daily_summary':
+        case 'daily_symptoms':
           content = narrative.sections.symptoms;
           break;
-        case 'symptom_summary':
-          content = narrative.sections.symptoms;
-          break;
-        case 'activity_summary':
+        case 'activity_impact':
           content = narrative.sections.activities;
           break;
-        case 'limitation_summary':
+        case 'functional_limitations':
           content = narrative.sections.limitations;
           break;
-        case 'pattern_analysis':
+        case 'patterns':
           content = narrative.sections.patterns;
           break;
-        case 'rfc_assessment':
+        case 'narrative':
           content = narrative.sections.rfc;
           break;
         default:
-          content = sectionTemplate.placeholder || '';
+          content = '';
       }
 
+      // Parse narrative content into blocks
+      const blocks = parseNarrativeToBlocks(content);
+
       return {
-        id: sectionTemplate.id,
+        id: generateId(),
+        sectionType: sectionTemplate.type,
         title: sectionTemplate.title,
-        content,
-        isEditable: true,
-        lastModified: new Date().toISOString(),
+        order: index,
+        blocks,
+        included: sectionTemplate.required,
+        userEdited: false,
+        sourceIds: [],
       };
     });
 
-    // Filter to included sections
-    const filteredSections = sections.filter(s =>
-      options.includeSections.length === 0 || options.includeSections.includes(s.id)
-    );
+    // Filter to included sections (if specified)
+    const filteredSections = options.includeSections.length === 0 
+      ? sections 
+      : sections.filter(s => options.includeSections.includes(s.sectionType));
 
     // Collect source references
-    const sourceReferences = {
-      dailyLogIds: dailyLogs.map(l => l.id),
-      activityLogIds: activityLogs.map(l => l.id),
-      limitationIds: limitations.map(l => l.id),
-    };
+    const sourceReferences: SourceReference[] = [
+      ...dailyLogs.map(l => ({ type: 'daily_log' as const, id: l.id, date: l.logDate })),
+      ...activityLogs.map(l => ({ type: 'activity_log' as const, id: l.id, date: l.activityDate })),
+      ...limitations.map(l => ({ type: 'limitation' as const, id: l.id })),
+    ];
 
     // Create draft
+    const draftId = generateId();
     const draft = createReportDraft(
+      draftId,
       options.profileId,
-      options.dateRange,
-      template.name,
-      filteredSections
+      template.title,
+      template.type,
+      options.dateRange
     );
 
+    // Add sections and source references
+    draft.sections = filteredSections;
     draft.sourceReferences = sourceReferences;
-    draft.metadata = {
-      analysisGenerated: new Date().toISOString(),
-      totalWordCount: narrative.metadata.totalWordCount,
-      ...analysis.overall,
-    };
 
     return draft;
   }
@@ -156,10 +219,10 @@ export class ReportService {
     );
 
     // Generate fresh narrative
-    const symptomPatterns = PatternDetector.detectSymptomPatterns(dailyLogs);
-    const activityPatterns = PatternDetector.detectActivityImpactPatterns(activityLogs);
-    const triggers = PatternDetector.identifyTriggers(dailyLogs, activityLogs);
-    const recovery = PatternDetector.analyzeRecoveryPatterns(dailyLogs);
+    const symptomPatterns = PatternDetector.analyzeSymptomPatterns(dailyLogs);
+    const activityPatterns = PatternDetector.analyzeActivityPatterns(activityLogs);
+    const triggers = PatternDetector.analyzeTriggerPatterns(dailyLogs);
+    const recovery = PatternDetector.analyzeRecoveryPatterns(activityLogs);
 
     const narrative = await NarrativeService.generateFullNarrative(
       dailyLogs,
@@ -178,38 +241,40 @@ export class ReportService {
       throw new Error(`Section not found: ${sectionId}`);
     }
 
-    // Map section ID to narrative content
+    // Map section type to narrative content
     let newContent = '';
-    switch (sectionId) {
-      case 'overview':
+    switch (section.sectionType) {
+      case 'summary':
         newContent = narrative.sections.overview;
         break;
-      case 'daily_summary':
-      case 'symptom_summary':
+      case 'daily_symptoms':
         newContent = narrative.sections.symptoms;
         break;
-      case 'activity_summary':
+      case 'activity_impact':
         newContent = narrative.sections.activities;
         break;
-      case 'limitation_summary':
+      case 'functional_limitations':
         newContent = narrative.sections.limitations;
         break;
-      case 'pattern_analysis':
+      case 'patterns':
         newContent = narrative.sections.patterns;
         break;
-      case 'rfc_assessment':
+      case 'narrative':
         newContent = narrative.sections.rfc;
         break;
       default:
-        throw new Error(`Unknown section: ${sectionId}`);
+        throw new Error(`Unknown section type: ${section.sectionType}`);
     }
 
-    // Update section
-    section.content = newContent;
-    section.lastModified = new Date().toISOString();
+    // Parse new content into blocks
+    const newBlocks = parseNarrativeToBlocks(newContent);
 
+    // Update section with new blocks
+    section.blocks = newBlocks;
+    section.userEdited = false;
+    
     // Update draft metadata
-    draft.lastModified = new Date().toISOString();
+    draft.updatedAt = new Date().toISOString();
 
     return draft;
   }
@@ -227,13 +292,17 @@ export class ReportService {
       throw new Error(`Section not found: ${sectionId}`);
     }
 
-    if (!section.isEditable) {
-      throw new Error(`Section is not editable: ${sectionId}`);
-    }
+    // Parse manual edits into blocks
+    const newBlocks = parseNarrativeToBlocks(newContent);
+    
+    // Mark all blocks as edited
+    newBlocks.forEach(block => {
+      block.edited = true;
+    });
 
-    section.content = newContent;
-    section.lastModified = new Date().toISOString();
-    draft.lastModified = new Date().toISOString();
+    section.blocks = newBlocks;
+    section.userEdited = true;
+    draft.updatedAt = new Date().toISOString();
 
     return draft;
   }
@@ -260,14 +329,7 @@ export class ReportService {
       
       lines.push(`Reporting Period: ${startDate} to ${endDate}`);
       lines.push(`Generated: ${new Date(draft.createdAt).toLocaleDateString()}`);
-      lines.push(`Last Modified: ${new Date(draft.lastModified).toLocaleDateString()}`);
-      
-      if (draft.metadata) {
-        lines.push('');
-        lines.push(`Total Days: ${draft.metadata.totalDays || 'N/A'}`);
-        lines.push(`Total Symptoms: ${draft.metadata.totalSymptoms || 'N/A'}`);
-        lines.push(`Work Capacity: ${draft.metadata.workCapacity || 'N/A'}`);
-      }
+      lines.push(`Last Modified: ${new Date(draft.updatedAt).toLocaleDateString()}`);
       
       lines.push('');
       lines.push('───────────────────────────────────────────────────────────────');
@@ -278,7 +340,20 @@ export class ReportService {
     draft.sections.forEach(section => {
       lines.push(section.title.toUpperCase());
       lines.push('');
-      lines.push(section.content);
+      
+      // Concatenate blocks into text
+      section.blocks.forEach(block => {
+        if (block.type === 'heading') {
+          lines.push(`# ${block.content}`);
+        } else if (block.type === 'bullet_point') {
+          lines.push(`• ${block.content}`);
+        } else if (block.type === 'quote') {
+          lines.push(`> ${block.content}`);
+        } else {
+          lines.push(block.content);
+        }
+      });
+      
       lines.push('');
       lines.push('───────────────────────────────────────────────────────────────');
       lines.push('');
@@ -288,16 +363,20 @@ export class ReportService {
     if (options.includeSourceReferences && draft.sourceReferences) {
       lines.push('SOURCE DATA REFERENCES');
       lines.push('');
-      lines.push(`Daily Logs: ${draft.sourceReferences.dailyLogIds.length} entries`);
-      lines.push(`Activity Logs: ${draft.sourceReferences.activityLogIds.length} entries`);
-      lines.push(`Limitations: ${draft.sourceReferences.limitationIds.length} entries`);
+      const dailyLogCount = draft.sourceReferences.filter(r => r.type === 'daily_log').length;
+      const activityLogCount = draft.sourceReferences.filter(r => r.type === 'activity_log').length;
+      const limitationCount = draft.sourceReferences.filter(r => r.type === 'limitation').length;
+      lines.push(`Daily Logs: ${dailyLogCount} entries`);
+      lines.push(`Activity Logs: ${activityLogCount} entries`);
+      lines.push(`Limitations: ${limitationCount} entries`);
       lines.push('');
       lines.push('───────────────────────────────────────────────────────────────');
     }
 
     // Footer
     const totalWords = draft.sections
-      .map(s => s.content.split(/\s+/).filter(w => w.length > 0).length)
+      .flatMap(s => s.blocks)
+      .map(b => b.content.split(/\s+/).filter(w => w.length > 0).length)
       .reduce((sum, count) => sum + count, 0);
 
     lines.push(`Total Word Count: ${totalWords}`);
@@ -319,20 +398,22 @@ export class ReportService {
       hasLimitations: boolean;
     };
   } {
+    // Calculate word count from blocks
     const totalWords = draft.sections
-      .map(s => s.content.split(/\s+/).filter(w => w.length > 0).length)
+      .flatMap(s => s.blocks)
+      .map(b => b.content.split(/\s+/).filter(w => w.length > 0).length)
       .reduce((sum, count) => sum + count, 0);
 
     const coverage = {
-      hasDailyLogs: (draft.sourceReferences?.dailyLogIds.length || 0) > 0,
-      hasActivityLogs: (draft.sourceReferences?.activityLogIds.length || 0) > 0,
-      hasLimitations: (draft.sourceReferences?.limitationIds.length || 0) > 0,
+      hasDailyLogs: (draft.sourceReferences?.filter(r => r.type === 'daily_log').length || 0) > 0,
+      hasActivityLogs: (draft.sourceReferences?.filter(r => r.type === 'activity_log').length || 0) > 0,
+      hasLimitations: (draft.sourceReferences?.filter(r => r.type === 'limitation').length || 0) > 0,
     };
 
     return {
       totalSections: draft.sections.length,
       totalWords,
-      lastModified: draft.lastModified,
+      lastModified: draft.updatedAt,
       coverage,
     };
   }
@@ -349,14 +430,16 @@ export class ReportService {
     const errors: string[] = [];
 
     // Check for empty sections
-    const emptySections = draft.sections.filter(s => !s.content || s.content.trim().length === 0);
+    const emptySections = draft.sections.filter(s => s.blocks.length === 0);
     if (emptySections.length > 0) {
       warnings.push(`${emptySections.length} empty section(s): ${emptySections.map(s => s.title).join(', ')}`);
     }
 
     // Check for very short sections
     const shortSections = draft.sections.filter(s => {
-      const wordCount = s.content.split(/\s+/).filter(w => w.length > 0).length;
+      const wordCount = s.blocks
+        .map(b => b.content.split(/\s+/).filter(w => w.length > 0).length)
+        .reduce((sum, count) => sum + count, 0);
       return wordCount > 0 && wordCount < 50;
     });
     
@@ -365,7 +448,13 @@ export class ReportService {
     }
 
     // Check for source data
-    if (!draft.sourceReferences || draft.sourceReferences.dailyLogIds.length === 0) {
+    if (!draft.sourceReferences || draft.sourceReferences.length === 0) {
+      errors.push('No source data referenced - report lacks evidence');
+    }
+
+    // Check for daily log data
+    const hasDailyLogs = draft.sourceReferences?.some(r => r.type === 'daily_log');
+    if (!hasDailyLogs) {
       errors.push('No daily logs referenced - report lacks symptom evidence');
     }
 

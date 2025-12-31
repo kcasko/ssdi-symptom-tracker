@@ -4,11 +4,12 @@
  */
 
 import { Profile, createProfile } from '../domain/models/Profile';
-import { DailyLog, createDailyLog, addSymptom } from '../domain/models/DailyLog';
-import { ActivityLog, createActivityLog, addImpact, addRecovery } from '../domain/models/ActivityLog';
+import { DailyLog, createDailyLog } from '../domain/models/DailyLog';
+import { ActivityLog, createActivityLog } from '../domain/models/ActivityLog';
 import { Limitation, createLimitation } from '../domain/models/Limitation';
 import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
+import { generateId } from './ids';
 
 export interface SeedData {
   profile: Profile;
@@ -22,7 +23,7 @@ export interface SeedData {
  */
 export function generateSeedData(): SeedData {
   // Create profile
-  const profile = createProfile('Test User');
+  const profile = createProfile('Test User', generateId());
 
   // Generate 30 days of daily logs
   const dailyLogs: DailyLog[] = [];
@@ -32,7 +33,7 @@ export function generateSeedData(): SeedData {
     const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
     const dateString = date.toISOString().split('T')[0];
 
-    let log = createDailyLog(profile.id, dateString);
+    const log = createDailyLog(generateId(), profile.id, dateString, 'morning');
 
     // Add 2-4 random symptoms per day
     const symptomCount = Math.floor(Math.random() * 3) + 2;
@@ -44,9 +45,8 @@ export function generateSeedData(): SeedData {
       
       if (symptom) {
         const severity = Math.floor(Math.random() * 5) + 4; // 4-8 range
-        log = addSymptom(log, {
+        log.symptoms.push({
           symptomId: symptom.id,
-          symptomName: symptom.name,
           severity,
           notes: i % 5 === 0 ? 'Worse after activity' : undefined,
         });
@@ -76,24 +76,34 @@ export function generateSeedData(): SeedData {
     const activity = getActivityById(activityId);
 
     if (activity) {
-      let log = createActivityLog(
+      const log = createActivityLog(
+        generateId(),
         profile.id,
         activity.id,
         activity.name,
-        dateString,
-        Math.floor(Math.random() * 60) + 15 // 15-75 minutes
+        dateString
       );
+      
+      // Set duration
+      log.duration = Math.floor(Math.random() * 60) + 15; // 15-75 minutes
 
-      // Add impact
-      log = addImpact(log, {
+      // Add impact to immediateImpact
+      const impactSeverity = Math.floor(Math.random() * 4) + 5; // 5-8
+      log.immediateImpact.symptoms.push({
         symptomId: 'chronic_pain',
-        symptomName: 'Pain',
-        severity: Math.floor(Math.random() * 4) + 5, // 5-8
+        severity: impactSeverity,
+        onsetTiming: 'during',
       });
+      log.immediateImpact.overallImpact = impactSeverity;
 
       // Add recovery for higher impact activities
-      if (log.impacts.length > 0 && log.impacts[0].severity >= 7) {
-        log = addRecovery(log, 'Rest', 30);
+      if (impactSeverity >= 7) {
+        log.recoveryActions.push({
+          actionId: 'rest',
+          actionName: 'Rest',
+          helpful: true,
+        });
+        log.recoveryDuration = 30;
         log.stoppedEarly = Math.random() > 0.5;
       }
 
@@ -109,49 +119,39 @@ export function generateSeedData(): SeedData {
   const limitations: Limitation[] = [];
 
   // Sitting limitation
-  limitations.push(
-    createLimitation(profile.id, 'sitting', 'usually', {
-      timeThreshold: { durationMinutes: 30 },
-      consequences: ['Increased pain', 'Need to change position'],
-      supportingLogs: dailyLogs.slice(0, 10).map(l => l.id),
-    })
-  );
+  const sitting = createLimitation(generateId(), profile.id, 'sitting');
+  sitting.frequency = 'usually';
+  sitting.timeThreshold = { durationMinutes: 30, confidence: 'moderate' };
+  sitting.consequences = ['Increased pain', 'Need to change position'];
+  limitations.push(sitting);
 
   // Standing limitation
-  limitations.push(
-    createLimitation(profile.id, 'standing', 'often', {
-      timeThreshold: { durationMinutes: 20 },
-      consequences: ['Fatigue', 'Increased pain'],
-      supportingLogs: dailyLogs.slice(0, 8).map(l => l.id),
-    })
-  );
+  const standing = createLimitation(generateId(), profile.id, 'standing');
+  standing.frequency = 'often';
+  standing.timeThreshold = { durationMinutes: 20, confidence: 'moderate' };
+  standing.consequences = ['Fatigue', 'Increased pain'];
+  limitations.push(standing);
 
   // Walking limitation
-  limitations.push(
-    createLimitation(profile.id, 'walking', 'often', {
-      distanceThreshold: { maxBlocks: 2 },
-      consequences: ['Severe fatigue', 'Pain flare'],
-      supportingLogs: activityLogs.slice(0, 5).map(l => l.id),
-    })
-  );
+  const walking = createLimitation(generateId(), profile.id, 'walking');
+  walking.frequency = 'often';
+  walking.distanceThreshold = { maxBlocks: 2, withRests: true };
+  walking.consequences = ['Severe fatigue', 'Pain flare'];
+  limitations.push(walking);
 
   // Lifting limitation
-  limitations.push(
-    createLimitation(profile.id, 'lifting', 'usually', {
-      weightThreshold: { maxPounds: 10, frequency: 'occasionally' },
-      consequences: ['Immediate pain increase', 'Extended recovery needed'],
-      supportingLogs: [],
-    })
-  );
+  const lifting = createLimitation(generateId(), profile.id, 'lifting');
+  lifting.frequency = 'usually';
+  lifting.weightThreshold = { maxPounds: 10, frequency: 'occasionally' };
+  lifting.consequences = ['Immediate pain increase', 'Extended recovery needed'];
+  limitations.push(lifting);
 
   // Concentration limitation
-  limitations.push(
-    createLimitation(profile.id, 'concentration', 'often', {
-      timeThreshold: { durationMinutes: 60 },
-      consequences: ['Brain fog', 'Unable to focus'],
-      supportingLogs: dailyLogs.slice(0, 12).map(l => l.id),
-    })
-  );
+  const concentration = createLimitation(generateId(), profile.id, 'concentration');
+  concentration.frequency = 'often';
+  concentration.timeThreshold = { durationMinutes: 60, confidence: 'high' };
+  concentration.consequences = ['Brain fog', 'Unable to focus'];
+  limitations.push(concentration);
 
   return {
     profile,
@@ -165,7 +165,7 @@ export function generateSeedData(): SeedData {
  * Generate minimal seed data (1 profile, 7 days)
  */
 export function generateMinimalSeedData(): SeedData {
-  const profile = createProfile('Demo User');
+  const profile = createProfile('Demo User', generateId());
   const dailyLogs: DailyLog[] = [];
   const now = new Date();
 
@@ -173,13 +173,12 @@ export function generateMinimalSeedData(): SeedData {
     const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
     const dateString = date.toISOString().split('T')[0];
 
-    let log = createDailyLog(profile.id, dateString);
+    const log = createDailyLog(generateId(), profile.id, dateString, 'morning');
 
     const symptom = getSymptomById('chronic_pain');
     if (symptom) {
-      log = addSymptom(log, {
+      log.symptoms.push({
         symptomId: symptom.id,
-        symptomName: symptom.name,
         severity: 6,
       });
     }

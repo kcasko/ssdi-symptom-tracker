@@ -74,7 +74,7 @@ export const SEVERITY_DESCRIPTORS = {
   moderate: ['moderate', 'significant', 'noticeable', 'interfering', 'limiting'],
   severe: ['severe', 'marked', 'substantial', 'considerable', 'major'],
   extreme: ['extreme', 'profound', 'debilitating', 'incapacitating', 'preventing'],
-} as const;
+};
 
 // Time-related terms
 export const TIME_TERMS = {

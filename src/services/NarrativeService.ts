@@ -8,6 +8,7 @@ import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
 import { SymptomPattern, ActivityPattern, TriggerPattern, RecoveryPattern } from '../engine/PatternDetector';
 import { SSDINarrativeBuilder } from '../engine/SSDINarrativeBuilder';
+import { getSymptomById } from '../data/symptoms';
 import { SymptomEngine } from '../engine/SymptomEngine';
 import { LimitationAnalyzer } from '../engine/LimitationAnalyzer';
 
@@ -87,12 +88,14 @@ export class NarrativeService {
       const sortedSymptoms = [...dailyLog.symptoms].sort((a, b) => b.severity - a.severity);
       
       sortedSymptoms.forEach(symptom => {
+        const symptomData = getSymptomById(symptom.symptomId);
+        const symptomName = symptomData?.name || symptom.symptomId;
         const severity = symptom.severity >= 7 ? 'severe' 
           : symptom.severity >= 5 ? 'moderate to severe'
           : symptom.severity >= 3 ? 'moderate'
           : 'mild';
         
-        lines.push(`- ${symptom.symptomName}: ${severity} (${symptom.severity}/10)`);
+        lines.push(`- ${symptomName}: ${severity} (${symptom.severity}/10)`);
         
         if (symptom.notes) {
           lines.push(`  Context: ${symptom.notes}`);
@@ -132,6 +135,9 @@ export class NarrativeService {
     lines.push(`Duration: ${activityLog.duration} minutes`);
     lines.push('');
 
+    // TODO: Implement impact narrative once impact tracking is implemented
+    // ActivityLog uses immediateImpact/delayedImpact, not impacts array
+    /*
     // Impact
     if (activityLog.impacts.length > 0) {
       const maxImpact = Math.max(...activityLog.impacts.map(i => i.severity));
@@ -150,6 +156,7 @@ export class NarrativeService {
 
       lines.push('');
     }
+    */
 
     // Stopped early
     if (activityLog.stoppedEarly) {
@@ -157,6 +164,9 @@ export class NarrativeService {
       lines.push('');
     }
 
+    // TODO: Implement recovery narrative once recovery tracking is implemented
+    // ActivityLog uses recoveryActions array, not recovery
+    /*
     // Recovery
     if (activityLog.recovery) {
       const totalRecovery = activityLog.recovery.reduce((sum, r) => sum + r.durationMinutes, 0);
@@ -169,6 +179,7 @@ export class NarrativeService {
 
       lines.push('');
     }
+    */
 
     // Notes
     if (activityLog.notes) {
@@ -319,8 +330,8 @@ export class NarrativeService {
     if (recovery.length > 0) {
       const recoveryActions = recovery.map(r => ({
         name: r.actionName,
-        effectiveness: r.effectivenessRate,
-        duration: r.averageDuration,
+        effectiveness: r.effectiveness,
+        duration: r.averageRecoveryDuration,
       }));
 
       const recoveryNarrative = SSDINarrativeBuilder.buildRecoveryNarrative(recoveryActions);

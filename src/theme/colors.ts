@@ -111,6 +111,7 @@ export const colors = {
   
   // Common color shorthands
   white: '#ffffff',
+  black: '#000000',
   primaryMain: '#0066e6',        // primary[500] - main primary color
   primary600: '#0052b3',         // primary[600] - darker primary
   primaryLight: '#e6f0ff',       // primary[50]

@@ -76,7 +76,7 @@ export class Storage {
    */
   static async getAllKeys(): Promise<StorageResult<string[]>> {
     try {
-      const keys = await AsyncStorage.getAllKeys();
+      const keys = [...await AsyncStorage.getAllKeys()];
       return { success: true, data: keys };
     } catch (error) {
       console.error('Storage.getAllKeys error:', error);
@@ -143,7 +143,7 @@ export class Storage {
 export class ProfileStorage {
   static async getActiveProfileId(): Promise<string | null> {
     const result = await Storage.get(STORAGE_KEYS.ACTIVE_PROFILE, null);
-    return result.data;
+    return result.data || null;
   }
 
   static async setActiveProfileId(profileId: string | null): Promise<boolean> {

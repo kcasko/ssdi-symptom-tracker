@@ -98,7 +98,7 @@ export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigat
           </View>
         )}
 
-        {draft.sections.map((section) => (
+        {draft.sections.map((section: any) => (
           <View key={section.id} style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>{section.title}</Text>
