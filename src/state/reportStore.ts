@@ -58,6 +58,9 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
   // Actions
   setCurrentProfile: (profileId: string | null) => {
+    const current = get().currentProfileId;
+    if (current === profileId) return; // Prevent redundant updates
+    
     set({ currentProfileId: profileId });
     if (profileId) {
       get().loadDrafts(profileId);
@@ -67,7 +70,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
   },
 
   loadDrafts: async (profileId: string) => {
-    set({ loading: true, error: null, currentProfileId: profileId });
+    set({ loading: true, error: null });
     
     try {
       const drafts = await LogStorage.getReportDrafts(profileId);

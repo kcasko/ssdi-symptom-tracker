@@ -78,6 +78,9 @@ export const useLogStore = create<LogState>((set, get) => ({
 
   // Actions
   setCurrentProfile: (profileId: string | null) => {
+    const current = get().currentProfileId;
+    if (current === profileId) return; // Prevent redundant updates
+    
     set({ currentProfileId: profileId });
     if (profileId) {
       get().loadData(profileId);
@@ -87,7 +90,7 @@ export const useLogStore = create<LogState>((set, get) => ({
   },
 
   loadData: async (profileId: string) => {
-    set({ loading: true, error: null, currentProfileId: profileId });
+    set({ loading: true, error: null });
     
     try {
       const [dailyLogs, activityLogs, limitations, medications, appointments] = await Promise.all([

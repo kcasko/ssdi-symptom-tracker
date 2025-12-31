@@ -62,7 +62,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         setActiveSymptomId(ids[0]);
       }
     }
-  }, [existingLog]);
+  }, [existingLog?.id]); // Only re-run if the log ID changes
 
   const handleToggleSymptom = (symptomId: string) => {
     if (selectedSymptomIds.includes(symptomId)) {
