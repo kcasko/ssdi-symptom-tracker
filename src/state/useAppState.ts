@@ -3,7 +3,7 @@
  * Central hook that coordinates all stores and provides app-wide state
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useProfileStore } from './profileStore';
 import { useLogStore } from './logStore';
 import { useReportStore } from './reportStore';
@@ -63,6 +63,10 @@ export function useAppState(): AppState {
   const logStore = useLogStore();
   const reportStore = useReportStore();
   const settingsStore = useSettingsStore();
+  
+  // Use refs to prevent infinite loops
+  const hasInitialized = useRef(false);
+  const lastSyncedProfileId = useRef<string | null>(null);
 
   // Derived state
   const isLoading = 
@@ -85,13 +89,11 @@ export function useAppState(): AppState {
     settingsStore.error || 
     null;
 
-  // Initialize app on mount - use ref to prevent re-initialization
+  // Initialize app on mount - only once
   useEffect(() => {
-    let isInitialized = false;
-    
     const initialize = async () => {
-      if (isInitialized) return;
-      isInitialized = true;
+      if (hasInitialized.current) return;
+      hasInitialized.current = true;
       
       try {
         // Check if first launch
@@ -128,6 +130,7 @@ export function useAppState(): AppState {
         if (profileStore.activeProfileId) {
           logStore.setCurrentProfile(profileStore.activeProfileId);
           reportStore.setCurrentProfile(profileStore.activeProfileId);
+          lastSyncedProfileId.current = profileStore.activeProfileId;
         }
         
         // Mark first launch complete if needed
@@ -148,6 +151,12 @@ export function useAppState(): AppState {
   useEffect(() => {
     const profileId = profileStore.activeProfileId;
     
+    // Only sync if profile actually changed and we've already initialized
+    if (!hasInitialized.current) return;
+    if (lastSyncedProfileId.current === profileId) return;
+    
+    lastSyncedProfileId.current = profileId;
+    
     if (logStore.currentProfileId !== profileId) {
       logStore.setCurrentProfile(profileId);
     }
@@ -155,7 +164,7 @@ export function useAppState(): AppState {
     if (reportStore.currentProfileId !== profileId) {
       reportStore.setCurrentProfile(profileId);
     }
-  }, [profileStore.activeProfileId, logStore, reportStore]);
+  }, [profileStore.activeProfileId]);
 
   const initializeApp = async (): Promise<void> => {
     try {
