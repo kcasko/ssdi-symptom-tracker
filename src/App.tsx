@@ -14,10 +14,10 @@ import { typography } from './theme/typography';
 
 export default function App() {
   // Initialize app state
-  const { isInitialized, isLoading, hasError, errorMessage } = useAppState();
+  const { isInitialized, hasError, errorMessage } = useAppState();
 
-  // Loading screen while app initializes
-  if (isLoading || !isInitialized) {
+  // Loading screen while app initializes (ONLY during init, not after)
+  if (!isInitialized) {
     return (
       <SafeAreaProvider>
         <View style={styles.loadingContainer}>
