@@ -59,7 +59,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         profileLimitations
       );
 
-      addReportDraft(draft);
+      await updateReportDraft(draft);
       Alert.alert('Success', 'Report generated', [
         { text: 'View', onPress: () => navigation.navigate('ReportEditor', { reportId: draft.id }) },
       ]);

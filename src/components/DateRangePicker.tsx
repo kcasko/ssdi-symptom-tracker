@@ -8,7 +8,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { formatDateShort } from '../utils/dates';
+import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 interface DateRangePickerProps {
   startDate: string;
@@ -96,7 +96,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
       <View style={styles.selectedContainer}>
         <Text style={styles.selectedText}>
-          {formatDateShort(startDate)} - {formatDateShort(endDate)}
+          {formatDate(startDate, DISPLAY_DATE_SHORT)} - {formatDate(endDate, DISPLAY_DATE_SHORT)}
         </Text>
         <Text style={styles.daysText}>({calculateDays()} days)</Text>
       </View>

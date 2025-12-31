@@ -20,7 +20,7 @@ import { typography } from '../theme/typography';
 import { BigButton, SummaryCard } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
-import { formatDateShort } from '../utils/dates';
+import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
