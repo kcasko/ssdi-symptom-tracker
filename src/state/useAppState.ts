@@ -85,9 +85,14 @@ export function useAppState(): AppState {
     settingsStore.error || 
     null;
 
-  // Initialize app on mount
+  // Initialize app on mount - use ref to prevent re-initialization
   useEffect(() => {
+    let isInitialized = false;
+    
     const initialize = async () => {
+      if (isInitialized) return;
+      isInitialized = true;
+      
       try {
         // Check if first launch
         const isFirstLaunch = await SettingsStorage.isFirstLaunch();
@@ -150,7 +155,7 @@ export function useAppState(): AppState {
     if (reportStore.currentProfileId !== profileId) {
       reportStore.setCurrentProfile(profileId);
     }
-  }, [profileStore.activeProfileId]);
+  }, [profileStore.activeProfileId, logStore, reportStore]);
 
   const initializeApp = async (): Promise<void> => {
     try {
