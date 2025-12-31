@@ -100,7 +100,7 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
       } else {
         Alert.alert('Error', 'Failed to create profile. Please try again.');
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to create profile. Please try again.');
     } finally {
       setLoading(false);
@@ -484,8 +484,9 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: typography.sizes.md,
-    fontWeight: typography.weights.medium as any,
-    color: colors.gray700,
+    fontWeight: typography.weights.semibold as any,
+    color: colors.gray800,
+    marginBottom: spacing.xs,
   },
   textInput: {
     borderWidth: 1,

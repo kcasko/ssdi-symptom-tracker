@@ -34,7 +34,7 @@ function getFileSize(filePath) {
     try {
         const stats = fs.statSync(filePath);
         return (stats.size / 1024).toFixed(2) + ' KB';
-    } catch (error) {
+    } catch {
         return 'N/A';
     }
 }
@@ -97,7 +97,7 @@ function suggestOptimizations() {
             if (sizeKB > largePngThreshold) {
                 largeFiles.push({ file: fileName, size: sizeKB.toFixed(2) });
             }
-        } catch (error) {
+        } catch {
             // Ignore files that can't be read
         }
     });

@@ -22,6 +22,7 @@ npm run web        # Web browser
 ```
 
 **First Time Setup:**
+
 1. App starts on Profile Picker screen
 2. Create a profile (or load seed data for testing)
 3. Navigate to Dashboard
@@ -55,6 +56,7 @@ npm run web        # Web browser
 - ✅ Multi-profile support built-in
 
 ### Screens
+
 1. **Onboarding** - First-time introduction
 2. **Profile Picker** - Select/create profiles
 3. **Dashboard** - Main hub with statistics and quick actions
@@ -71,12 +73,14 @@ npm run web        # Web browser
 The app follows a **three-layer truth architecture**:
 
 ### Layer 1: Raw Evidence
+
 - `DailyLog`: Daily symptom entries - never edited indirectly
 - `ActivityLog`: Activity attempts and impacts - factual records
 - `Limitation`: Baseline functional limits - objective thresholds
 - `Medication` & `Appointment`: Treatment history and medical contacts
 
 ### Layer 2: Analysis
+
 - `PatternDetector`: Identifies recurring patterns in symptoms and activities
 - `SymptomEngine`: Analyzes symptom trends, clusters, and correlations
 - `ActivityImpactEngine`: Computes activity tolerance and RFC categories
@@ -84,6 +88,7 @@ The app follows a **three-layer truth architecture**:
 - All analysis is computed from raw evidence and repeatable
 
 ### Layer 3: Narrative & Reporting
+
 - `ReportDraft`: Editable reports that preserve links to source evidence
 - `NarrativeService`: Converts analysis into SSDI-appropriate language
 - `SSDINarrativeBuilder`: Generates functional statements with professional tone
@@ -150,6 +155,7 @@ const minimal = generateMinimalSeedData();
 ## 📱 Core User Flow
 
 ### Minimum Viable Flow
+
 1. **Profile Setup**: Create or select a profile
 2. **Daily Logging**: Log symptoms in under 60 seconds
 3. **Activity Tracking**: Record activities and their impacts
@@ -159,6 +165,7 @@ const minimal = generateMinimalSeedData();
 7. **Export**: Generate PDF or copyable text
 
 ### Key Screens
+
 - **ProfilePickerScreen**: Multi-profile management
 - **DashboardScreen**: Quick access to all functions
 - **DailyLogScreen**: Fast symptom entry
@@ -170,6 +177,7 @@ const minimal = generateMinimalSeedData();
 ## 🔧 Key Components
 
 ### Data Models
+
 - **Profile**: User profiles with settings and preferences
 - **DailyLog**: Daily symptom entries with severity, duration, triggers
 - **ActivityLog**: Activity attempts with impact and recovery data
@@ -177,6 +185,7 @@ const minimal = generateMinimalSeedData();
 - **ReportDraft**: Editable reports with structured sections and text blocks
 
 ### UI Components
+
 - **PainScale**: 0-10 severity input with visual feedback
 - **SymptomPicker**: Multi-select symptom picker with categories
 - **DurationPicker**: Time duration input with presets
@@ -184,6 +193,7 @@ const minimal = generateMinimalSeedData();
 - **SummaryCard**: Data summary displays
 
 ### Services
+
 - **LogService**: Manages all logging operations
 - **AnalysisService**: Computes patterns and insights
 - **NarrativeService**: Generates SSDI-appropriate text

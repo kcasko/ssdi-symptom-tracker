@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, DateRangePicker, SummaryCard } from '../components';
+import { BigButton, DateRangePicker } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService } from '../services';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
@@ -26,7 +26,7 @@ import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
 export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, activityLogs, limitations, reportDrafts, updateReportDraft } =
+  const { activeProfile, dailyLogs, activityLogs, limitations, reportDrafts, addReportDraft, updateReportDraft } =
     useAppState();
 
   const now = new Date();
@@ -47,7 +47,19 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
       const profileActivities = activityLogs.filter((l) => l.profileId === activeProfile.id);
       const profileLimitations = limitations.filter((l) => l.profileId === activeProfile.id);
 
-      const draft = await ReportService.generateReportDraft(
+      // First create an empty draft
+      const draftId = await addReportDraft(
+        'SSDI Full Report',
+        'full_narrative',
+        { start: startDate, end: endDate }
+      );
+      
+      if (!draftId) {
+        throw new Error('Failed to create report draft');
+      }
+
+      // Generate the full report content
+      const generatedDraft = await ReportService.generateReportDraft(
         {
           profileId: activeProfile.id,
           dateRange: { start: startDate, end: endDate },
@@ -59,9 +71,17 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         profileLimitations
       );
 
-      await updateReportDraft(draft);
-      Alert.alert('Success', 'Report generated', [
-        { text: 'View', onPress: () => navigation.navigate('ReportEditor', { reportId: draft.id }) },
+      // Update the draft with generated content
+      const draftWithGeneratedContent = {
+        ...generatedDraft,
+        id: draftId, // Keep the original ID from the created draft
+      };
+      
+      await updateReportDraft(draftWithGeneratedContent);
+      
+      Alert.alert('Success', 'Report generated successfully', [
+        { text: 'View', onPress: () => navigation.navigate('ReportEditor', { reportId: draftId }) },
+        { text: 'OK', style: 'cancel' },
       ]);
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to generate report');

@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -24,7 +25,7 @@ import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 type ProfilePickerProps = NativeStackScreenProps<RootStackParamList, 'ProfilePicker'>;
 
 export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }) => {
-  const { profiles, setActiveProfile, createProfile } = useAppState();
+  const { profiles, setActiveProfile, deleteProfile } = useAppState();
 
   const handleSelectProfile = (profileId: string) => {
     setActiveProfile(profileId);
@@ -33,6 +34,28 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
 
   const handleCreateProfile = async () => {
     navigation.navigate('ProfileCreation');
+  };
+
+  const handleDeleteProfile = (profileId: string, profileName: string) => {
+    Alert.alert(
+      'Delete Profile',
+      `Are you sure you want to delete "${profileName}"? This action cannot be undone and will remove all associated data.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteProfile(profileId);
+            } catch {
+              Alert.alert('Error', 'Failed to delete profile. Please try again.');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -46,22 +69,29 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {profiles.map((profile) => (
-          <TouchableOpacity
-            key={profile.id}
-            style={styles.profileCard}
-            onPress={() => handleSelectProfile(profile.id)}
-          >
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>{profile.displayName}</Text>
-              <Text style={styles.profileMeta}>
-                Created {formatDate(profile.createdAt, DISPLAY_DATE_SHORT)}
-              </Text>
-              <Text style={styles.profileMeta}>
-                Last updated {formatDate(profile.lastAccessed, DISPLAY_DATE_SHORT)}
-              </Text>
-            </View>
-            <Text style={styles.arrow}>→</Text>
-          </TouchableOpacity>
+          <View key={profile.id} style={styles.profileCard}>
+            <TouchableOpacity
+              style={styles.profileMain}
+              onPress={() => handleSelectProfile(profile.id)}
+            >
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>{profile.displayName}</Text>
+                <Text style={styles.profileMeta}>
+                  Created {formatDate(profile.createdAt, DISPLAY_DATE_SHORT)}
+                </Text>
+                <Text style={styles.profileMeta}>
+                  Last updated {formatDate(profile.lastAccessed, DISPLAY_DATE_SHORT)}
+                </Text>
+              </View>
+              <Text style={styles.arrow}>→</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteProfile(profile.id, profile.displayName)}
+            >
+              <Text style={styles.deleteButtonText}>🗑️</Text>
+            </TouchableOpacity>
+          </View>
         ))}
 
         {profiles.length === 0 && (
@@ -108,15 +138,19 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: colors.white,
-    padding: spacing.lg,
-    borderRadius: 8,
     marginBottom: spacing.md,
+    borderRadius: 8,
     borderWidth: 2,
     borderColor: colors.gray200,
+    flexDirection: 'row',
+  },
+  profileMain: {
+    flex: 1,
+    padding: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
   },
   profileInfo: {
     flex: 1,
@@ -134,6 +168,20 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: typography.sizes.xxl,
     color: colors.primary600,
+  },
+  deleteButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.lg,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderLeftWidth: 1,
+    borderLeftColor: colors.gray200,
+    minWidth: 56,
+  },
+  deleteButtonText: {
+    fontSize: 20,
+    color: colors.error.main,
+    opacity: 0.7,
   },
   emptyState: {
     alignItems: 'center',

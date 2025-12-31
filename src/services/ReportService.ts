@@ -135,25 +135,25 @@ export class ReportService {
       // Map template sections to narrative sections
       switch (sectionTemplate.type) {
         case 'summary':
-          content = narrative.sections.overview;
+          content = narrative.sections.overview || 'No overview data available for the selected date range.';
           break;
         case 'daily_symptoms':
-          content = narrative.sections.symptoms;
+          content = narrative.sections.symptoms || 'No symptom data recorded during this period.';
           break;
         case 'activity_impact':
-          content = narrative.sections.activities;
+          content = narrative.sections.activities || 'No activity data recorded during this period.';
           break;
         case 'functional_limitations':
-          content = narrative.sections.limitations;
+          content = narrative.sections.limitations || 'No limitation data recorded.';
           break;
         case 'patterns':
-          content = narrative.sections.patterns;
+          content = narrative.sections.patterns || 'Insufficient data to determine patterns.';
           break;
         case 'narrative':
-          content = narrative.sections.rfc;
+          content = narrative.sections.rfc || 'Unable to assess residual functional capacity without data.';
           break;
         default:
-          content = '';
+          content = 'Content not available.';
       }
 
       // Parse narrative content into blocks

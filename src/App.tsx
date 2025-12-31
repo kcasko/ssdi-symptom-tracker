@@ -10,7 +10,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './navigation/AppNavigator';
 import { useAppState } from './state/useAppState';
 import { colors } from './theme/colors';
-import { typography } from './theme/typography';
 
 export default function App() {
   // Initialize app state

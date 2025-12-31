@@ -30,6 +30,7 @@ interface AppState {
   // Profile actions
   setActiveProfile: (profileId: string | null) => Promise<void>;
   createProfile: (name: string, options?: any) => Promise<string | null>;
+  deleteProfile: (profileId: string) => Promise<void>;
   
   // Log data
   dailyLogs: any[];
@@ -237,6 +238,7 @@ export function useAppState(): AppState {
     clearAllErrors,
     setActiveProfile: profileStore.setActiveProfile,
     createProfile: profileStore.createProfile,
+    deleteProfile: profileStore.deleteProfile,
     
     // Log store data and methods
     dailyLogs: logStore.dailyLogs,
