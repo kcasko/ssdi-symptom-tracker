@@ -89,9 +89,21 @@ The app follows a **three-layer truth architecture**:
 - `SSDINarrativeBuilder`: Generates functional statements with professional tone
 - Users can edit drafts without losing underlying evidence
 
+## 🎨 Visual Assets
+
+Professional medical-themed visual identity:
+- **SVG-first design system** for scalability
+- **Medical chart theme** with data visualization elements  
+- **Deep blue color scheme** (`#1a365d`) for professional documentation feel
+- **Automated asset generation** from SVG sources using Node.js/Sharp
+- **Complete icon set** including iOS, Android adaptive, and web favicon
+- **Multi-device splash screens** optimized for all screen sizes
+
+See [assets/README.md](assets/README.md) for detailed asset documentation and generation instructions.
+
 ## 🛠️ Tech Stack
 
-- **React Native 0.73** + **Expo SDK 50**
+- **React Native 0.74** + **Expo SDK 51**
 - **TypeScript** (strict mode)
 - **Zustand** v4.5 (state management)
 - **React Navigation** v6 (navigation)

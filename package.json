@@ -8,7 +8,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "assets": "node generate-assets.js",
+    "assets:validate": "node validate-assets.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
@@ -36,6 +38,7 @@
     "@babel/core": "^7.24.0",
     "@types/react": "~18.2.45",
     "@types/uuid": "^9.0.8",
+    "sharp": "^0.34.5",
     "typescript": "~5.3.3"
   },
   "private": true

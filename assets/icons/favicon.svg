@@ -1,0 +1,42 @@
+<!-- Favicon - Simple Medical Chart Icon -->
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="32" height="32" rx="6" fill="#1a365d"/>
+  
+  <!-- Medical Chart -->
+  <g transform="translate(4, 4)">
+    <!-- Chart Background -->
+    <rect x="0" y="0" width="24" height="24" rx="3" fill="white"/>
+    
+    <!-- Chart Header -->
+    <rect x="0" y="0" width="24" height="6" rx="3" fill="#0066e6"/>
+    <rect x="0" y="4" width="24" height="2" fill="#0066e6"/>
+    
+    <!-- Chart Data -->
+    <g transform="translate(2, 8)">
+      <!-- Health Line -->
+      <path d="M0 8 L5 6 L10 3 L15 7 L20 4" 
+            stroke="#0066e6" stroke-width="1.5" fill="none"/>
+      
+      <!-- Data Points -->
+      <circle cx="5" cy="6" r="1.5" fill="#0066e6"/>
+      <circle cx="15" cy="7" r="1.5" fill="#0066e6"/>
+      
+      <!-- Heart -->
+      <g transform="translate(14, 2)">
+        <path d="M3,5 C3,3 2,2 0,2 C-2,2 -3,3 -3,5 C-3,7 0,10 3,5 Z" fill="#dc3545"/>
+        <path d="M3,5 C3,3 4,2 6,2 C8,2 9,3 9,5 C9,7 6,10 3,5 Z" fill="#dc3545"/>
+      </g>
+      
+      <!-- Simple bars -->
+      <rect x="0" y="12" width="8" height="2" rx="1" fill="#28a745"/>
+      <rect x="0" y="15" width="12" height="2" rx="1" fill="#ffc107"/>
+    </g>
+    
+    <!-- Medical Cross -->
+    <g transform="translate(18, 1)">
+      <rect x="2" y="0.5" width="1" height="4" fill="white"/>
+      <rect x="0.5" y="2" width="4" height="1" fill="white"/>
+    </g>
+  </g>
+</svg>

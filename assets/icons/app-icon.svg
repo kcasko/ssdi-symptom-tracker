@@ -1,0 +1,79 @@
+<!-- SSDI Symptom Tracker App Icon -->
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="512" cy="512" r="512" fill="#1a365d"/>
+  
+  <!-- Medical Cross Background -->
+  <circle cx="512" cy="512" r="400" fill="#003d80"/>
+  
+  <!-- Main Icon: Medical Chart with Heart -->
+  <g transform="translate(312, 262)">
+    <!-- Chart Background -->
+    <rect x="0" y="0" width="400" height="500" rx="24" fill="white"/>
+    
+    <!-- Chart Header -->
+    <rect x="0" y="0" width="400" height="80" rx="24" fill="#0066e6"/>
+    <rect x="0" y="56" width="400" height="24" fill="#0066e6"/>
+    
+    <!-- Chart Title -->
+    <rect x="30" y="20" width="120" height="16" rx="8" fill="white"/>
+    <rect x="30" y="42" width="200" height="12" rx="6" fill="white" opacity="0.8"/>
+    
+    <!-- Medical Cross Icon -->
+    <g transform="translate(320, 15)">
+      <rect x="20" y="5" width="10" height="40" fill="white"/>
+      <rect x="5" y="20" width="40" height="10" fill="white"/>
+    </g>
+    
+    <!-- Chart Content - Health Data Visualization -->
+    <g transform="translate(30, 110)">
+      <!-- Heart Rate Line -->
+      <path d="M0 60 L40 40 L80 20 L120 45 L160 25 L200 50 L240 30 L280 55 L320 35 L340 45" 
+            stroke="#0066e6" stroke-width="4" fill="none"/>
+      
+      <!-- Heart Symbol -->
+      <g transform="translate(280, 25)">
+        <path d="M20,35 C20,25 10,15 0,15 C-10,15 -20,25 -20,35 C-20,45 0,65 20,35 Z"
+              fill="#dc3545"/>
+        <path d="M20,35 C20,25 30,15 40,15 C50,15 60,25 60,35 C60,45 40,65 20,35 Z"
+              fill="#dc3545"/>
+      </g>
+      
+      <!-- Data Points -->
+      <circle cx="40" cy="40" r="6" fill="#0066e6"/>
+      <circle cx="120" cy="45" r="6" fill="#0066e6"/>
+      <circle cx="200" cy="50" r="6" fill="#0066e6"/>
+      <circle cx="280" cy="55" r="6" fill="#0066e6"/>
+      
+      <!-- Symptom Severity Bars -->
+      <rect x="0" y="120" width="60" height="20" rx="10" fill="#28a745"/>
+      <rect x="0" y="150" width="120" height="20" rx="10" fill="#ffc107"/>
+      <rect x="0" y="180" width="180" height="20" rx="10" fill="#fd7e14"/>
+      <rect x="0" y="210" width="240" height="20" rx="10" fill="#dc3545"/>
+      
+      <!-- Severity Labels -->
+      <rect x="70" y="122" width="40" height="16" rx="8" fill="#f8f9fa"/>
+      <rect x="130" y="152" width="40" height="16" rx="8" fill="#f8f9fa"/>
+      <rect x="190" y="182" width="40" height="16" rx="8" fill="#f8f9fa"/>
+      <rect x="250" y="212" width="40" height="16" rx="8" fill="#f8f9fa"/>
+      
+      <!-- Time Stamps -->
+      <rect x="0" y="260" width="80" height="12" rx="6" fill="#6c757d"/>
+      <rect x="90" y="260" width="80" height="12" rx="6" fill="#6c757d"/>
+      <rect x="180" y="260" width="80" height="12" rx="6" fill="#6c757d"/>
+      <rect x="270" y="260" width="60" height="12" rx="6" fill="#6c757d"/>
+      
+      <!-- Footer Notes -->
+      <rect x="0" y="300" width="320" height="8" rx="4" fill="#dee2e6"/>
+      <rect x="0" y="315" width="280" height="8" rx="4" fill="#dee2e6"/>
+      <rect x="0" y="330" width="200" height="8" rx="4" fill="#dee2e6"/>
+    </g>
+  </g>
+  
+  <!-- Subtle Medical Plus Symbol in Corner -->
+  <g transform="translate(750, 150)">
+    <circle cx="50" cy="50" r="60" fill="white" opacity="0.1"/>
+    <rect x="35" y="20" width="30" height="60" rx="15" fill="white" opacity="0.3"/>
+    <rect x="20" y="35" width="60" height="30" rx="15" fill="white" opacity="0.3"/>
+  </g>
+</svg>
