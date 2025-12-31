@@ -178,7 +178,7 @@ export class SSDINarrativeBuilder {
           statement += ` restricted to ${limitation.weightThreshold.maxPounds} pounds ${limitation.weightThreshold.frequency}`;
         }
         
-        if (limitation.consequences.length > 0) {
+        if (limitation.consequences && limitation.consequences.length > 0) {
           statement += `, resulting in ${limitation.consequences[0].toLowerCase()}`;
         }
         
@@ -203,7 +203,7 @@ export class SSDINarrativeBuilder {
           statement += ` limited to ${duration}`;
         }
         
-        if (limitation.consequences.length > 0) {
+        if (limitation.consequences && limitation.consequences.length > 0) {
           statement += `, with ${limitation.consequences.join(', ').toLowerCase()}`;
         }
         
@@ -221,7 +221,7 @@ export class SSDINarrativeBuilder {
         
         let statement = `${category} affected ${frequency}`;
         
-        if (limitation.consequences.length > 0) {
+        if (limitation.consequences && limitation.consequences.length > 0) {
           statement += `, resulting in ${limitation.consequences[0].toLowerCase()}`;
         }
         

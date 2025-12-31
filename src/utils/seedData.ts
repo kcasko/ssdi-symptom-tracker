@@ -92,7 +92,7 @@ export function generateSeedData(): SeedData {
       });
 
       // Add recovery for higher impact activities
-      if (log.impacts[0].severity >= 7) {
+      if (log.impacts.length > 0 && log.impacts[0].severity >= 7) {
         log = addRecovery(log, 'Rest', 30);
         log.stoppedEarly = Math.random() > 0.5;
       }

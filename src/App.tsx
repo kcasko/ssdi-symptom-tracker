@@ -21,12 +21,12 @@ export default function App() {
     return (
       <SafeAreaProvider>
         <View style={styles.loadingContainer}>
-          <Text style={[styles.appTitle, { color: colors.primary[600] }]}>
+          <Text style={[styles.appTitle, { color: colors.primary600 }]}>
             SSDI Symptom Tracker
           </Text>
           <ActivityIndicator 
             size="large" 
-            color={colors.primary[600]} 
+            color={colors.primary600} 
             style={styles.spinner}
           />
           <Text style={[styles.loadingText, { color: colors.text.secondary }]}>

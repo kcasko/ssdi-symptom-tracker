@@ -47,7 +47,7 @@ export const ActivityPicker: React.FC<ActivityPickerProps> = ({
       (a) =>
         a.name.toLowerCase().includes(query) ||
         a.category.toLowerCase().includes(query) ||
-        a.description.toLowerCase().includes(query)
+        a.description?.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 

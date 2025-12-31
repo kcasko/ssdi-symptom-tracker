@@ -49,7 +49,7 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
       (s) =>
         s.name.toLowerCase().includes(query) ||
         s.category.toLowerCase().includes(query) ||
-        s.description.toLowerCase().includes(query)
+        s.description?.toLowerCase().includes(query)
     );
   }, [searchQuery]);
 
