@@ -5,7 +5,7 @@
 
 import { DailyLog } from '../domain/models/DailyLog';
 import { getSymptomById } from '../data/symptoms';
-import { isSameDayAs } from '../utils/dates';
+// Date utilities not currently used in this file
 
 export interface SymptomSummary {
   symptomId: string;
@@ -364,7 +364,8 @@ export class SymptomEngine {
    */
   static generateSymptomReport(
     logs: DailyLog[],
-    dateRange: { start: string; end: string }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _dateRange: { start: string; end: string }
   ): {
     summary: {
       totalDays: number;

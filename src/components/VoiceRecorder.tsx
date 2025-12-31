@@ -3,7 +3,7 @@
  * Records audio and converts to text for hands-free symptom logging
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -37,85 +37,20 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const [transcription, setTranscription] = useState('');
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
 
+  // Use refs to always access latest prop values without re-registering listeners
+  const onTranscriptionRef = useRef(onTranscription);
+  const onErrorRef = useRef(onError);
+  const autoSpeakRef = useRef(autoSpeak);
+
+  // Update refs when props change
   useEffect(() => {
-    initializeVoice();
-    return cleanup;
-  }, []);
-
-  const initializeVoice = async () => {
-    try {
-      // Request audio recording permissions
-      if (Platform.OS !== 'web') {
-        const { status } = await Audio.requestPermissionsAsync();
-        setHasPermission(status === 'granted');
-        
-        if (status !== 'granted') {
-          Alert.alert(
-            'Microphone Permission Required',
-            'Voice logging needs microphone access to work. Please enable it in your device settings.',
-            [{ text: 'OK' }]
-          );
-          return;
-        }
-      }
-
-      // Initialize voice recognition
-      Voice.onSpeechStart = onSpeechStart;
-      Voice.onSpeechEnd = onSpeechEnd;
-      Voice.onSpeechResults = onSpeechResults;
-      Voice.onSpeechError = onSpeechError;
-      Voice.onSpeechPartialResults = onSpeechPartialResults;
-    } catch (error) {
-      console.error('Voice initialization error:', error);
-      onError?.('Failed to initialize voice recognition');
-    }
-  };
+    onTranscriptionRef.current = onTranscription;
+    onErrorRef.current = onError;
+    autoSpeakRef.current = autoSpeak;
+  }, [onTranscription, onError, autoSpeak]);
 
   const cleanup = () => {
     Voice.removeAllListeners();
-  };
-
-  const onSpeechStart = () => {
-    setIsRecording(true);
-    setIsProcessing(false);
-  };
-
-  const onSpeechEnd = () => {
-    setIsRecording(false);
-    setIsProcessing(true);
-  };
-
-  const onSpeechResults = (event: any) => {
-    if (event.value && event.value.length > 0) {
-      const text = event.value[0];
-      setTranscription(text);
-      setIsProcessing(false);
-      onTranscription?.(text);
-      
-      // Provide audio feedback
-      if (autoSpeak) {
-        speakFeedback(`I heard: ${text}`);
-      }
-    }
-  };
-
-  const onSpeechPartialResults = (event: any) => {
-    if (event.value && event.value.length > 0) {
-      setTranscription(event.value[0]);
-    }
-  };
-
-  const onSpeechError = (event: any) => {
-    setIsRecording(false);
-    setIsProcessing(false);
-    console.error('Speech recognition error:', event);
-    
-    const errorMessage = getErrorMessage(event.error?.message || event.error);
-    onError?.(errorMessage);
-    
-    if (autoSpeak) {
-      speakFeedback('Sorry, I didn\'t catch that. Please try again.');
-    }
   };
 
   const getErrorMessage = (error: string): string => {
@@ -138,6 +73,85 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       rate: 0.9,
     });
   };
+
+  const onSpeechStart = () => {
+    setIsRecording(true);
+    setIsProcessing(false);
+  };
+
+  const onSpeechEnd = () => {
+    setIsRecording(false);
+    setIsProcessing(true);
+  };
+
+  const onSpeechResults = (event: any) => {
+    if (event.value && event.value.length > 0) {
+      const text = event.value[0];
+      setTranscription(text);
+      setIsProcessing(false);
+      onTranscriptionRef.current?.(text);
+      
+      // Provide audio feedback
+      if (autoSpeakRef.current) {
+        speakFeedback(`I heard: ${text}`);
+      }
+    }
+  };
+
+  const onSpeechPartialResults = (event: any) => {
+    if (event.value && event.value.length > 0) {
+      setTranscription(event.value[0]);
+    }
+  };
+
+  const onSpeechError = (event: any) => {
+    setIsRecording(false);
+    setIsProcessing(false);
+    console.error('Speech recognition error:', event);
+    
+    const errorMessage = getErrorMessage(event.error?.message || event.error);
+    onErrorRef.current?.(errorMessage);
+    
+    if (autoSpeakRef.current) {
+      speakFeedback('Sorry, I didn\'t catch that. Please try again.');
+    }
+  };
+
+  useEffect(() => {
+    const initializeVoice = async () => {
+      try {
+        // Request audio recording permissions
+        if (Platform.OS !== 'web') {
+          const { status } = await Audio.requestPermissionsAsync();
+          setHasPermission(status === 'granted');
+          
+          if (status !== 'granted') {
+            Alert.alert(
+              'Microphone Permission Required',
+              'Voice logging needs microphone access to work. Please enable it in your device settings.',
+              [{ text: 'OK' }]
+            );
+            return;
+          }
+        }
+
+        // Initialize voice recognition
+        Voice.onSpeechStart = onSpeechStart;
+        Voice.onSpeechEnd = onSpeechEnd;
+        Voice.onSpeechResults = onSpeechResults;
+        Voice.onSpeechError = onSpeechError;
+        Voice.onSpeechPartialResults = onSpeechPartialResults;
+      } catch (error) {
+        console.error('Voice initialization error:', error);
+        onErrorRef.current?.('Failed to initialize voice recognition');
+      }
+    };
+
+    initializeVoice();
+    return cleanup;
+    // Handlers use refs for props, so they don't need to be in dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const startRecording = async () => {
     if (hasPermission === false) {

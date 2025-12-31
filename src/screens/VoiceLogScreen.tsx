@@ -42,8 +42,8 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
       setVoiceResult(result);
       
       // Provide audio feedback
-      const feedback = VoiceLoggingService.generateFeedback(result);
       // Note: Feedback would be spoken via the VoiceRecorder component
+      // VoiceLoggingService.generateFeedback(result);
       
     } catch (error) {
       console.error('Voice processing error:', error);

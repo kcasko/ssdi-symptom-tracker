@@ -6,7 +6,7 @@
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { getSymptomById } from '../data/symptoms';
-import { isSameDayAs, getDaysBetween, parseDate } from '../utils/dates';
+import { getDaysBetween } from '../utils/dates';
 
 export interface SymptomPattern {
   symptomId: string;

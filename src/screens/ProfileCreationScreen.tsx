@@ -40,7 +40,7 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
     activityPromptEnabled: true,
   });
   
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [

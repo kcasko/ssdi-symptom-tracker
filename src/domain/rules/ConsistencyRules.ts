@@ -6,7 +6,7 @@
 import { DailyLog } from '../models/DailyLog';
 import { ActivityLog } from '../models/ActivityLog';
 import { Limitation, LimitationFrequency } from '../models/Limitation';
-import { isSameDayAs, getDaysBetween } from '../../utils/dates';
+import { getDaysBetween } from '../../utils/dates';
 
 /**
  * Calculate logging consistency (percentage of days with logs)
@@ -109,7 +109,7 @@ export function validateLimitationFrequency(
   }
 
   // Count how many times the limitation was exceeded
-  const relevantLogs = activityLogs.filter(log => {
+  const relevantLogs = activityLogs.filter(() => {
     // This would need category-specific logic
     return true; // Simplified for now
   });

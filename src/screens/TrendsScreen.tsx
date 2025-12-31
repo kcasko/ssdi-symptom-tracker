@@ -35,11 +35,15 @@ export function TrendsScreen() {
   const { dailyLogs } = useAppState();
   const [selectedTrend, setSelectedTrend] = useState<TrendType>('day-quality');
   
-  // Use useMemo to initialize date range to avoid calling Date.now() during render
-  const initialDateRange = useMemo(() => ({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
-  }), []);
+  // Initialize date range using useMemo to avoid calling Date.now() during render
+  const initialDateRange = useMemo(() => {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    return {
+      startDate: thirtyDaysAgo.toISOString().split('T')[0],
+      endDate: now.toISOString().split('T')[0],
+    };
+  }, []);
   
   const [dateRange, setDateRange] = useState(initialDateRange);
 

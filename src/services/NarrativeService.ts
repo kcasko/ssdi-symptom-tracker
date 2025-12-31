@@ -10,7 +10,7 @@ import { SymptomPattern, ActivityPattern, TriggerPattern, RecoveryPattern } from
 import { SSDINarrativeBuilder } from '../engine/SSDINarrativeBuilder';
 import { getSymptomById } from '../data/symptoms';
 import { SymptomEngine } from '../engine/SymptomEngine';
-import { LimitationAnalyzer } from '../engine/LimitationAnalyzer';
+// LimitationAnalyzer not currently used in this service
 import { DayQualityAnalyzer } from './DayQualityAnalyzer';
 
 export interface DailyNarrative {

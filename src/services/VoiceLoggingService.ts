@@ -180,7 +180,8 @@ export class VoiceLoggingService {
   /**
    * Extract severity from text context
    */
-  private static extractSeverity(text: string, matchedTerms: string[]): number | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private static extractSeverity(text: string, _matchedTerms: string[]): number | undefined {
     // Look for numeric ratings (1-10)
     const numericMatch = text.match(/(?:level|rating|severity|pain)?\s*(?:is\s*)?(?:about\s*)?(\d+)(?:\s*out\s*of\s*10)?/i);
     if (numericMatch) {
@@ -207,7 +208,8 @@ export class VoiceLoggingService {
   /**
    * Extract location information
    */
-  private static extractLocation(text: string, matchedTerms: string[]): string | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private static extractLocation(text: string, _matchedTerms: string[]): string | undefined {
     const locations: string[] = [];
 
     for (const location of LOCATION_KEYWORDS) {
@@ -229,7 +231,8 @@ export class VoiceLoggingService {
   /**
    * Extract additional notes for specific symptom
    */
-  private static extractSymptomNotes(text: string, matchedTerms: string[]): string | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private static extractSymptomNotes(text: string, _matchedTerms: string[]): string | undefined {
     // Look for descriptive words near the symptom
     const descriptors = ['sharp', 'dull', 'aching', 'burning', 'stabbing', 'throbbing', 
                         'constant', 'intermittent', 'getting worse', 'better', 'same'];

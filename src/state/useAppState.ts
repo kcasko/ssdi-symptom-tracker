@@ -183,6 +183,8 @@ export function useAppState(): AppState {
     if (reportStore.currentProfileId !== profileId) {
       reportStore.setCurrentProfile(profileId);
     }
+    // Store objects are stable but shouldn't be in dependencies to avoid unnecessary re-runs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initComplete, profileStore.activeProfileId]); // Don't include store objects
 
   const initializeApp = async (): Promise<void> => {

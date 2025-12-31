@@ -21,7 +21,7 @@ import { BigButton, SummaryCard } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
 import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
-import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
+// Date formatting utilities not currently used in this screen
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -29,9 +29,18 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
 
   // Filter logs for active profile
-  const profileDailyLogs = activeProfile ? dailyLogs.filter(l => l.profileId === activeProfile.id) : [];
-  const profileActivityLogs = activeProfile ? activityLogs.filter(l => l.profileId === activeProfile.id) : [];
-  const profileLimitations = activeProfile ? limitations.filter(l => l.profileId === activeProfile.id) : [];
+  const profileDailyLogs = React.useMemo(() => 
+    activeProfile ? dailyLogs.filter(l => l.profileId === activeProfile.id) : [],
+    [activeProfile, dailyLogs]
+  );
+  const profileActivityLogs = React.useMemo(() =>
+    activeProfile ? activityLogs.filter(l => l.profileId === activeProfile.id) : [],
+    [activeProfile, activityLogs]
+  );
+  const profileLimitations = React.useMemo(() =>
+    activeProfile ? limitations.filter(l => l.profileId === activeProfile.id) : [],
+    [activeProfile, limitations]
+  );
 
   // Get quick stats
   const stats = activeProfile ? AnalysisService.getQuickStats(

@@ -5,7 +5,7 @@
 
 import { ActivityLog, getWorstImpact, getTotalRecoveryTime } from '../domain/models/ActivityLog';
 import { DailyLog } from '../domain/models/DailyLog';
-import { isSameDayAs, getMinutesBetween } from '../utils/dates';
+// Date utilities not currently used in this file
 
 export interface ActivityImpactAnalysis {
   activityId: string;
@@ -169,7 +169,8 @@ export class ActivityImpactEngine {
   static analyzeFunctionalCapacity(
     activityLogs: ActivityLog[],
     dailyLogs: DailyLog[],
-    dateRange: { start: string; end: string }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _dateRange: { start: string; end: string }
   ): OverallFunctionalCapacity {
     // Default conservative values
     let sittingTolerance = 30;

@@ -15,8 +15,8 @@ import {
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
-import { AnalysisService, ComprehensiveAnalysis } from './AnalysisService';
-import { NarrativeService, FullNarrative } from './NarrativeService';
+import { AnalysisService } from './AnalysisService';
+import { NarrativeService } from './NarrativeService';
 import { PatternDetector } from '../engine/PatternDetector';
 import { getReportTemplate } from '../data/reportTemplates';
 import { generateId } from '../utils/ids';
@@ -97,7 +97,8 @@ export class ReportService {
     limitations: Limitation[]
   ): Promise<ReportDraft> {
     // Run comprehensive analysis
-    const analysis = await AnalysisService.runComprehensiveAnalysis(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _analysis = await AnalysisService.runComprehensiveAnalysis(
       dailyLogs,
       activityLogs,
       limitations,
@@ -214,7 +215,8 @@ export class ReportService {
     limitations: Limitation[]
   ): Promise<ReportDraft> {
     // Re-run analysis
-    const analysis = await AnalysisService.runComprehensiveAnalysis(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _analysis = await AnalysisService.runComprehensiveAnalysis(
       dailyLogs,
       activityLogs,
       limitations,

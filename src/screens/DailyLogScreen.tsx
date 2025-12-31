@@ -45,8 +45,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   useEffect(() => {
     if (existingLog) {
       const ids = existingLog.symptoms.map((s: { symptomId: string }) => s.symptomId);
-      setSelectedSymptomIds(ids);
-      
       const entries: Record<string, SymptomEntry> = {};
       existingLog.symptoms.forEach((s: { symptomId: string; severity: number; notes?: string }) => {
         entries[s.symptomId] = {
@@ -55,6 +53,9 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           notes: s.notes,
         };
       });
+      
+      // Batch state updates to avoid cascading renders
+      setSelectedSymptomIds(ids);
       setSymptomEntries(entries);
       setGeneralNotes(existingLog.notes || '');
       
@@ -62,6 +63,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         setActiveSymptomId(ids[0]);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingLog?.id]); // Only re-run if the log ID changes
 
   const handleToggleSymptom = (symptomId: string) => {

@@ -9,13 +9,10 @@ import {
   formatSeverityForNarrative,
   formatFrequencyForNarrative,
   formatDurationForNarrative,
-  generateFunctionalStatement,
-  generateRecoveryStatement,
   generateConsistencyStatement,
   ensureProfessionalTone,
 } from '../domain/rules/SSDILanguageRules';
 import { getSymptomById } from '../data/symptoms';
-import { getActivityById } from '../data/activities';
 import { getLimitationCategoryLabel } from '../domain/models/Limitation';
 
 export class SSDINarrativeBuilder {

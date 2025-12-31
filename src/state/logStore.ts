@@ -4,11 +4,11 @@
  */
 
 import { create } from 'zustand';
-import { DailyLog, createDailyLog } from '../domain/models/DailyLog';
-import { ActivityLog, createActivityLog } from '../domain/models/ActivityLog';
-import { Limitation, createLimitation } from '../domain/models/Limitation';
-import { Medication, createMedication } from '../domain/models/Medication';
-import { Appointment, createAppointment } from '../domain/models/Appointment';
+import { DailyLog } from '../domain/models/DailyLog';
+import { ActivityLog } from '../domain/models/ActivityLog';
+import { Limitation } from '../domain/models/Limitation';
+import { Medication } from '../domain/models/Medication';
+import { Appointment } from '../domain/models/Appointment';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { isSameDayAs } from '../utils/dates';

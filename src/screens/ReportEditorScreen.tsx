@@ -21,11 +21,11 @@ import { typography } from '../theme/typography';
 import { BigButton } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService } from '../services';
-import * as Sharing from 'expo-sharing';
+// Sharing functionality not currently used
 
 type ReportEditorProps = NativeStackScreenProps<RootStackParamList, 'ReportEditor'>;
 
-export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigation }) => {
+export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route }) => {
   const { reportId } = route.params;
   const { reportDrafts, updateReportDraft } = useAppState();
   
@@ -58,7 +58,7 @@ export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigat
 
   const handleExport = async () => {
     try {
-      const text = ReportService.exportAsText(draft, {
+      ReportService.exportAsText(draft, {
         format: 'text',
         includeMetadata: true,
         includeSourceReferences: true,
@@ -68,7 +68,7 @@ export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigat
       Alert.alert('Export', 'Report ready for export (text format)', [
         { text: 'OK' }
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to export report');
     }
   };
