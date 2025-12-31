@@ -3,7 +3,7 @@
  * Central hook that coordinates all stores and provides app-wide state
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useProfileStore } from './profileStore';
 import { useLogStore } from './logStore';
 import { useReportStore } from './reportStore';
@@ -64,8 +64,9 @@ export function useAppState(): AppState {
   const reportStore = useReportStore();
   const settingsStore = useSettingsStore();
   
-  // Use refs to prevent infinite loops
+  // Use refs to prevent infinite loops and track initialization
   const hasInitialized = useRef(false);
+  const [initComplete, setInitComplete] = useState(false);
   const lastSyncedProfileId = useRef<string | null>(null);
 
   // Derived state
@@ -117,8 +118,9 @@ export function useAppState(): AppState {
         if (settingsStore.settings.appLockEnabled) {
           const authenticated = await settingsStore.authenticateUser();
           if (!authenticated) {
-            // Handle authentication failure
+            // Handle authentication failure - still mark as complete
             console.log('Authentication required but failed');
+            setInitComplete(true);
             return;
           }
         }
@@ -141,6 +143,10 @@ export function useAppState(): AppState {
         console.log('App initialized successfully');
       } catch (error) {
         console.error('App initialization failed:', error);
+        // Still mark as complete even on error so app doesn't hang
+      } finally {
+        // ALWAYS mark initialization as complete
+        setInitComplete(true);
       }
     };
 
@@ -198,8 +204,8 @@ export function useAppState(): AppState {
   };
 
   return {
-    // Initialization
-    isInitialized: !isLoading && profileStore.profiles.length >= 0,
+    // Initialization - use explicit flag instead of derived state
+    isInitialized: initComplete,
     isFirstLaunch: false, // Would need to track this properly
     needsMigration: false, // Would need to check this properly
     
