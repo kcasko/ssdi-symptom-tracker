@@ -206,11 +206,19 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
         contentHints: ['Sitting capacity', 'Standing limits', 'Physical exertion', 'Cognitive demands'],
       },
       {
+        type: 'day_quality',
+        title: 'Day Quality and Functional Capacity Analysis',
+        description: 'Good/bad day ratios showing consistent functional limitations',
+        required: true,
+        order: 5,
+        contentHints: ['Good day percentage', 'Bad day percentage', 'Functional capacity trends', 'SSDI implications'],
+      },
+      {
         type: 'functional_limitations',
         title: 'Residual Functional Capacity',
         description: 'Comprehensive RFC assessment',
         required: true,
-        order: 5,
+        order: 6,
         contentHints: ['Physical RFC', 'Mental RFC', 'Environmental limitations'],
       },
       {
@@ -218,7 +226,7 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
         title: 'Treatment History',
         description: 'Medications and treatments tried',
         required: false,
-        order: 6,
+        order: 7,
         contentHints: ['Current medications', 'Effectiveness', 'Side effects', 'Treatment compliance'],
       },
       {
@@ -226,7 +234,7 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
         title: 'Medical Care',
         description: 'Medical appointments and professional opinions',
         required: false,
-        order: 7,
+        order: 8,
         contentHints: ['Provider visits', 'Specialist consultations', 'Treatment recommendations'],
       },
       {
@@ -234,7 +242,7 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
         title: 'Disability Determination Narrative',
         description: 'Complete narrative for disability determination',
         required: true,
-        order: 8,
+        order: 9,
         contentHints: ['Meets listing criteria', 'RFC limitations', 'Work capacity', 'Accommodations'],
       },
     ],

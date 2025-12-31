@@ -83,6 +83,7 @@ export type SectionType =
   | 'daily_symptoms'
   | 'activity_impact'
   | 'functional_limitations'
+  | 'day_quality'
   | 'medications'
   | 'appointments'
   | 'patterns'

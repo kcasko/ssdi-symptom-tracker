@@ -20,6 +20,7 @@ import { typography } from '../theme/typography';
 import { BigButton, SummaryCard } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
+import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
@@ -27,31 +28,39 @@ type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
 
+  // Filter logs for active profile
+  const profileDailyLogs = activeProfile ? dailyLogs.filter(l => l.profileId === activeProfile.id) : [];
+  const profileActivityLogs = activeProfile ? activityLogs.filter(l => l.profileId === activeProfile.id) : [];
+  const profileLimitations = activeProfile ? limitations.filter(l => l.profileId === activeProfile.id) : [];
+
+  // Get quick stats
+  const stats = activeProfile ? AnalysisService.getQuickStats(
+    profileDailyLogs,
+    profileActivityLogs,
+    profileLimitations
+  ) : null;
+
+  // Calculate day quality ratios
+  const dayAnalyzer = React.useMemo(() => new DayQualityAnalyzer(), []);
+  const timeRangeRatios = React.useMemo(() => {
+    return dayAnalyzer.calculateTimeRangeRatios(profileDailyLogs);
+  }, [dayAnalyzer, profileDailyLogs]);
+  const last7DayRatios = timeRangeRatios.last7Days;
+  const last30DayRatios = timeRangeRatios.last30Days;
+
+  // Check if logged today
+  const today = new Date().toISOString().split('T')[0];
+  const loggedToday = profileDailyLogs.some(l => l.logDate === today);
+
   useEffect(() => {
     if (!activeProfile) {
       navigation.replace('ProfilePicker');
     }
   }, [activeProfile, navigation]);
 
-  if (!activeProfile) {
+  if (!activeProfile || !stats) {
     return null;
   }
-
-  // Filter logs for active profile
-  const profileDailyLogs = dailyLogs.filter(l => l.profileId === activeProfile.id);
-  const profileActivityLogs = activityLogs.filter(l => l.profileId === activeProfile.id);
-  const profileLimitations = limitations.filter(l => l.profileId === activeProfile.id);
-
-  // Get quick stats
-  const stats = AnalysisService.getQuickStats(
-    profileDailyLogs,
-    profileActivityLogs,
-    profileLimitations
-  );
-
-  // Check if logged today
-  const today = new Date().toISOString().split('T')[0];
-  const loggedToday = profileDailyLogs.some(l => l.logDate === today);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -109,6 +118,26 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </View>
           <View style={styles.statsGrid}>
             <SummaryCard
+              title="Good Days"
+              value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
+              subtitle="Functional capacity"
+              variant={
+                last7DayRatios.goodDayPercentage >= 60 ? 'success' : 
+                last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
+              }
+            />
+            <SummaryCard
+              title="Bad Days"
+              value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
+              subtitle="Limited function"
+              variant={
+                last7DayRatios.badDayPercentage >= 60 ? 'error' : 
+                last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
+              }
+            />
+          </View>
+          <View style={styles.statsGrid}>
+            <SummaryCard
               title="Activities"
               value={stats.last7Days.activitiesLogged}
               subtitle="Logged"
@@ -120,6 +149,46 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               subtitle="All time"
               variant="default"
             />
+          </View>
+        </View>
+
+        {/* Day Quality Summary - Last 30 Days */}
+        <View style={styles.dayQualitySection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Last 30 Days - Functional Capacity</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Trends')}>
+              <Text style={styles.viewDetailsLink}>View Details →</Text>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.capacityBar}>
+            <View style={styles.capacityBarTrack}>
+              <View 
+                style={[
+                  styles.capacityBarFill,
+                  {
+                    width: `${last30DayRatios.goodDayPercentage}%`,
+                    backgroundColor: 
+                      last30DayRatios.goodDayPercentage >= 60 ? colors.successMain :
+                      last30DayRatios.goodDayPercentage >= 30 ? colors.warningMain : colors.errorMain
+                  }
+                ]} 
+              />
+            </View>
+            <Text style={styles.capacityBarLabel}>
+              {last30DayRatios.goodDayPercentage.toFixed(0)}% Good Days
+            </Text>
+          </View>
+
+          <View style={styles.statsGrid}>
+            <View style={styles.streakCard}>
+              <Text style={styles.streakValue}>{last30DayRatios.worstStreak}</Text>
+              <Text style={styles.streakLabel}>Worst Streak</Text>
+            </View>
+            <View style={styles.streakCard}>
+              <Text style={styles.streakValue}>{last30DayRatios.bestStreak}</Text>
+              <Text style={styles.streakLabel}>Best Streak</Text>
+            </View>
           </View>
         </View>
 
@@ -261,6 +330,57 @@ const styles = StyleSheet.create({
   actionsSection: {
     padding: spacing.lg,
     gap: spacing.md,
+  },
+  dayQualitySection: {
+    padding: spacing.lg,
+    gap: spacing.md,
+    backgroundColor: colors.gray50,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  viewDetailsLink: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
+  },
+  capacityBar: {
+    gap: spacing.xs,
+  },
+  capacityBarTrack: {
+    height: 32,
+    backgroundColor: colors.gray200,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  capacityBarFill: {
+    height: '100%',
+    borderRadius: 16,
+  },
+  capacityBarLabel: {
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.semibold as any,
+    color: colors.gray700,
+    textAlign: 'center',
+  },
+  streakCard: {
+    flex: 1,
+    backgroundColor: colors.white,
+    padding: spacing.md,
+    borderRadius: 8,
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  streakValue: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold as any,
+    color: colors.gray900,
+  },
+  streakLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
   },
   summarySection: {
     padding: spacing.lg,

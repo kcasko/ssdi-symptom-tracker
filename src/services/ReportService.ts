@@ -149,6 +149,9 @@ export class ReportService {
         case 'patterns':
           content = narrative.sections.patterns || 'Insufficient data to determine patterns.';
           break;
+        case 'day_quality':
+          content = narrative.sections.dayQuality || 'Insufficient data to assess day quality ratios.';
+          break;
         case 'narrative':
           content = narrative.sections.rfc || 'Unable to assess residual functional capacity without data.';
           break;

@@ -25,33 +25,67 @@ import {
   type TrendDataPoint,
   type TrendInsights,
 } from '../utils/trendAnalysis';
+import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
 
 const screenWidth = Dimensions.get('window').width;
 
-type TrendType = 'symptoms' | 'severity' | 'patterns';
+type TrendType = 'symptoms' | 'severity' | 'patterns' | 'day-quality';
 
 export function TrendsScreen() {
   const { dailyLogs } = useAppState();
-  const [selectedTrend, setSelectedTrend] = useState<TrendType>('symptoms');
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-    endDate: new Date(),
-  });
+  const [selectedTrend, setSelectedTrend] = useState<TrendType>('day-quality');
+  
+  // Use useMemo to initialize date range to avoid calling Date.now() during render
+  const initialDateRange = useMemo(() => ({
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
+  }), []);
+  
+  const [dateRange, setDateRange] = useState(initialDateRange);
+
+  // Initialize day quality analyzer
+  const dayAnalyzer = useMemo(() => new DayQualityAnalyzer(), []);
 
   // Process daily logs into trend data
   const trendData: TrendDataPoint[] = useMemo(() => {
-    return processTrendData(dailyLogs, dateRange.startDate, dateRange.endDate);
+    const start = new Date(dateRange.startDate);
+    const end = new Date(dateRange.endDate);
+    return processTrendData(dailyLogs, start, end);
   }, [dailyLogs, dateRange]);
+
+  // Calculate day quality ratios
+  const dayRatios = useMemo(() => {
+    const filteredLogs = dailyLogs.filter(log => {
+      const logDate = new Date(log.logDate);
+      const start = new Date(dateRange.startDate);
+      const end = new Date(dateRange.endDate);
+      return logDate >= start && logDate <= end;
+    });
+    return dayAnalyzer.calculateDayRatios(filteredLogs);
+  }, [dailyLogs, dateRange, dayAnalyzer]);
 
   // Generate insights
   const insights: TrendInsights = useMemo(() => {
     return generateTrendInsights(trendData);
   }, [trendData]);
 
-  // Generate chart data based on selected trend type
+  // Generate chart data
   const chartData = useMemo(() => {
+    if (selectedTrend === 'day-quality') {
+      return {
+        labels: ['Good', 'Neutral', 'Bad', 'Very Bad'],
+        datasets: [{
+          data: [
+            dayRatios.goodDays,
+            dayRatios.neutralDays,
+            dayRatios.badDays,
+            dayRatios.veryBadDays,
+          ],
+        }],
+      };
+    }
     return generateChartData(trendData, selectedTrend);
-  }, [trendData, selectedTrend]);
+  }, [trendData, selectedTrend, dayRatios]);
 
   const chartConfig = {
     backgroundGradientFrom: COLORS.gray50,
@@ -66,34 +100,91 @@ export function TrendsScreen() {
     },
   };
 
-  const renderTrendSelector = () => (
-    <View style={styles.trendSelector}>
-      <TouchableOpacity
-        style={[styles.trendButton, selectedTrend === 'symptoms' && styles.trendButtonActive]}
-        onPress={() => setSelectedTrend('symptoms')}
-      >
-        <Text style={[styles.trendButtonText, selectedTrend === 'symptoms' && styles.trendButtonTextActive]}>
-          Symptom Count
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.trendButton, selectedTrend === 'severity' && styles.trendButtonActive]}
-        onPress={() => setSelectedTrend('severity')}
-      >
-        <Text style={[styles.trendButtonText, selectedTrend === 'severity' && styles.trendButtonTextActive]}>
-          Avg Severity
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.trendButton, selectedTrend === 'patterns' && styles.trendButtonActive]}
-        onPress={() => setSelectedTrend('patterns')}
-      >
-        <Text style={[styles.trendButtonText, selectedTrend === 'patterns' && styles.trendButtonTextActive]}>
-          Top Symptoms
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  function renderDayRatioInsights() {
+    return (
+      <View style={styles.dayRatioContainer}>
+        <Text style={styles.sectionTitle}>Day Quality Analysis</Text>
+        
+        <View style={styles.ratioStatsGrid}>
+          <View style={styles.ratioStatCard}>
+            <Text style={[styles.ratioValue, { color: COLORS.successMain }]}> 
+              {dayRatios.goodDayPercentage.toFixed(0)}%
+            </Text>
+            <Text style={styles.ratioLabel}>Good Days</Text>
+            <Text style={styles.ratioCount}>({dayRatios.goodDays} days)</Text>
+          </View>
+          
+          <View style={styles.ratioStatCard}>
+            <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}> 
+              {dayRatios.badDayPercentage.toFixed(0)}%
+            </Text>
+            <Text style={styles.ratioLabel}>Bad Days</Text>
+            <Text style={styles.ratioCount}>({dayRatios.badDays + dayRatios.veryBadDays} days)</Text>
+          </View>
+        </View>
+
+        <View style={styles.functionalCapacityCard}>
+          <Text style={styles.functionalCapacityTitle}>Functional Capacity</Text>
+          <View style={styles.functionalCapacityBar}>
+            <View 
+              style={[
+                styles.functionalCapacityFill, 
+                { 
+                  width: `${dayRatios.functionalDaysPercentage}%`,
+                  backgroundColor: dayRatios.functionalDaysPercentage >= 60 
+                    ? COLORS.successMain 
+                    : dayRatios.functionalDaysPercentage >= 30 
+                      ? COLORS.warningMain 
+                      : COLORS.errorMain
+                }
+              ]} 
+            />
+          </View>
+          <Text style={styles.functionalCapacityText}>
+            {dayRatios.functionalDaysPercentage.toFixed(0)}% of days with adequate function
+          </Text>
+        </View>
+
+        {dayRatios.worstStreak > 0 && (
+          <View style={styles.streakCard}>
+            <Text style={styles.streakTitle}>Symptom Patterns</Text>
+            <Text style={styles.streakText}>
+              Longest difficult period: <Text style={styles.streakValue}>{dayRatios.worstStreak} consecutive days</Text>
+            </Text>
+            {dayRatios.bestStreak > 0 && (
+              <Text style={styles.streakText}>
+                Longest good period: <Text style={styles.streakValue}>{dayRatios.bestStreak} consecutive days</Text>
+              </Text>
+            )}
+          </View>
+        )}
+
+        <View style={styles.ssdiInsightsCard}>
+          <Text style={styles.ssdiInsightsTitle}>SSDI Documentation Notes</Text>
+          {dayRatios.badDayPercentage >= 25 && (
+            <Text style={styles.ssdiInsightText}>
+              • Over {dayRatios.badDayPercentage.toFixed(0)}% of days significantly impaired by symptoms
+            </Text>
+          )}
+          {dayRatios.functionalDaysPercentage < 75 && (
+            <Text style={styles.ssdiInsightText}>
+              • Functional capacity limited on {(100 - dayRatios.functionalDaysPercentage).toFixed(0)}% of days
+            </Text>
+          )}
+          {dayRatios.worstStreak >= 7 && (
+            <Text style={styles.ssdiInsightText}>
+              • Experienced prolonged periods of impairment ({dayRatios.worstStreak} consecutive days)
+            </Text>
+          )}
+          {dayRatios.averageSeverity >= 5 && (
+            <Text style={styles.ssdiInsightText}>
+              • Average symptom severity of {dayRatios.averageSeverity.toFixed(1)}/10 indicates substantial limitation
+            </Text>
+          )}
+        </View>
+      </View>
+    );
+  }
 
   const renderChart = () => {
     if (chartData.labels[0] === 'No Data') {
@@ -105,14 +196,16 @@ export function TrendsScreen() {
       );
     }
 
-    return selectedTrend === 'patterns' ? (
+    return selectedTrend === 'patterns' || selectedTrend === 'day-quality' ? (
       <BarChart
         data={chartData}
         width={screenWidth - SPACING.xl}
         height={220}
         chartConfig={chartConfig}
-        verticalLabelRotation={30}        yAxisLabel=""
-        yAxisSuffix=""        style={styles.chart}
+        verticalLabelRotation={30}
+        yAxisLabel=""
+        yAxisSuffix=""
+        style={styles.chart}
       />
     ) : (
       <LineChart
@@ -179,7 +272,7 @@ export function TrendsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <Text style={styles.title}>Symptom Trends</Text>
         <Text style={styles.subtitle}>Visual analysis of your symptom patterns</Text>
@@ -187,21 +280,55 @@ export function TrendsScreen() {
 
       <View style={styles.dateRangeContainer}>
         <DateRangePicker
-          startDate={dateRange.startDate.toISOString().split('T')[0]}
-          endDate={dateRange.endDate.toISOString().split('T')[0]}
+          startDate={dateRange.startDate}
+          endDate={dateRange.endDate}
           onChange={(start, end) => {
             setDateRange({
-              startDate: new Date(start),
-              endDate: new Date(end),
+              startDate: start,
+              endDate: end,
             });
           }}
         />
       </View>
 
-      {renderTrendSelector()}
+      <View style={styles.trendSelector}>
+        <TouchableOpacity
+          style={[styles.trendButton, selectedTrend === 'day-quality' && styles.trendButtonActive]}
+          onPress={() => setSelectedTrend('day-quality')}
+        >
+          <Text style={[styles.trendButtonText, selectedTrend === 'day-quality' && styles.trendButtonTextActive]}>
+            Day Quality
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.trendButton, selectedTrend === 'symptoms' && styles.trendButtonActive]}
+          onPress={() => setSelectedTrend('symptoms')}
+        >
+          <Text style={[styles.trendButtonText, selectedTrend === 'symptoms' && styles.trendButtonTextActive]}>
+            Symptom Count
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.trendButton, selectedTrend === 'severity' && styles.trendButtonActive]}
+          onPress={() => setSelectedTrend('severity')}
+        >
+          <Text style={[styles.trendButtonText, selectedTrend === 'severity' && styles.trendButtonTextActive]}>
+            Avg Severity
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.trendButton, selectedTrend === 'patterns' && styles.trendButtonActive]}
+          onPress={() => setSelectedTrend('patterns')}
+        >
+          <Text style={[styles.trendButtonText, selectedTrend === 'patterns' && styles.trendButtonTextActive]}>
+            Top Symptoms
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.chartContainer}>
         <Text style={styles.sectionTitle}>
+          {selectedTrend === 'day-quality' && 'Good vs Bad Day Distribution'}
           {selectedTrend === 'symptoms' && 'Daily Symptom Count'}
           {selectedTrend === 'severity' && 'Average Severity Over Time'}
           {selectedTrend === 'patterns' && 'Most Common Symptoms'}
@@ -210,6 +337,8 @@ export function TrendsScreen() {
       </View>
 
       {renderInsights()}
+      
+      {selectedTrend === 'day-quality' && renderDayRatioInsights()}
     </ScrollView>
   );
 }
@@ -335,5 +464,104 @@ const styles = StyleSheet.create({
   },
   worseningText: {
     color: COLORS.errorMain,
+  },
+  dayRatioContainer: {
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.xl,
+  },
+  ratioStatsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: SPACING.lg,
+    gap: SPACING.md,
+  },
+  ratioStatCard: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    padding: SPACING.lg,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.gray200,
+  },
+  ratioValue: {
+    ...TYPOGRAPHY.displayLarge,
+    fontWeight: 'bold',
+    marginBottom: SPACING.xs,
+  },
+  ratioLabel: {
+    ...TYPOGRAPHY.labelMedium,
+    color: COLORS.gray700,
+    marginBottom: SPACING.xs,
+  },
+  ratioCount: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.gray600,
+  },
+  functionalCapacityCard: {
+    backgroundColor: COLORS.white,
+    padding: SPACING.lg,
+    borderRadius: 12,
+    marginBottom: SPACING.lg,
+  },
+  functionalCapacityTitle: {
+    ...TYPOGRAPHY.titleLarge,
+    color: COLORS.gray900,
+    marginBottom: SPACING.md,
+  },
+  functionalCapacityBar: {
+    height: 24,
+    backgroundColor: COLORS.gray200,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: SPACING.sm,
+  },
+  functionalCapacityFill: {
+    height: '100%',
+    borderRadius: 12,
+  },
+  functionalCapacityText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.gray700,
+    textAlign: 'center',
+  },
+  streakCard: {
+    backgroundColor: COLORS.gray100,
+    padding: SPACING.md,
+    borderRadius: 12,
+    marginBottom: SPACING.lg,
+  },
+  streakTitle: {
+    ...TYPOGRAPHY.titleMedium,
+    color: COLORS.gray900,
+    marginBottom: SPACING.sm,
+  },
+  streakText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.gray700,
+    marginBottom: SPACING.xs,
+  },
+  streakValue: {
+    fontWeight: 'bold',
+    color: COLORS.primary600,
+  },
+  ssdiInsightsCard: {
+    backgroundColor: COLORS.primaryLight,
+    padding: SPACING.lg,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary600,
+  },
+  ssdiInsightsTitle: {
+    ...TYPOGRAPHY.titleLarge,
+    color: COLORS.primary600,
+    marginBottom: SPACING.md,
+    fontWeight: 'bold',
+  },
+  ssdiInsightText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.gray800,
+    marginBottom: SPACING.sm,
+    lineHeight: 20,
   },
 });

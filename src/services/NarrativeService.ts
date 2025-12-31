@@ -11,6 +11,7 @@ import { SSDINarrativeBuilder } from '../engine/SSDINarrativeBuilder';
 import { getSymptomById } from '../data/symptoms';
 import { SymptomEngine } from '../engine/SymptomEngine';
 import { LimitationAnalyzer } from '../engine/LimitationAnalyzer';
+import { DayQualityAnalyzer } from './DayQualityAnalyzer';
 
 export interface DailyNarrative {
   date: string;
@@ -40,6 +41,7 @@ export interface FullNarrative {
     limitations: string;
     patterns: string;
     rfc: string;
+    dayQuality?: string; // SSDI day quality ratios
   };
   
   // Metadata
@@ -240,6 +242,7 @@ export class NarrativeService {
       limitations: '',
       patterns: '',
       rfc: '',
+      dayQuality: '',
     };
 
     // Overview section
@@ -259,6 +262,17 @@ export class NarrativeService {
     // Limitations section
     sections.limitations = SSDINarrativeBuilder.buildLimitationsNarrative(limitations);
 
+    // Day Quality section (SSDI-critical functional capacity metrics)
+    const dayAnalyzer = new DayQualityAnalyzer();
+    const filteredLogs = dailyLogs.filter(log => {
+      const logDate = new Date(log.logDate);
+      return logDate >= new Date(dateRange.start) && logDate <= new Date(dateRange.end);
+    });
+    const dateRangeRatios = dayAnalyzer.calculateDayRatios(filteredLogs);
+    const allTimeRangeRatios = dayAnalyzer.calculateTimeRangeRatios(dailyLogs);
+    const ssdiInsights = dayAnalyzer.generateSSIDInsights(allTimeRangeRatios);
+    sections.dayQuality = this.buildDayQualitySection(dateRangeRatios, ssdiInsights);
+
     // Patterns section
     sections.patterns = this.buildPatternsSection(triggers, recovery, dayRatio);
 
@@ -276,6 +290,9 @@ export class NarrativeService {
       '',
       'OVERVIEW',
       sections.overview,
+      '',
+      'DAY QUALITY ANALYSIS',
+      sections.dayQuality,
       '',
       'SYMPTOM ANALYSIS',
       sections.symptoms,
@@ -303,6 +320,44 @@ export class NarrativeService {
       },
       fullText,
     };
+  }
+
+  /**
+   * Build day quality section for SSDI documentation
+   */
+  private static buildDayQualitySection(
+    ratios: ReturnType<DayQualityAnalyzer['calculateDayRatios']>,
+    insights: string[]
+  ): string {
+    const lines: string[] = [];
+    
+    lines.push(`During this reporting period, functional capacity analysis reveals:`);
+    lines.push('');
+    lines.push(`Good days (minimal limitation): ${ratios.goodDayPercentage.toFixed(1)}%`);
+    lines.push(`Neutral days (moderate limitation): ${((ratios.totalDays - ratios.goodDays - ratios.badDays - ratios.veryBadDays) / ratios.totalDays * 100).toFixed(1)}%`);
+    lines.push(`Bad days (significant limitation): ${ratios.badDayPercentage.toFixed(1)}%`);
+    lines.push(`Very bad days (severe limitation): ${((ratios.veryBadDays / ratios.totalDays) * 100).toFixed(1)}%`);
+    lines.push('');
+    
+    lines.push(`Average functional capacity: ${(10 - ratios.averageSeverity).toFixed(1)}/10`);
+    lines.push(`Average symptom severity: ${ratios.averageSeverity.toFixed(1)}/10`);
+    lines.push(`Average symptom count per day: ${(ratios.totalDays > 0 ? (ratios.goodDays + ratios.neutralDays + ratios.badDays + ratios.veryBadDays) / ratios.totalDays : 0).toFixed(1)}`);
+    lines.push('');
+    
+    if (ratios.worstStreak > 0) {
+      lines.push(`Longest period of consecutive bad days: ${ratios.worstStreak} days`);
+    }
+    if (ratios.bestStreak > 0) {
+      lines.push(`Longest period of consecutive good days: ${ratios.bestStreak} days`);
+    }
+    lines.push('');
+    
+    lines.push('SSDI-Relevant Observations:');
+    insights.forEach(insight => {
+      lines.push(`- ${insight}`);
+    });
+    
+    return lines.join('\n');
   }
 
   /**
