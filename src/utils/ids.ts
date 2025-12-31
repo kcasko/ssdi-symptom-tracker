@@ -1,9 +1,21 @@
-import { v4 as uuidv4 } from 'uuid';
-
 /**
  * SSDI Symptom Tracker - ID Utilities
  * Stable, unique identifiers for all records
  */
+
+// Polyfill for crypto.getRandomValues in React Native
+if (typeof crypto === 'undefined') {
+  global.crypto = {
+    getRandomValues: (array: Uint8Array) => {
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256);
+      }
+      return array;
+    },
+  } as any;
+}
+
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Generate a new UUID v4
