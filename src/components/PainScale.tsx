@@ -24,9 +24,9 @@ export const PainScale: React.FC<PainScaleProps> = ({
 }) => {
   const getSeverityColor = (severity: number): string => {
     if (severity === 0) return colors.gray300;
-    if (severity <= 3) return colors.success;
-    if (severity <= 6) return colors.warning;
-    return colors.error;
+    if (severity <= 3) return colors.successMain;
+    if (severity <= 6) return colors.warningMain;
+    return colors.errorMain;
   };
 
   const getSeverityLabel = (severity: number): string => {

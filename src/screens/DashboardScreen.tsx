@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: colors.success,
+    borderLeftColor: colors.successMain,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -229,11 +229,11 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold as any,
-    color: colors.success,
+    color: colors.successMain,
   },
   editLink: {
     fontSize: typography.sizes.md,
-    color: colors.primary,
+    color: colors.primaryMain,
     fontWeight: typography.weights.semibold as any,
   },
   statsSection: {

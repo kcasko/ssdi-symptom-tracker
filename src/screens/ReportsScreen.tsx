@@ -21,7 +21,7 @@ import { typography } from '../theme/typography';
 import { BigButton, DateRangePicker, SummaryCard } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService } from '../services';
-import { formatDateShort } from '../utils/dates';
+import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
@@ -119,13 +119,13 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                   <View style={styles.reportInfo}>
                     <Text style={styles.reportTitle}>{report.reportType}</Text>
                     <Text style={styles.reportMeta}>
-                      {formatDateShort(report.dateRange.start)} - {formatDateShort(report.dateRange.end)}
+                      {formatDate(report.dateRange.start, DISPLAY_DATE_SHORT)} - {formatDate(report.dateRange.end, DISPLAY_DATE_SHORT)}
                     </Text>
                     <Text style={styles.reportMeta}>
                       {stats.totalSections} sections • {stats.totalWords} words
                     </Text>
                     <Text style={styles.reportMeta}>
-                      Last edited {formatDateShort(report.lastModified)}
+                      Last edited {formatDate(report.lastModified, DISPLAY_DATE_SHORT)}
                     </Text>
                   </View>
                   <Text style={styles.arrow}>→</Text>
@@ -210,6 +210,6 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: typography.sizes.xl,
-    color: colors.primary,
+    color: colors.primaryMain,
   },
 });

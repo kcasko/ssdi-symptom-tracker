@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
   
   // Primary variant
   primaryButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMain,
   },
   primaryText: {
     color: colors.white,
@@ -103,15 +103,15 @@ const styles = StyleSheet.create({
   secondaryButton: {
     backgroundColor: colors.white,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: colors.primaryMain,
   },
   secondaryText: {
-    color: colors.primary,
+    color: colors.primaryMain,
   },
   
   // Danger variant
   dangerButton: {
-    backgroundColor: colors.error,
+    backgroundColor: colors.errorMain,
   },
   dangerText: {
     color: colors.white,

@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   toggleActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMain,
   },
   toggleText: {
     fontSize: typography.sizes.sm,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   infoTitle: {
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.bold as any,
-    color: colors.primary,
+    color: colors.primaryMain,
   },
   infoText: {
     fontSize: typography.sizes.sm,

@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     fontSize: typography.sizes.md,
-    color: colors.primary,
+    color: colors.primaryMain,
     fontWeight: typography.weights.semibold as any,
   },
   content: {
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   editor: {
     backgroundColor: colors.white,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: colors.primaryMain,
     borderRadius: 8,
     padding: spacing.md,
     fontSize: typography.sizes.md,

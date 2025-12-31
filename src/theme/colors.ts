@@ -111,10 +111,14 @@ export const colors = {
   
   // Common color shorthands
   white: '#ffffff',
-  primary600: '#0052b3',     // primary[600]
-  primaryLight: '#e6f0ff',   // primary[50]
-  warningLight: '#fff3cd',   // warning.light
-  successLight: '#d4edda',   // success.light
+  primaryMain: '#0066e6',        // primary[500] - main primary color
+  primary600: '#0052b3',         // primary[600] - darker primary
+  primaryLight: '#e6f0ff',       // primary[50]
+  warningMain: '#ffc107',        // warning.main
+  warningLight: '#fff3cd',       // warning.light
+  errorMain: '#dc3545',          // error.main
+  successMain: '#28a745',        // success.main
+  successLight: '#d4edda',       // success.light
 } as const;
 
 /**

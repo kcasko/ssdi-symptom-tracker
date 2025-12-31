@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   expandIcon: {
     fontSize: typography.sizes.xl,
-    color: colors.primary,
+    color: colors.primaryMain,
     fontWeight: typography.weights.bold as any,
   },
   activityButton: {
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   activityButtonSelected: {
     backgroundColor: colors.primaryLight,
-    borderColor: colors.primary,
+    borderColor: colors.primaryMain,
   },
   activityContent: {
     flex: 1,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     color: colors.gray900,
   },
   activityNameSelected: {
-    color: colors.primary,
+    color: colors.primaryMain,
   },
   activityDescription: {
     fontSize: typography.sizes.sm,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: typography.sizes.xl,
-    color: colors.primary,
+    color: colors.primaryMain,
     fontWeight: typography.weights.bold as any,
     marginLeft: spacing.sm,
   },

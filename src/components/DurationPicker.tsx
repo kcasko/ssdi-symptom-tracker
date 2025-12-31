@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   presetButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.primaryMain,
+    borderColor: colors.primaryMain,
   },
   presetText: {
     fontSize: typography.sizes.md,
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   customButton: {
     paddingHorizontal: spacing.lg,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primaryMain,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
