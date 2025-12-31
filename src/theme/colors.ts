@@ -96,6 +96,24 @@ export const colors = {
     exported: '#28a745',
     draft: '#6c757d',
   },
+
+  // Shorthand aliases for commonly used colors (for convenience)
+  gray50: '#f8f9fa',
+  gray100: '#f1f3f5',
+  gray200: '#e9ecef',
+  gray300: '#dee2e6',
+  gray400: '#ced4da',
+  gray500: '#adb5bd',
+  gray600: '#6c757d',
+  gray700: '#495057',
+  gray800: '#343a40',
+  gray900: '#212529',
+  
+  // Common color shorthands
+  white: '#ffffff',
+  background: '#f8f9fa',     // background.secondary
+  primaryLight: '#e6f0ff',   // primary[50]
+  warningLight: '#fff3cd',   // warning.light
 } as const;
 
 /**

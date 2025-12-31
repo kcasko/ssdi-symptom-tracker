@@ -187,6 +187,19 @@ export const typography = {
     fontWeight: fontWeights.bold,
     fontVariant: ['tabular-nums'],
   } as TextStyle,
+
+  // Font size tokens (for backwards compatibility with existing code)
+  sizes: {
+    xs: 10,
+    sm: 12,
+    md: 14,
+    lg: 16,
+    xl: 18,
+    xxl: 24,
+  },
+
+  // Font weight tokens (for backwards compatibility with existing code)
+  weights: fontWeights,
 } as const;
 
 export type Typography = typeof typography;
