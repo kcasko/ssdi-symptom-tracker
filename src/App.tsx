@@ -4,10 +4,13 @@
  */
 
 import React from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './navigation/AppNavigator';
 import { useAppState } from './state/useAppState';
+import { colors } from './theme/colors';
+import { typography } from './theme/typography';
 
 export default function App() {
   // Initialize app state
@@ -15,11 +18,6 @@ export default function App() {
 
   // Loading screen while app initializes
   if (isLoading || !isInitialized) {
-    const React = require('react');
-    const { View, Text, ActivityIndicator, StyleSheet } = require('react-native');
-    const { colors } = require('./theme/colors');
-    const { typography } = require('./theme/typography');
-    
     return (
       <SafeAreaProvider>
         <View style={styles.loadingContainer}>
@@ -42,11 +40,6 @@ export default function App() {
 
   // Error screen if initialization failed
   if (hasError && errorMessage) {
-    const React = require('react');
-    const { View, Text, StyleSheet } = require('react-native');
-    const { colors } = require('./theme/colors');
-    const { typography } = require('./theme/typography');
-    
     return (
       <SafeAreaProvider>
         <View style={styles.errorContainer}>
