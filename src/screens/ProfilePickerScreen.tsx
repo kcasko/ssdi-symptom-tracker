@@ -19,7 +19,7 @@ import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { BigButton } from '../components';
 import { useAppState } from '../state/useAppState';
-import { formatDateShort } from '../utils/dates';
+import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ProfilePickerProps = NativeStackScreenProps<RootStackParamList, 'ProfilePicker'>;
 
@@ -31,11 +31,13 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
     navigation.replace('Dashboard');
   };
 
-  const handleCreateProfile = () => {
+  const handleCreateProfile = async () => {
     const name = `Profile ${profiles.length + 1}`;
-    const profile = createProfile(name);
-    setActiveProfile(profile.id);
-    navigation.replace('Dashboard');
+    const profileId = await createProfile(name);
+    if (profileId) {
+      await setActiveProfile(profileId);
+      navigation.replace('Dashboard');
+    }
   };
 
   return (
@@ -57,10 +59,10 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
             <View style={styles.profileInfo}>
               <Text style={styles.profileName}>{profile.displayName}</Text>
               <Text style={styles.profileMeta}>
-                Created {formatDateShort(profile.createdAt)}
+                Created {formatDate(profile.createdAt, DISPLAY_DATE_SHORT)}
               </Text>
               <Text style={styles.profileMeta}>
-                Last updated {formatDateShort(profile.lastAccessed)}
+                Last updated {formatDate(profile.lastAccessed, DISPLAY_DATE_SHORT)}
               </Text>
             </View>
             <Text style={styles.arrow}>→</Text>
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: typography.sizes.xxl,
-    color: colors.primary,
+    color: colors.primary600,
   },
   emptyState: {
     alignItems: 'center',

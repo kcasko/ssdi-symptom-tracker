@@ -20,13 +20,39 @@ interface AppState {
   // Current state
   activeProfileId: string | null;
   activeProfile: any | null;
+  profiles: any[];
   
   // Loading states
   isLoading: boolean;
   hasError: boolean;
   errorMessage: string | null;
   
-  // Actions
+  // Profile actions
+  setActiveProfile: (profileId: string | null) => Promise<void>;
+  createProfile: (name: string) => Promise<string | null>;
+  
+  // Log data
+  dailyLogs: any[];
+  activityLogs: any[];
+  limitations: any[];
+  
+  // Log actions
+  addDailyLog: (log: any) => Promise<void>;
+  updateDailyLog: (log: any) => Promise<void>;
+  addActivityLog: (log: any) => Promise<void>;
+  
+  // Report data
+  reportDrafts: any[];
+  
+  // Report actions
+  addReportDraft: (title: string, reportType: any, dateRange: any) => Promise<string | null>;
+  updateReportDraft: (draft: any) => Promise<void>;
+  
+  // Settings
+  settings: any;
+  updateSettings: (updates: any) => Promise<void>;
+  
+  // General actions
   initializeApp: () => Promise<void>;
   switchProfile: (profileId: string | null) => Promise<void>;
   clearAllErrors: () => void;
@@ -166,6 +192,7 @@ export function useAppState(): AppState {
     // Current state
     activeProfileId: profileStore.activeProfileId,
     activeProfile: profileStore.activeProfile,
+    profiles: profileStore.profiles,
     
     // Loading states
     isLoading,
@@ -176,6 +203,25 @@ export function useAppState(): AppState {
     initializeApp,
     switchProfile,
     clearAllErrors,
+    setActiveProfile: profileStore.setActiveProfile,
+    createProfile: profileStore.createProfile,
+    
+    // Log store data and methods
+    dailyLogs: logStore.dailyLogs,
+    activityLogs: logStore.activityLogs,
+    limitations: logStore.limitations,
+    addDailyLog: logStore.addDailyLog,
+    updateDailyLog: logStore.updateDailyLog,
+    addActivityLog: logStore.addActivityLog,
+    
+    // Report store data and methods
+    reportDrafts: reportStore.drafts,
+    addReportDraft: reportStore.createDraft,
+    updateReportDraft: reportStore.updateDraft,
+    
+    // Settings
+    settings: settingsStore.settings,
+    updateSettings: settingsStore.updateSettings,
   };
 }
 
