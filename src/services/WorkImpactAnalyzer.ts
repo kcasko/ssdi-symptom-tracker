@@ -248,6 +248,7 @@ export class WorkImpactAnalyzer {
    */
   private static findSittingInterference(
     dailyLogs: DailyLog[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _limitations: Limitation[]
   ): InterferingFactor[] {
     const factors: InterferingFactor[] = [];
@@ -411,6 +412,7 @@ export class WorkImpactAnalyzer {
    */
   private static findDexterityInterference(
     dailyLogs: DailyLog[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _limitations: Limitation[]
   ): InterferingFactor[] {
     const factors: InterferingFactor[] = [];
@@ -519,6 +521,7 @@ export class WorkImpactAnalyzer {
    */
   private static findMemoryInterference(
     dailyLogs: DailyLog[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _limitations: Limitation[]
   ): InterferingFactor[] {
     const factors: InterferingFactor[] = [];

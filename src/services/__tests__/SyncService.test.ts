@@ -3,15 +3,18 @@
  */
 
 import { SyncService } from '../SyncService';
-import { PendingOperation, SyncConflict } from '../../domain/models/SyncModels';
+import { PendingOperation } from '../../domain/models/SyncModels';
+import NetInfo from '@react-native-community/netinfo';
 
 // Mock NetInfo
 jest.mock('@react-native-community/netinfo', () => ({
-  addEventListener: jest.fn((callback) => {
+  addEventListener: jest.fn(() => {
     return jest.fn(); // Mock unsubscribe function
   }),
   fetch: jest.fn(() => Promise.resolve({ isConnected: true, isInternetReachable: true }))
 }));
+
+const MockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
 
 describe('SyncService', () => {
   let syncService: SyncService;
@@ -83,8 +86,7 @@ describe('SyncService', () => {
     });
 
     it('should not sync when offline', async () => {
-      const NetInfo = require('@react-native-community/netinfo');
-      NetInfo.fetch.mockResolvedValueOnce({ isConnected: false });
+      (MockNetInfo.fetch as jest.Mock).mockResolvedValueOnce({ isConnected: false });
 
       await syncService.queueOperation({
         entityType: 'DailyLog',

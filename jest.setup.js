@@ -1,3 +1,6 @@
+/* eslint-env jest */
+/* global global, jest, beforeAll, afterAll */
+
 // Polyfill for global if needed
 if (typeof global !== 'undefined') {
   global.performance = global.performance || {

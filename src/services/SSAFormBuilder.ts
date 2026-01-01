@@ -211,6 +211,7 @@ export class SSAFormBuilder {
    */
   private static extractMedicalConditions(
     limitations: Limitation[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     evidenceSummary: EvidenceSummary
   ): MedicalCondition[] {
     // Group limitations by underlying condition

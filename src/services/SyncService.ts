@@ -13,14 +13,12 @@ import {
   SyncResult,
   PendingOperation,
   SyncConflict,
-  EntityMetadata,
   SyncManifest,
   DEFAULT_SYNC_CONFIG,
   SyncOperation,
   EntityType,
   createOperationId,
   canRetryOperation,
-  hasConflict,
   resolveConflict
 } from '../domain/models/SyncModels';
 

@@ -331,8 +331,8 @@ export class RFCBuilder {
     });
     
     const problemLifting = liftingActivities.filter(log => {
-      const impactScore = (log.immediateImpact?.pain || 0) + (log.immediateImpact?.fatigue || 0);
-      return log.stoppedEarly || log.immediateImpact.overallImpact >= 7
+      return log.stoppedEarly || log.immediateImpact.overallImpact >= 7;
+    });
     
     const liftingLimitations = limitations.filter(l =>
       l.isActive && (l.category === 'lifting' || l.category === 'carrying')
@@ -638,8 +638,7 @@ export class RFCBuilder {
       accommodations.push(`Requires ${walking.assistiveDeviceType || 'assistive device'}`);
     }
     
-    if (concentration.requiresFrequentBreaks) {
-      accommodations.?.requiresFrequentBreaks) {
+    if (concentration?.requiresFrequentBreaks) {
       accommodations.push('Frequent rest breaks needed');
     }
     
@@ -647,7 +646,8 @@ export class RFCBuilder {
       accommodations.push('Flexible schedule required');
     }
     
-    if (social?ations.push('Limited public interaction');
+    if (social?.limitedPublicInteraction) {
+      accommodations.push('Limited public interaction');
     }
     
     return accommodations;

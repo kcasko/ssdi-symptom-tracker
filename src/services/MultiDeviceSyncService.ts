@@ -6,7 +6,6 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
 import {
   Device,
   DeviceSyncManifest,
@@ -19,11 +18,8 @@ import {
   generateDeviceId,
   calculateEntityChecksum,
   detectChanges,
-  applyChanges,
   mergeEntities
 } from '../domain/models/MultiDeviceSync';
-import { CloudBackupService } from './CloudBackupService';
-import { SyncService } from './SyncService';
 
 const DEVICE_KEY = '@device_info';
 const MANIFEST_KEY = '@device_sync_manifest';
@@ -245,7 +241,7 @@ export class MultiDeviceSyncService {
     let resolvedData: any;
     
     switch (resolution) {
-      case 'use_device':
+      case 'use_device': {
         if (!selectedDeviceId) {
           throw new Error('Device ID required for use_device resolution');
         }
@@ -255,6 +251,7 @@ export class MultiDeviceSyncService {
         }
         resolvedData = selectedVersion.data;
         break;
+      }
         
       case 'merge':
         resolvedData = mergeEntities(conflict.versions.map(v => v.data));

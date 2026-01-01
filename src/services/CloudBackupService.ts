@@ -296,7 +296,7 @@ export class CloudBackupService {
         try {
           await this.decryptData(backupPackage.data.substring(0, 100)); // Test with small sample
           result.checks.encryptionValid = true;
-        } catch (_error) {
+        } catch {
           result.checks.encryptionValid = false;
           result.errors.push('Cannot decrypt - wrong encryption key or corrupted data');
         }
@@ -313,7 +313,7 @@ export class CloudBackupService {
         }
         JSON.parse(testData.substring(0, 1000)); // Test parse with small sample
         result.checks.dataIntegrity = true;
-      } catch (_error) {
+      } catch {
         result.checks.dataIntegrity = false;
         result.errors.push('Invalid JSON structure');
       }
