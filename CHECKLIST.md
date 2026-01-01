@@ -55,8 +55,8 @@ npm run web        # Run in browser
 ```
 
 ### Testing Checklist
-- [ ] Install dependencies successfully
-- [ ] App starts without errors
+- [x] Install dependencies successfully
+- [x] App starts without errors
 - [ ] Create first profile
 - [ ] Log daily symptoms
 - [ ] Log activity impact
