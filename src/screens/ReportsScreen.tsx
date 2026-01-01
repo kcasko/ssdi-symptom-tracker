@@ -20,13 +20,13 @@ import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { BigButton, DateRangePicker } from '../components';
 import { useAppState } from '../state/useAppState';
-import { ReportService } from '../services';
+import { ReportService, ExportService, CredibilityScorer } from '../services';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
 export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, activityLogs, limitations, reportDrafts, addReportDraft, updateReportDraft } =
+  const { activeProfile, dailyLogs, activityLogs, limitations, medications, reportDrafts, addReportDraft, updateReportDraft } =
     useAppState();
 
   const now = new Date();
@@ -35,8 +35,68 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
   const [startDate, setStartDate] = useState(thirtyDaysAgo.toISOString().split('T')[0]);
   const [endDate, setEndDate] = useState(now.toISOString().split('T')[0]);
   const [generating, setGenerating] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const profileReports = reportDrafts.filter((r) => r.profileId === activeProfile?.id);
+
+  // Calculate credibility score
+  const credibilityScore = activeProfile
+    ? CredibilityScorer.calculateCredibility(
+        dailyLogs.filter(l => l.profileId === activeProfile.id),
+        activityLogs.filter(l => l.profileId === activeProfile.id),
+        medications.filter(m => m.profileId === activeProfile.id),
+        limitations.filter(l => l.profileId === activeProfile.id)
+      )
+    : null;
+
+  const handleExportData = async (type: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations' | 'all') => {
+    if (!activeProfile) return;
+
+    setExporting(true);
+    try {
+      if (type === 'all') {
+        await ExportService.exportAllData(
+          dailyLogs.filter(l => l.profileId === activeProfile.id),
+          activityLogs.filter(l => l.profileId === activeProfile.id),
+          medications.filter(m => m.profileId === activeProfile.id),
+          limitations.filter(l => l.profileId === activeProfile.id)
+        );
+      } else if (type === 'daily-logs') {
+        const filename = ExportService.generateFilename('daily_logs', 'csv');
+        await ExportService.exportToCSV(
+          'daily-logs',
+          dailyLogs.filter(l => l.profileId === activeProfile.id),
+          filename
+        );
+      } else if (type === 'activity-logs') {
+        const filename = ExportService.generateFilename('activity_logs', 'csv');
+        await ExportService.exportToCSV(
+          'activity-logs',
+          activityLogs.filter(l => l.profileId === activeProfile.id),
+          filename
+        );
+      } else if (type === 'medications') {
+        const filename = ExportService.generateFilename('medications', 'csv');
+        await ExportService.exportToCSV(
+          'medications',
+          medications.filter(m => m.profileId === activeProfile.id),
+          filename
+        );
+      } else if (type === 'limitations') {
+        const filename = ExportService.generateFilename('limitations', 'csv');
+        await ExportService.exportToCSV(
+          'limitations',
+          limitations.filter(l => l.profileId === activeProfile.id),
+          filename
+        );
+      }
+      Alert.alert('Success', 'Data exported successfully');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to export data');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleGenerateReport = async () => {
     if (!activeProfile) return;
@@ -98,6 +158,85 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Credibility Score */}
+        {credibilityScore && (
+          <View style={styles.credibilitySection}>
+            <Text style={styles.sectionTitle}>Documentation Strength</Text>
+            <View style={styles.credibilityCard}>
+              <View style={styles.credibilityHeader}>
+                <Text style={styles.credibilityScore}>{credibilityScore.overallScore}</Text>
+                <View style={styles.credibilityGrade}>
+                  <Text style={styles.credibilityGradeText}>{credibilityScore.grade}</Text>
+                  <Text style={styles.credibilityLabel}>Documentation Quality</Text>
+                </View>
+              </View>
+              
+              <View style={styles.credibilityIndicators}>
+                <View style={styles.indicatorRow}>
+                  <Text style={styles.indicatorLabel}>Logging Consistency:</Text>
+                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.loggingConsistency.rating}</Text>
+                </View>
+                <View style={styles.indicatorRow}>
+                  <Text style={styles.indicatorLabel}>Duration Coverage:</Text>
+                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.durationCoverage.rating}</Text>
+                </View>
+                <View style={styles.indicatorRow}>
+                  <Text style={styles.indicatorLabel}>Data Completeness:</Text>
+                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.dataCompleteness.rating}</Text>
+                </View>
+                <View style={styles.indicatorRow}>
+                  <Text style={styles.indicatorLabel}>Pattern Stability:</Text>
+                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.patternStability.rating}</Text>
+                </View>
+              </View>
+
+              {credibilityScore.recommendations.length > 0 && (
+                <View style={styles.recommendationsSection}>
+                  <Text style={styles.recommendationsTitle}>Recommendations:</Text>
+                  {credibilityScore.recommendations.map((rec, idx) => (
+                    <Text key={idx} style={styles.recommendationText}>• {rec}</Text>
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {/* Export Data */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Export Data</Text>
+          <View style={styles.exportButtons}>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={() => handleExportData('daily-logs')}
+              disabled={exporting}
+            >
+              <Text style={styles.exportButtonText}>Daily Logs (CSV)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={() => handleExportData('activity-logs')}
+              disabled={exporting}
+            >
+              <Text style={styles.exportButtonText}>Activities (CSV)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={() => handleExportData('medications')}
+              disabled={exporting}
+            >
+              <Text style={styles.exportButtonText}>Medications (CSV)</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={() => handleExportData('all')}
+              disabled={exporting}
+            >
+              <Text style={styles.exportButtonText}>Full Backup (JSON)</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Generate New Report</Text>
           
@@ -230,6 +369,92 @@ const styles = StyleSheet.create({
   },
   arrow: {
     fontSize: typography.sizes.xl,
+    color: colors.primaryMain,
+  },
+  credibilitySection: {
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  credibilityCard: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: spacing.lg,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.primaryMain,
+  },
+  credibilityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    marginBottom: spacing.md,
+  },
+  credibilityScore: {
+    fontSize: 56,
+    fontWeight: typography.weights.bold as any,
+    color: colors.primaryMain,
+  },
+  credibilityGrade: {
+    flex: 1,
+  },
+  credibilityGradeText: {
+    fontSize: typography.sizes.xl,
+    fontWeight: typography.weights.bold as any,
+    color: colors.gray900,
+  },
+  credibilityLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
+  },
+  credibilityIndicators: {
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  indicatorRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  indicatorLabel: {
+    fontSize: typography.sizes.md,
+    color: colors.gray700,
+  },
+  indicatorValue: {
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.bold as any,
+    color: colors.primaryMain,
+  },
+  recommendationsSection: {
+    marginTop: spacing.md,
+    padding: spacing.md,
+    backgroundColor: colors.gray50,
+    borderRadius: 8,
+  },
+  recommendationsTitle: {
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.bold as any,
+    color: colors.gray900,
+    marginBottom: spacing.sm,
+  },
+  recommendationText: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray700,
+    marginBottom: spacing.xs,
+    lineHeight: 20,
+  },
+  exportButtons: {
+    gap: spacing.sm,
+  },
+  exportButton: {
+    backgroundColor: colors.white,
+    borderWidth: 2,
+    borderColor: colors.primaryMain,
+    borderRadius: 8,
+    padding: spacing.md,
+    alignItems: 'center',
+  },
+  exportButtonText: {
+    fontSize: typography.sizes.md,
+    fontWeight: typography.weights.bold as any,
     color: colors.primaryMain,
   },
 });

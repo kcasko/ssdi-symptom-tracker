@@ -36,6 +36,7 @@ interface AppState {
   dailyLogs: any[];
   activityLogs: any[];
   limitations: any[];
+  medications: any[];
   
   // Log actions
   addDailyLog: (log: any) => Promise<void>;
@@ -246,6 +247,7 @@ export function useAppState(): AppState {
     dailyLogs: logStore.dailyLogs,
     activityLogs: logStore.activityLogs,
     limitations: logStore.limitations,
+    medications: logStore.medications,
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,
     addActivityLog: logStore.addActivityLog,
