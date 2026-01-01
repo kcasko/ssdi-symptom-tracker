@@ -76,11 +76,8 @@ export function createMockWorkHistory(overrides?: Partial<WorkHistory>): WorkHis
     ...overrides
   };
 }
-daily',
-    physicalRequirements: {
-      standing: true,
-      lifting: 20
-    }bDuty(overrides?: Partial<JobDuty>): JobDuty {
+
+export function mockJobDuty(overrides?: Partial<JobDuty>): JobDuty {
   return {
     id: 'duty1',
     description: 'Test duty',
@@ -114,16 +111,16 @@ export function createMockActivityLog(overrides?: Partial<ActivityLog>): Activit
   return {
     id: 'activity1',
     profileId: 'profile1',
-    crsymptoms: [],
-      overallImpact: 301',
+    createdAt: now,
+    updatedAt: now,
+    activityDate: now.split('T')[0],
     activityId: 'housework',
     activityName: 'Housework',
     duration: 60,
     intensity: 'moderate',
     immediateImpact: {
-      painIncrease: 2,
-      fatigueIncrease: 3,
-      symptomsTriggered: []
+      symptoms: [],
+      overallImpact: 3
     },
     recoveryActions: [],
     stoppedEarly: false,
@@ -133,7 +130,8 @@ export function createMockActivityLog(overrides?: Partial<ActivityLog>): Activit
 
 export function createMockAppointment(overrides?: Partial<Appointment>): Appointment {
   const now = new Date().toISOString();
-  reid: 'appt1',
+  return {
+    id: 'appt1',
     profileId: 'profile1',
     createdAt: now,
     updatedAt: now,
@@ -151,7 +149,7 @@ export function createMockMedication(overrides?: Partial<Medication>): Medicatio
     id: 'med1',
     profileId: 'profile1',
     createdAt: now,
-    updatedAt['Pain management']
+    updatedAt: now,
     name: 'Test Medication',
     dosage: '100mg',
     frequency: 'daily' as MedicationFrequency,

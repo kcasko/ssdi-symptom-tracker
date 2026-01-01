@@ -36,7 +36,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
   const [endDate, setEndDate] = useState(now.toISOString().split('T')[0]);
   const [generating, setGenerating] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [backing up, setBackingUp] = useState(false);
+  const [backingUp, setBackingUp] = useState(false);
 
   const profileReports = reportDrafts.filter((r) => r.profileId === activeProfile?.id);
 

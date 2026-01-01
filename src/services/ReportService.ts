@@ -135,13 +135,14 @@ export class ReportService {
 
       // Map template sections to narrative sections
       switch (sectionTemplate.type) {
-        case 'header':
+        case 'header': {
           // Generate a header with date range, profile, and log counts
           const logCount = dailyLogs.length;
           const activityCount = activityLogs.length;
           const limitationCount = limitations.length;
           content = `Report for profile: ${options.profileId}\nDate range: ${options.dateRange.start} to ${options.dateRange.end}\nEntries: ${logCount} daily logs, ${activityCount} activity logs, ${limitationCount} limitations.`;
           break;
+        }
         case 'summary':
           content = narrative.sections.overview || 'No overview data available for the selected date range.';
           break;
