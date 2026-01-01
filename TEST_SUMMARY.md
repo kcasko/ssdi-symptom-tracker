@@ -19,6 +19,7 @@ A comprehensive test suite has been created to validate all core functionality o
 
 
 ##### Core Service Tests
+  - **Jest** configured with **ts-jest** for TypeScript support
 
 1. **RFCBuilder.test.ts** - 10 test suites, tests RFC generation from logs
 2. **WorkImpactAnalyzer.test.ts** - 6 test suites, tests job duty impact analysis
@@ -28,6 +29,7 @@ A comprehensive test suite has been created to validate all core functionality o
 6. **CloudBackupService.test.ts** - 6 test suites, tests encrypted cloud backups
 
 ##### Utility Tests
+
 
 7. **utilities.test.ts** - 3 test suites, tests date/flare/trend utilities
 
