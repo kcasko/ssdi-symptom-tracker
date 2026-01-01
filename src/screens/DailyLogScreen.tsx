@@ -33,7 +33,7 @@ interface SymptomEntry {
 }
 
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, photos, addPhoto, deletePhoto, getPhotosByEntity } = useAppState();
+  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity } = useAppState();
   const [date] = useState(new Date().toISOString().split('T')[0]);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<string[]>([]);
   const [symptomEntries, setSymptomEntries] = useState<Record<string, SymptomEntry>>({});

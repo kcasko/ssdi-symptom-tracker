@@ -4,8 +4,6 @@
  * Uses fixed sentence templates - no expressive language or emotional descriptors
  */
 
-import { DailyLog } from '../domain/models/DailyLog';
-import { ActivityLog } from '../domain/models/ActivityLog';
 import { FunctionalDomain, FUNCTIONAL_DOMAIN_INFO } from '../domain/rules/functionalDomains';
 
 /**

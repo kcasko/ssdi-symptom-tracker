@@ -3,7 +3,7 @@
  * Generates clean, lawyer-ready PDF reports with no styling, icons, or branding
  */
 
-import { EvidenceReport, FunctionalLimitationNarrative } from './EvidenceReportBuilder';
+import { EvidenceReport } from './EvidenceReportBuilder';
 
 /**
  * PDF export configuration
@@ -323,7 +323,6 @@ function formatTimestamp(isoString: string): string {
  * Helper: Escape HTML
  */
 function escapeHTML(text: string): string {
-  const div = { textContent: text } as any;
   const textarea = document?.createElement?.('textarea');
   if (textarea) {
     textarea.textContent = text;

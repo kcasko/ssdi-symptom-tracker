@@ -127,14 +127,15 @@ export class BackupRestoreService {
   /**
    * Restore data from backup
    * @param backup Backup data to restore
-   * @param options Restore options
+   * @param _options Restore options (currently unused but kept for API compatibility)
    */
   static async restoreFromBackup(
     backup: BackupData,
-    _options: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _options?: {
       mergeWithExisting?: boolean; // If false, clears existing data first
       skipPhotos?: boolean; // Photos may not restore if files don't exist
-    } = {}
+    }
   ): Promise<RestoreResult> {
     const result: RestoreResult = {
       success: false,

@@ -31,7 +31,6 @@ import {
   getPurposeLabel,
 } from '../domain/models/Appointment';
 import { AppointmentSummaryService, AppointmentPreparationSummary } from '../services/AppointmentSummaryService';
-import { ids } from '../utils/ids';
 
 type Tab = 'medications' | 'appointments';
 
@@ -42,8 +41,6 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const deleteMedication = useLogStore(state => state.deleteMedication);
   
   const appointments = useLogStore(state => state.appointments);
-  const addAppointment = useLogStore(state => state.addAppointment);
-  const updateAppointment = useLogStore(state => state.updateAppointment);
   const deleteAppointment = useLogStore(state => state.deleteAppointment);
   
   const { dailyLogs, activityLogs, limitations } = useAppState();
@@ -53,9 +50,6 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [editingMed, setEditingMed] = useState<Medication | null>(null);
   const [showSideEffectsModal, setShowSideEffectsModal] = useState(false);
   const [selectedMedForSideEffects, setSelectedMedForSideEffects] = useState<Medication | null>(null);
-  
-  const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
-  const [showApptModal, setShowApptModal] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
 

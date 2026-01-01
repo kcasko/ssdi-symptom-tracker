@@ -72,7 +72,6 @@ export function useAppState(): AppState {
   const logStore = useLogStore();
   const reportStore = useReportStore();
   const settingsStore = useSettingsStore();
-  const evidenceStore = useEvidenceModeStore();
   
   // Use refs to prevent infinite loops and track initialization
   const hasInitialized = useRef(false);

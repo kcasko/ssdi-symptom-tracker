@@ -4,7 +4,7 @@
  * NOT LABELED AS SSA IN UI - used only for logical grouping
  */
 
-import { FunctionalDomain, FunctionalImpactMapping } from '../models/EvidenceMode';
+import { FunctionalDomain } from '../models/EvidenceMode';
 
 /**
  * Symptom to functional domain mappings

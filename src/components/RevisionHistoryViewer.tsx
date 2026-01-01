@@ -32,11 +32,15 @@ export function RevisionHistoryViewer({
   useEffect(() => {
     if (visible) {
       const logRevisions = evidenceStore.getLogRevisions(logId);
-      setRevisions(logRevisions.sort((a, b) => 
+      const sorted = [...logRevisions].sort((a, b) => 
         new Date(b.revisionTimestamp).getTime() - new Date(a.revisionTimestamp).getTime()
-      ));
+      );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRevisions(sorted);
+    } else {
+      setRevisions([]);
     }
-  }, [visible, logId]);
+  }, [visible, logId, evidenceStore]);
 
   if (!visible) return null;
 

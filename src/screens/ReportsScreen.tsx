@@ -92,7 +92,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         );
       }
       Alert.alert('Success', 'Data exported successfully');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to export data');
     } finally {
       setExporting(false);
@@ -156,7 +156,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
     setBackingUp(true);
     try {
-      const fileUri = await BackupRestoreService.createBackup({
+      await BackupRestoreService.createBackup({
         profiles,
         dailyLogs,
         activityLogs,
@@ -173,7 +173,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         'Your data has been backed up successfully. Save this file to a secure location.',
         [{ text: 'OK' }]
       );
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to create backup');
     } finally {
       setBackingUp(false);
@@ -221,7 +221,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
       } else {
         Alert.alert('Restore Failed', result.errors.join('\n'));
       }
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to restore backup');
     }
   };

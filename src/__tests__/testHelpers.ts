@@ -4,18 +4,18 @@
 
 import { DailyLog, SymptomEntry, TimeOfDay, SleepEntry } from '../domain/models/DailyLog';
 import { Limitation, LimitationCategory, LimitationFrequency, VariabilityLevel } from '../domain/models/Limitation';
-import { WorkHistory, JobDuty, PhysicalDemands, WorkImpact, DutyImpact } from '../domain/models/WorkHistory';
+import { WorkHistory, JobDuty, PhysicalDemands } from '../domain/models/WorkHistory';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Appointment, AppointmentPurpose } from '../domain/models/Appointment';
 import { Medication, MedicationFrequency } from '../domain/models/Medication';
 
 export function createMockDailyLog(overrides?: Partial<DailyLog>): DailyLog {
-  const now = new Date().toISOString();
+  const timestamp = new Date().toISOString();
   return {
     id: 'log1',
     profileId: 'profile1',
-    createdAt: now,
-    updatedAt: now,
+    createdAt: timestamp,
+    updatedAt: timestamp,
     logDate: '2024-01-01',
     timeOfDay: 'morning' as TimeOfDay,
     symptoms: [],
@@ -38,12 +38,12 @@ export function createMockDailyLogs(count: number, baseOverrides?: Partial<Daily
 }
 
 export function createMockLimitation(overrides?: Partial<Limitation>): Limitation {
-  const now = new Date().toISOString();
+  const timestamp = new Date().toISOString();
   return {
     id: 'lim1',
     profileId: 'profile1',
-    createdAt: now,
-    updatedAt: now,
+    createdAt: timestamp,
+    updatedAt: timestamp,
     category: 'standing' as LimitationCategory,
     frequency: 'constant' as LimitationFrequency,
     consequences: ['Pain increases', 'Fatigue worsens'],
@@ -54,7 +54,6 @@ export function createMockLimitation(overrides?: Partial<Limitation>): Limitatio
 }
 
 export function createMockWorkHistory(overrides?: Partial<WorkHistory>): WorkHistory {
-  const now = new Date().toISOString();
   return {
     id: 'job1',
     profileId: 'profile1',

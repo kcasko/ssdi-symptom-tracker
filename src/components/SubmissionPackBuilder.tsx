@@ -15,8 +15,6 @@ import {
 } from 'react-native';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { useLogStore } from '../state/logStore';
-import { DailyLog } from '../domain/models/DailyLog';
-import { ActivityLog } from '../domain/models/ActivityLog';
 
 interface SubmissionPackBuilderProps {
   profileId: string;

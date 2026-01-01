@@ -22,15 +22,6 @@ const brokenStreak: DailyPainEntry[] = [
   { date: '2026-01-06', painScore: 8 }
 ];
 
-const backToBackFlares: DailyPainEntry[] = [
-  { date: '2026-01-01', painScore: 6 },
-  { date: '2026-01-02', painScore: 7 },
-  { date: '2026-01-03', painScore: 8 },
-  { date: '2026-01-04', painScore: 6 },
-  { date: '2026-01-05', painScore: 7 },
-  { date: '2026-01-06', painScore: 8 }
-];
-
 const multipleEntriesPerDay: DailyPainEntry[] = [
   { date: '2026-01-01', painScore: 5 },
   { date: '2026-01-01', painScore: 9 }, // highest wins

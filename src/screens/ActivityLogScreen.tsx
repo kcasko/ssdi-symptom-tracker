@@ -28,7 +28,7 @@ import {
 } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService } from '../services';
-import { canModifyLog, updateLogWithRevision } from '../services/EvidenceLogService';
+import { canModifyLog } from '../services/EvidenceLogService';
 
 type ActivityLogProps = NativeStackScreenProps<RootStackParamList, 'ActivityLog'>;
 
