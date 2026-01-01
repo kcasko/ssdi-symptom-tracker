@@ -16,3 +16,5 @@ export * from './PhotoService';
 export * from './RFCBuilder';
 export * from './WorkImpactAnalyzer';
 export * from './SSAFormBuilder';
+export * from './SyncService';
+export * from './CloudBackupService';
