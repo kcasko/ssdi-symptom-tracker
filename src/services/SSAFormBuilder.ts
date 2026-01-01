@@ -123,8 +123,8 @@ export class SSAFormBuilder {
       providerType: a.type as any,
       address: a.location || '',
       phone: '',
-      dateFirstVisit: a.date,
-      dateLastVisit: a.date,
+      dateFirstVisit: a.appointmentDate,
+      dateLastVisit: a.appointmentDate,
       frequencyOfVisits: 'As documented in logs',
       treatmentFor: a.purpose,
       sourceLogIds: [a.id]
@@ -136,7 +136,7 @@ export class SSAFormBuilder {
       stillWorking: false,
       howConditionsLimit: this.buildHowConditionsLimitNarrative(rfc),
       workHistory,
-      didConditionsAffectWork: workImpacts.some(wi => !wi.canReturnToJob),
+      didConditionsAffectWork: workImpacts.some(wi => !wi.canReturnToThisJob),
       whenDidConditionsAffectWork: evidenceSummary.dateRangeStart,
       howConditionsAffectedWork: this.buildWorkAffectedNarrative(workImpacts),
       medications: medicationEntries,
@@ -180,7 +180,7 @@ export class SSAFormBuilder {
     
     return {
       jobs,
-      canDoAnyPastWork: workImpacts.every(wi => wi.canReturnToJob),
+      canDoAnyPastWork: workImpacts.every(wi => wi.canReturnToThisJob),
       reasonsCannotDoPastWork,
       evidenceSummary
     };
@@ -191,17 +191,17 @@ export class SSAFormBuilder {
    */
   private static buildRFCSummary(rfc: RFC, evidenceSummary: EvidenceSummary): RFCSummary {
     return {
-      workCapacityLevel: rfc.workCapacityLevel,
+      workCapacityLevel: rfc.overallRating,
       canWorkFullTime: rfc.canWorkFullTime,
-      sittingCapacity: this.formatCapacity('sitting', rfc.exertionalCapacity.sitting),
-      standingCapacity: this.formatCapacity('standing', rfc.exertionalCapacity.standing),
-      walkingCapacity: this.formatCapacity('walking', rfc.exertionalCapacity.walking),
-      liftingCapacity: this.formatCapacity('lifting', rfc.exertionalCapacity.maxLiftingCapacity),
+      sittingCapacity: this.formatCapacity('sitting', rfc.exertionalLimitations.sitting),
+      standingCapacity: this.formatCapacity('standing', rfc.exertionalLimitations.standing),
+      walkingCapacity: this.formatCapacity('walking', rfc.exertionalLimitations.walking),
+      liftingCapacity: this.formatCapacity('lifting', rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional),
       posturalLimitations: this.formatPosturalLimitations(rfc.posturalLimitations),
       manipulativeLimitations: this.formatManipulativeLimitations(rfc.manipulativeLimitations),
       environmentalRestrictions: this.formatEnvironmentalRestrictions(rfc.environmentalLimitations),
       mentalLimitations: this.formatMentalLimitations(rfc.mentalLimitations),
-      requiredAccommodations: rfc.requiredAccommodations || [],
+      requiredAccommodations: rfc.requiresAccommodations || [],
       evidenceSummary
     };
   }
@@ -270,7 +270,7 @@ export class SSAFormBuilder {
       hoursPerWeek: job.hoursPerWeek,
       payRate: job.payRate || 0,
       physicalDemands: this.formatPhysicalDemands(job.physicalDemands),
-      canReturnToJob: workImpact.canReturnToJob,
+      canReturnToJob: workImpact.canReturnToThisJob,
       impactStatement: workImpact.overallImpactStatement,
       essentialDutiesAffected: affectedDuties.filter(d =>
         job.duties.find(duty => duty.description === d.duty.description)?.essential
@@ -323,10 +323,10 @@ export class SSAFormBuilder {
     // Group by activity
     const activityMap = new Map<string, ActivityLog[]>();
     activityLogs.forEach(log => {
-      if (!activityMap.has(log.activity)) {
-        activityMap.set(log.activity, []);
+      if (!activityMap.has(log.activityId)) {
+        activityMap.set(log.activityId, []);
       }
-      activityMap.get(log.activity)!.push(log);
+      activityMap.get(log.activityId)!.push(log);
     });
     
     return Array.from(activityMap.entries()).map(([activity, logs]) => {
@@ -363,43 +363,43 @@ export class SSAFormBuilder {
     const abilities: AffectedAbility[] = [];
     
     // Exertional
-    if (rfc.exertionalCapacity.sitting.hoursWithoutBreak < 2) {
+    if (rfc.exertionalLimitations.sitting.maxContinuousMinutes < 2) {
       abilities.push({
         ability: 'sitting',
         affected: true,
-        description: `Can sit only ${rfc.exertionalCapacity.sitting.hoursWithoutBreak} hours without break`,
+        description: `Can sit only ${rfc.exertionalLimitations.sitting.maxContinuousMinutes} hours without break`,
         evidenceFromRFC: true,
-        sourceLogIds: rfc.exertionalCapacity.sitting.supportingEvidence
+        sourceLogIds: rfc.exertionalLimitations.sitting.evidence
       });
     }
     
-    if (rfc.exertionalCapacity.standing.hoursWithoutBreak < 2) {
+    if (rfc.exertionalLimitations.standing.maxContinuousMinutes < 2) {
       abilities.push({
         ability: 'standing',
         affected: true,
-        description: `Can stand only ${rfc.exertionalCapacity.standing.hoursWithoutBreak} hours without break`,
+        description: `Can stand only ${rfc.exertionalLimitations.standing.maxContinuousMinutes} hours without break`,
         evidenceFromRFC: true,
-        sourceLogIds: rfc.exertionalCapacity.standing.supportingEvidence
+        sourceLogIds: rfc.exertionalLimitations.standing.evidence
       });
     }
     
-    if (rfc.exertionalCapacity.walking.hoursWithoutBreak < 2) {
+    if (rfc.exertionalLimitations.walking.maxContinuousMinutes < 2) {
       abilities.push({
         ability: 'walking',
         affected: true,
-        description: `Can walk only ${rfc.exertionalCapacity.walking.hoursWithoutBreak} hours without break`,
+        description: `Can walk only ${rfc.exertionalLimitations.walking.maxContinuousMinutes} hours without break`,
         evidenceFromRFC: true,
-        sourceLogIds: rfc.exertionalCapacity.walking.supportingEvidence
+        sourceLogIds: rfc.exertionalLimitations.walking.evidence
       });
     }
     
-    if (rfc.exertionalCapacity.maxLiftingCapacity.occasionalWeight < 25) {
+    if (rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional < 25) {
       abilities.push({
         ability: 'lifting',
         affected: true,
-        description: `Can lift only ${rfc.exertionalCapacity.maxLiftingCapacity.occasionalWeight} lbs occasionally, ${rfc.exertionalCapacity.maxLiftingCapacity.frequentWeight} lbs frequently`,
+        description: `Can lift only ${rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional} lbs occasionally, ${rfc.exertionalLimitations.lifting.maxWeightPoundsFrequent} lbs frequently`,
         evidenceFromRFC: true,
-        sourceLogIds: rfc.exertionalCapacity.maxLiftingCapacity.supportingEvidence
+        sourceLogIds: rfc.exertionalLimitations.lifting.evidence
       });
     }
     
@@ -488,7 +488,7 @@ export class SSAFormBuilder {
         .filter(d => d.toolsRequired && d.toolsRequired.length > 0)
         .flatMap(d => d.toolsRequired || []),
       supervision: 'unsupervised',
-      canReturnToJob: workImpact.canReturnToJob,
+      canReturnToJob: workImpact.canReturnToThisJob,
       dutiesAffected: workImpact.dutyImpacts.map(di => this.buildDutyImpactSummary(di)),
       overallImpactStatement: workImpact.overallImpactStatement
     };
@@ -516,7 +516,7 @@ export class SSAFormBuilder {
     limitations: Limitation[],
     rfc: RFC
   ): EvidenceSummary {
-    const dates = dailyLogs.map(l => new Date(l.date));
+    const dates = dailyLogs.map(l => new Date(l.logDate));
     const startDate = new Date(Math.min(...dates.map(d => d.getTime())));
     const endDate = new Date(Math.max(...dates.map(d => d.getTime())));
     
@@ -604,7 +604,7 @@ export class SSAFormBuilder {
     parts.push('');
     
     workImpacts.forEach(wi => {
-      if (!wi.canReturnToJob) {
+      if (!wi.canReturnToThisJob) {
         const affectedDuties = wi.dutyImpacts.filter(di => !di.canPerform);
         parts.push(
           `Cannot return to ${wi.workHistory.jobTitle} due to inability to perform ${affectedDuties.length} essential duties:`
@@ -629,12 +629,12 @@ export class SSAFormBuilder {
     parts.push('');
     
     // Exertional
-    const exert = rfc.exertionalCapacity;
-    parts.push(`Sitting capacity: ${exert.sitting.hoursWithoutBreak} hours without break`);
-    parts.push(`Standing capacity: ${exert.standing.hoursWithoutBreak} hours without break`);
-    parts.push(`Walking capacity: ${exert.walking.hoursWithoutBreak} hours without break`);
+    const exert = rfc.exertionalLimitations;
+    parts.push(`Sitting capacity: ${exert.sitting.maxContinuousMinutes} hours without break`);
+    parts.push(`Standing capacity: ${exert.standing.maxContinuousMinutes} hours without break`);
+    parts.push(`Walking capacity: ${exert.walking.maxContinuousMinutes} hours without break`);
     parts.push(
-      `Lifting capacity: ${exert.maxLiftingCapacity.occasionalWeight} lbs occasionally, ${exert.maxLiftingCapacity.frequentWeight} lbs frequently`
+      `Lifting capacity: ${exert.lifting.maxWeightPoundsOccasional} lbs occasionally, ${exert.lifting.maxWeightPoundsFrequent} lbs frequently`
     );
     parts.push('');
     
@@ -650,7 +650,7 @@ export class SSAFormBuilder {
   }
   
   private static buildWorkAffectedNarrative(workImpacts: WorkImpact[]): string {
-    const affected = workImpacts.filter(wi => !wi.canReturnToJob);
+    const affected = workImpacts.filter(wi => !wi.canReturnToThisJob);
     if (affected.length === 0) {
       return 'No work impacts documented';
     }
@@ -663,13 +663,13 @@ export class SSAFormBuilder {
   private static extractChangesSinceDisability(rfc: RFC): string[] {
     const changes: string[] = [];
     
-    if (rfc.exertionalCapacity.sitting.hoursWithoutBreak < 6) {
+    if (rfc.exertionalLimitations.sitting.maxContinuousMinutes < 6) {
       changes.push('Can no longer sit for full workday');
     }
-    if (rfc.exertionalCapacity.standing.hoursWithoutBreak < 2) {
+    if (rfc.exertionalLimitations.standing.maxContinuousMinutes < 2) {
       changes.push('Can no longer stand for extended periods');
     }
-    if (rfc.exertionalCapacity.maxLiftingCapacity.occasionalWeight < 25) {
+    if (rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional < 25) {
       changes.push('Can no longer lift moderate weights');
     }
     
@@ -736,7 +736,7 @@ export class SSAFormBuilder {
   private static getLoggingPeriodDays(dailyLogs: DailyLog[]): number {
     if (dailyLogs.length === 0) return 0;
     
-    const dates = dailyLogs.map(l => new Date(l.date));
+    const dates = dailyLogs.map(l => new Date(l.logDate));
     const minDate = Math.min(...dates.map(d => d.getTime()));
     const maxDate = Math.max(...dates.map(d => d.getTime()));
     

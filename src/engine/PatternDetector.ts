@@ -95,7 +95,7 @@ export class PatternDetector {
       let trend: 'improving' | 'worsening' | 'stable' = 'stable';
       if (data.severities.length >= 3) {
         const sorted = [...data.severities].sort((a, b) => 
-          new Date(a.date).getTime() - new Date(b.date).getTime()
+          new Date(a.appointmentDate).getTime() - new Date(b.date).getTime()
         );
         const firstThird = sorted.slice(0, Math.floor(sorted.length / 3));
         const lastThird = sorted.slice(-Math.floor(sorted.length / 3));
@@ -196,7 +196,7 @@ export class PatternDetector {
 
       patterns.push({
         activityId,
-        activityName: activityLog.activityName,
+        activityName: activitylog.activityIdName,
         attempts: data.attempts,
         completionRate,
         averageDuration,

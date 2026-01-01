@@ -53,7 +53,7 @@ export class WorkImpactAnalyzer {
     const impactScore = this.calculateOverallImpact(dutyImpacts, workHistory.duties);
     
     // Determine if can return to this job
-    const canReturnToThisJob = this.canReturnToJob(dutyImpacts, workHistory.duties);
+    const canReturnToThisJob = this.canReturnToThisJob(dutyImpacts, workHistory.duties);
     
     // Generate impact statements
     const impactStatements = this.generateImpactStatements(
@@ -723,7 +723,7 @@ export class WorkImpactAnalyzer {
     const end = new Date(endDate);
     
     return logs.filter(log => {
-      const logDate = new Date(log.logDate || log.activityDate || log.date || '');
+      const logDate = new Date(log.logDate || log.activityDate || log.logDate || '');
       return logDate >= start && logDate <= end;
     });
   }

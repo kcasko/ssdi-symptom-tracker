@@ -194,7 +194,7 @@ export class ExportService {
 
         return [
           log.activityDate,
-          activityDef?.name || log.activityName,
+          activityDef?.name || log.activityIdName,
           log.duration,
           log.stoppedEarly ? 'Yes' : 'No',
           `${log.immediateImpact.overallImpact}/10`,

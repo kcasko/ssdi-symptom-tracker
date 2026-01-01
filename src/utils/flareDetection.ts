@@ -52,7 +52,7 @@ export function detectFlares(entries: DailyPainEntry[]): Flare[] {
   // Step 2: Convert to array and sort by date ascending
   const sortedEntries: DailyPainEntry[] = Array.from(dailyMaxScores.entries())
     .map(([date, painScore]) => ({ date, painScore }))
-    .sort((a, b) => a.date.localeCompare(b.date));
+    .sort((a, b) => a.appointmentDate.localeCompare(b.date));
 
   const flares: Flare[] = [];
   const PAIN_THRESHOLD = 6;

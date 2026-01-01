@@ -676,7 +676,7 @@ export class RFCBuilder {
     const end = new Date(endDate);
     
     return logs.filter(log => {
-      const logDate = new Date(log.logDate || log.activityDate || log.date || '');
+      const logDate = new Date(log.logDate || log.activityDate || log.logDate || '');
       return logDate >= start && logDate <= end;
     });
   }

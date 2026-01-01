@@ -400,7 +400,7 @@ export class LogService {
   } {
     return {
       date: log.activityDate,
-      activityName: log.activityName,
+      activityName: log.activityIdName,
       duration: log.duration,
       worstImpact: getWorstImpact(log),
       recoveryTime: getTotalRecoveryTime(log),

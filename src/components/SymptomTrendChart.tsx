@@ -48,7 +48,7 @@ export const SymptomTrendChart: React.FC<SymptomTrendChartProps> = ({
       }
     });
 
-    return points.sort((a, b) => a.date.localeCompare(b.date));
+    return points.sort((a, b) => a.appointmentDate.localeCompare(b.date));
   }, [logs, symptomId]);
 
   if (dataPoints.length === 0) {

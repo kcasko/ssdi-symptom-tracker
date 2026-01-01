@@ -90,7 +90,7 @@ describe('WorkImpactAnalyzer', () => {
       expect(impact).toBeDefined();
       expect(impact.workHistory).toBe(mockWorkHistory);
       expect(impact.dutyImpacts.length).toBe(mockJobDuties.length);
-      expect(impact.canReturnToJob).toBeDefined();
+      expect(impact.canReturnToThisJob).toBeDefined();
     });
 
     it('should determine cannot return to job for severe impacts', () => {
@@ -100,7 +100,7 @@ describe('WorkImpactAnalyzer', () => {
         mockLimitations
       );
 
-      expect(impact.canReturnToJob).toBe(false);
+      expect(impact.canReturnToThisJob).toBe(false);
       expect(impact.overallImpactStatement).toContain('cannot');
     });
 
@@ -257,7 +257,7 @@ describe('WorkImpactAnalyzer', () => {
       );
 
       if (hasUnperformableEssentialDuty) {
-        expect(impact.canReturnToJob).toBe(false);
+        expect(impact.canReturnToThisJob).toBe(false);
       }
     });
 
@@ -273,7 +273,7 @@ describe('WorkImpactAnalyzer', () => {
         mockLimitations
       );
 
-      expect(impact.canReturnToJob).toBeDefined();
+      expect(impact.canReturnToThisJob).toBeDefined();
     });
   });
 

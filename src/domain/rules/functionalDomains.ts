@@ -6,6 +6,9 @@
 
 import { FunctionalDomain } from '../models/EvidenceMode';
 
+// Re-export FunctionalDomain for convenience
+export type { FunctionalDomain } from '../models/EvidenceMode';
+
 /**
  * Symptom to functional domain mappings
  * Maps common symptoms to their functional impact areas

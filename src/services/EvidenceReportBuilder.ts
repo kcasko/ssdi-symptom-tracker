@@ -59,7 +59,7 @@ export interface EvidenceReport {
   
   // Narrative sections
   symptomNarratives: SymptomNarrative[];
-  activityNarratives: ActivityNarrative[];
+  activityNarratives: EvidenceActivityNarrative[];
   functionalLimitations: FunctionalLimitationNarrative[];
   
   // Revision section
@@ -75,7 +75,7 @@ export interface SymptomNarrative {
   severityStatement: string;
 }
 
-export interface ActivityNarrative {
+export interface EvidenceActivityNarrative {
   activityName: string;
   attemptStatement: string;
   impactStatement: string;
@@ -184,7 +184,7 @@ function buildSymptomNarratives(dailyLogs: DailyLog[], totalDays: number): Sympt
 /**
  * Build activity narratives
  */
-function buildActivityNarratives(activityLogs: ActivityLog[]): ActivityNarrative[] {
+function buildActivityNarratives(activityLogs: ActivityLog[]): EvidenceActivityNarrative[] {
   const activityStats = new Map<
     string,
     { attempts: number; stoppedEarly: number; totalImpact: number; assistanceCount: number }
@@ -208,7 +208,7 @@ function buildActivityNarratives(activityLogs: ActivityLog[]): ActivityNarrative
   });
 
   // Generate narratives
-  const narratives: ActivityNarrative[] = [];
+  const narratives: EvidenceActivityNarrative[] = [];
   activityStats.forEach((stats, activityId) => {
     const avgImpact = stats.totalImpact / stats.attempts;
     const impactStatement = generateActivityImpactStatement(
@@ -218,7 +218,7 @@ function buildActivityNarratives(activityLogs: ActivityLog[]): ActivityNarrative
       avgImpact
     );
 
-    const narrative: ActivityNarrative = {
+    const narrative: EvidenceActivityNarrative = {
       activityName: activityId,
       attemptStatement: `Attempted ${stats.attempts} times.`,
       impactStatement,
@@ -276,7 +276,7 @@ function buildFunctionalLimitations(
       };
       current.days.add(log.activityDate);
       current.totalSeverity += log.immediateImpact.overallImpact;
-      current.activities.add(log.activityName);
+      current.activities.add(log.activityIdName);
       domainImpacts.set(domain, current);
     });
   });

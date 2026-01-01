@@ -63,11 +63,11 @@ describe('RFCBuilder', () => {
     it('should analyze exertional capacity', () => {
       const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
 
-      expect(rfc.exertionalCapacity).toBeDefined();
-      expect(rfc.exertionalCapacity.sitting).toBeDefined();
-      expect(rfc.exertionalCapacity.standing).toBeDefined();
-      expect(rfc.exertionalCapacity.walking).toBeDefined();
-      expect(rfc.exertionalCapacity.maxLiftingCapacity).toBeDefined();
+      expect(rfc.exertionalLimitations).toBeDefined();
+      expect(rfc.exertionalLimitations.sitting).toBeDefined();
+      expect(rfc.exertionalLimitations.standing).toBeDefined();
+      expect(rfc.exertionalLimitations.walking).toBeDefined();
+      expect(rfc.exertionalLimitations.lifting).toBeDefined();
     });
 
     it('should determine work capacity level based on limitations', () => {
@@ -81,7 +81,7 @@ describe('RFCBuilder', () => {
     it('should include supporting evidence', () => {
       const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
 
-      expect(rfc.exertionalCapacity.sitting.supportingEvidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.sitting.evidence.length).toBeGreaterThan(0);
       expect(rfc.evidenceSummary).toBeDefined();
       expect(rfc.evidenceSummary.totalLogs).toBe(2);
     });
@@ -116,18 +116,18 @@ describe('RFCBuilder', () => {
 
       const rfc = RFCBuilder.buildFromLogs(highPainLogs, mockLimitations);
 
-      expect(rfc.exertionalCapacity.standing.hoursWithoutBreak).toBeLessThan(2);
+      expect(rfc.exertionalLimitations.standing.maxContinuousMinutes).toBeLessThan(2);
     });
 
     it('should limit lifting capacity based on severity', () => {
       const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
 
-      expect(rfc.exertionalCapacity.maxLiftingCapacity.occasionalWeight).toBeDefined();
-      expect(rfc.exertionalCapacity.maxLiftingCapacity.frequentWeight).toBeDefined();
+      expect(rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional).toBeDefined();
+      expect(rfc.exertionalLimitations.lifting.maxWeightPoundsFrequent).toBeDefined();
       expect(
-        rfc.exertionalCapacity.maxLiftingCapacity.frequentWeight
+        rfc.exertionalLimitations.lifting.maxWeightPoundsFrequent
       ).toBeLessThanOrEqual(
-        rfc.exertionalCapacity.maxLiftingCapacity.occasionalWeight
+        rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional
       );
     });
   });

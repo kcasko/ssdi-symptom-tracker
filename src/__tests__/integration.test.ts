@@ -2,13 +2,13 @@
  * Integration tests for end-to-end workflows
  */
 
-import { RFCBuilder } from '../../services/RFCBuilder';
-import { WorkImpactAnalyzer } from '../../services/WorkImpactAnalyzer';
-import { SSAFormBuilder } from '../../services/SSAFormBuilder';
-import { CredibilityScorer } from '../../services/CredibilityScorer';
-import { DailyLog } from '../../domain/models/DailyLog';
-import { Limitation } from '../../domain/models/Limitation';
-import { WorkHistory } from '../../domain/models/WorkHistory';
+import { RFCBuilder } from '../services/RFCBuilder';
+import { WorkImpactAnalyzer } from '../services/WorkImpactAnalyzer';
+import { SSAFormBuilder } from '../services/SSAFormBuilder';
+import { CredibilityScorer } from '../services/CredibilityScorer';
+import { DailyLog } from '../domain/models/DailyLog';
+import { Limitation } from '../domain/models/Limitation';
+import { WorkHistory } from '../domain/models/WorkHistory';
 
 describe('End-to-End Workflow Integration', () => {
   // Create comprehensive test data
@@ -127,7 +127,7 @@ describe('End-to-End Workflow Integration', () => {
         dailyLogs,
         mockLimitations
       );
-      expect(workImpact.canReturnToJob).toBe(false);
+      expect(workImpact.canReturnToThisJob).toBe(false);
 
       // Step 5: Generate SSA forms
       const formPackage = SSAFormBuilder.buildFormPackage(
@@ -157,8 +157,8 @@ describe('End-to-End Workflow Integration', () => {
       expect(rfc.evidenceSummary.totalLogs).toBe(90);
 
       // All capacity claims should have supporting evidence
-      expect(rfc.exertionalCapacity.sitting.supportingEvidence.length).toBeGreaterThan(0);
-      expect(rfc.exertionalCapacity.standing.supportingEvidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.sitting.evidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.standing.evidence.length).toBeGreaterThan(0);
 
       // Work impact should reference logs
       const workImpact = WorkImpactAnalyzer.analyzeWorkImpact(
@@ -268,9 +268,9 @@ describe('End-to-End Workflow Integration', () => {
       const rfc = RFCBuilder.buildFromLogs(dailyLogs, mockLimitations);
 
       // Every limitation should have evidence
-      expect(rfc.exertionalCapacity.sitting.supportingEvidence.length).toBeGreaterThan(0);
-      expect(rfc.exertionalCapacity.standing.supportingEvidence.length).toBeGreaterThan(0);
-      expect(rfc.exertionalCapacity.walking.supportingEvidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.sitting.evidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.standing.evidence.length).toBeGreaterThan(0);
+      expect(rfc.exertionalLimitations.walking.evidence.length).toBeGreaterThan(0);
     });
 
     it('should require minimum logging period for reliable RFC', () => {
@@ -348,7 +348,7 @@ describe('End-to-End Workflow Integration', () => {
 
       // Work impact should align with RFC capacity
       if (rfc.workCapacityLevel === 'sedentary' && !rfc.canWorkFullTime) {
-        expect(workImpact.canReturnToJob).toBe(false);
+        expect(workImpact.canReturnToThisJob).toBe(false);
       }
     });
   });
