@@ -11,3 +11,4 @@ export * from './VoiceLoggingService';
 export * from './DayQualityAnalyzer';
 export * from './CredibilityScorer';
 export * from './ExportService';
+export * from './AppointmentSummaryService';

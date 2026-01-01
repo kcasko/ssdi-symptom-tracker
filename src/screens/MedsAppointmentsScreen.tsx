@@ -13,8 +13,9 @@ import {
   TextInput,
   Modal,
   Alert,
+  Share,
 } from 'react-native';
-import { useLogStore } from '../state/useAppState';
+import { useLogStore, useAppState } from '../state/useAppState';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
@@ -24,7 +25,15 @@ import {
   EffectivenessRating,
   getFrequencyLabel,
 } from '../domain/models/Medication';
+import {
+  Appointment,
+  getProviderTypeLabel,
+  getPurposeLabel,
+} from '../domain/models/Appointment';
+import { AppointmentSummaryService, AppointmentPreparationSummary } from '../services/AppointmentSummaryService';
 import { ids } from '../utils/ids';
+
+type Tab = 'medications' | 'appointments';
 
 export const MedsAppointmentsScreen: React.FC = () => {
   const medications = useLogStore(state => state.medications);
@@ -32,13 +41,38 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const updateMedication = useLogStore(state => state.updateMedication);
   const deleteMedication = useLogStore(state => state.deleteMedication);
   
+  const appointments = useLogStore(state => state.appointments);
+  const addAppointment = useLogStore(state => state.addAppointment);
+  const updateAppointment = useLogStore(state => state.updateAppointment);
+  const deleteAppointment = useLogStore(state => state.deleteAppointment);
+  
+  const { dailyLogs, activityLogs, limitations } = useAppState();
+  
+  const [activeTab, setActiveTab] = useState<Tab>('medications');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMed, setEditingMed] = useState<Medication | null>(null);
   const [showSideEffectsModal, setShowSideEffectsModal] = useState(false);
   const [selectedMedForSideEffects, setSelectedMedForSideEffects] = useState<Medication | null>(null);
+  
+  const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
+  const [showApptModal, setShowApptModal] = useState(false);
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
 
   const activeMeds = medications.filter(m => m.isActive);
   const inactiveMeds = medications.filter(m => !m.isActive);
+  
+  const upcomingAppts = appointments.filter(a => {
+    const apptDate = new Date(a.appointmentDate);
+    const now = new Date();
+    return apptDate >= now && a.status === 'scheduled';
+  }).sort((a, b) => a.appointmentDate.localeCompare(b.appointmentDate));
+  
+  const pastAppts = appointments.filter(a => {
+    const apptDate = new Date(a.appointmentDate);
+    const now = new Date();
+    return apptDate < now || a.status !== 'scheduled';
+  }).sort((a, b) => b.appointmentDate.localeCompare(a.appointmentDate));
 
   const handleAddMedication = () => {
     setEditingMed(null);
@@ -69,15 +103,133 @@ export const MedsAppointmentsScreen: React.FC = () => {
       ]
     );
   };
+  
+  const handleAddAppointment = () => {
+    setEditingAppt(null);
+    setShowApptModal(true);
+  };
+  
+  const handleEditAppointment = (appt: Appointment) => {
+    setEditingAppt(appt);
+    setShowApptModal(true);
+  };
+  
+  const handleDeleteAppointment = (apptId: string) => {
+    Alert.alert(
+      'Delete Appointment',
+      'Are you sure you want to delete this appointment?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteAppointment(apptId),
+        },
+      ]
+    );
+  };
+  
+  const handleViewSummary = (appt: Appointment) => {
+    const summary = AppointmentSummaryService.generatePreparationSummary(
+      appt,
+      dailyLogs,
+      activityLogs,
+      limitations,
+      medications
+    );
+    setSelectedSummary(summary);
+    setShowSummaryModal(true);
+  };
+  
+  const handleShareSummary = async () => {
+    if (!selectedSummary) return;
+    
+    const text = AppointmentSummaryService.formatSummaryAsText(selectedSummary);
+    
+    try {
+      await Share.share({
+        message: text,
+        title: 'Appointment Preparation Summary',
+      });
+    } catch (error) {
+      console.error('Share error:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Medications & Appointments</Text>
         <Text style={styles.subtitle}>Treatment tracking for medical documentation</Text>
+        
+        {/* Tabs */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'medications' && styles.activeTab]}
+            onPress={() => setActiveTab('medications')}
+          >
+            <Text style={[styles.tabText, activeTab === 'medications' && styles.activeTabText]}>
+              Medications
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'appointments' && styles.activeTab]}
+            onPress={() => setActiveTab('appointments')}
+          >
+            <Text style={[styles.tabText, activeTab === 'appointments' && styles.activeTabText]}>
+              Appointments
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollContent}>
+        {activeTab === 'medications' && renderMedicationsTab()}
+        {activeTab === 'appointments' && renderAppointmentsTab()}
+      </ScrollView>
+
+      <MedicationModal
+        visible={showAddModal}
+        medication={editingMed}
+        onClose={() => setShowAddModal(false)}
+        onSave={async (medData) => {
+          if (editingMed) {
+            await updateMedication({ ...editingMed, ...medData, updatedAt: new Date().toISOString() });
+          } else {
+            await addMedication(medData);
+          }
+          setShowAddModal(false);
+        }}
+      />
+
+      <SideEffectsModal
+        visible={showSideEffectsModal}
+        medication={selectedMedForSideEffects}
+        onClose={() => setShowSideEffectsModal(false)}
+        onSave={async (sideEffects) => {
+          if (selectedMedForSideEffects) {
+            await updateMedication({
+              ...selectedMedForSideEffects,
+              sideEffects,
+              updatedAt: new Date().toISOString(),
+            });
+          }
+          setShowSideEffectsModal(false);
+        }}
+      />
+      
+      <AppointmentPreparationModal
+        visible={showSummaryModal}
+        summary={selectedSummary}
+        onClose={() => setShowSummaryModal(false)}
+        onShare={handleShareSummary}
+      />
+    </View>
+  );
+  
+  function renderMedicationsTab() {
+    return (
+      <>
         {/* Active Medications */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -120,39 +272,60 @@ export const MedsAppointmentsScreen: React.FC = () => {
             ))}
           </View>
         )}
-      </ScrollView>
+      </>
+    );
+  }
+  
+  function renderAppointmentsTab() {
+    return (
+      <>
+        {/* Upcoming Appointments */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Upcoming Appointments</Text>
+            <TouchableOpacity onPress={handleAddAppointment} style={styles.addButton}>
+              <Text style={styles.addButtonText}>+ Add</Text>
+            </TouchableOpacity>
+          </View>
 
-      <MedicationModal
-        visible={showAddModal}
-        medication={editingMed}
-        onClose={() => setShowAddModal(false)}
-        onSave={async (medData) => {
-          if (editingMed) {
-            await updateMedication({ ...editingMed, ...medData, updatedAt: new Date().toISOString() });
-          } else {
-            await addMedication(medData);
-          }
-          setShowAddModal(false);
-        }}
-      />
+          {upcomingAppts.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>No upcoming appointments</Text>
+              <Text style={styles.emptySubtext}>Tap "Add" to schedule an appointment</Text>
+            </View>
+          ) : (
+            upcomingAppts.map(appt => (
+              <AppointmentCard
+                key={appt.id}
+                appointment={appt}
+                onEdit={handleEditAppointment}
+                onDelete={handleDeleteAppointment}
+                onViewSummary={handleViewSummary}
+                showSummaryButton={true}
+              />
+            ))
+          )}
+        </View>
 
-      <SideEffectsModal
-        visible={showSideEffectsModal}
-        medication={selectedMedForSideEffects}
-        onClose={() => setShowSideEffectsModal(false)}
-        onSave={async (sideEffects) => {
-          if (selectedMedForSideEffects) {
-            await updateMedication({
-              ...selectedMedForSideEffects,
-              sideEffects,
-              updatedAt: new Date().toISOString(),
-            });
-          }
-          setShowSideEffectsModal(false);
-        }}
-      />
-    </View>
-  );
+        {/* Past Appointments */}
+        {pastAppts.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Past Appointments</Text>
+            {pastAppts.slice(0, 10).map(appt => (
+              <AppointmentCard
+                key={appt.id}
+                appointment={appt}
+                onEdit={handleEditAppointment}
+                onDelete={handleDeleteAppointment}
+                onViewSummary={handleViewSummary}
+                showSummaryButton={false}
+              />
+            ))}
+          </View>
+        )}
+      </>
+    );
+  }
 };
 
 interface MedicationCardProps {
@@ -496,6 +669,223 @@ const SideEffectsModal: React.FC<SideEffectsModalProps> = ({ visible, medication
   );
 };
 
+interface AppointmentCardProps {
+  appointment: Appointment;
+  onEdit: (appt: Appointment) => void;
+  onDelete: (apptId: string) => void;
+  onViewSummary: (appt: Appointment) => void;
+  showSummaryButton: boolean;
+}
+
+const AppointmentCard: React.FC<AppointmentCardProps> = ({
+  appointment,
+  onEdit,
+  onDelete,
+  onViewSummary,
+  showSummaryButton,
+}) => {
+  const apptDate = new Date(appointment.appointmentDate);
+  const isPast = apptDate < new Date();
+  
+  return (
+    <View style={[styles.card, isPast && styles.pastApptCard]}>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardTitleSection}>
+          <Text style={styles.medName}>{appointment.providerName}</Text>
+          <Text style={styles.genericName}>{getProviderTypeLabel(appointment.providerType)}</Text>
+        </View>
+        <View style={[styles.statusBadge, styles[`status_${appointment.status}`]]}>
+          <Text style={styles.statusBadgeText}>{appointment.status}</Text>
+        </View>
+      </View>
+      
+      <Text style={styles.dosage}>
+        {apptDate.toLocaleDateString()} {appointment.appointmentTime && `at ${appointment.appointmentTime}`}
+      </Text>
+      <Text style={styles.purpose}>Purpose: {getPurposeLabel(appointment.purpose)}</Text>
+      
+      {appointment.facilityName && (
+        <Text style={styles.frequency}>Facility: {appointment.facilityName}</Text>
+      )}
+      
+      {appointment.preAppointmentNotes && (
+        <View style={styles.notesSection}>
+          <Text style={styles.sideEffectsLabel}>Notes:</Text>
+          <Text style={styles.sideEffectsText}>{appointment.preAppointmentNotes}</Text>
+        </View>
+      )}
+      
+      <View style={styles.cardActions}>
+        {showSummaryButton && (
+          <TouchableOpacity onPress={() => onViewSummary(appointment)} style={styles.primaryActionButton}>
+            <Text style={styles.primaryActionButtonText}>Preparation Summary</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity onPress={() => onEdit(appointment)} style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => onDelete(appointment.id)} style={styles.deleteButton}>
+          <Text style={styles.deleteButtonText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+interface AppointmentPreparationModalProps {
+  visible: boolean;
+  summary: AppointmentPreparationSummary | null;
+  onClose: () => void;
+  onShare: () => void;
+}
+
+const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = ({
+  visible,
+  summary,
+  onClose,
+  onShare,
+}) => {
+  if (!summary) return null;
+  
+  return (
+    <Modal visible={visible} animationType="slide" transparent={false}>
+      <View style={styles.summaryModalContainer}>
+        <View style={styles.summaryHeader}>
+          <View>
+            <Text style={styles.summaryTitle}>Appointment Preparation</Text>
+            <Text style={styles.summarySubtitle}>
+              {summary.appointment.providerName} - {new Date(summary.appointment.appointmentDate).toLocaleDateString()}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+        
+        <ScrollView style={styles.summaryContent}>
+          {/* Day Quality */}
+          <View style={styles.summarySection}>
+            <Text style={styles.summarySectionTitle}>Functional Status</Text>
+            <Text style={styles.summaryText}>
+              Good Days: {summary.dayQualitySummary.goodDays} | Bad Days: {summary.dayQualitySummary.badDays} ({summary.dayQualitySummary.percentage}%)
+            </Text>
+            <Text style={styles.summaryText}>Trend: {summary.dayQualitySummary.trend}</Text>
+          </View>
+          
+          {/* Recent Symptoms */}
+          {summary.recentSymptoms.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>Recent Symptoms</Text>
+              {summary.recentSymptoms.slice(0, 5).map((symptom, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryBullet}>•</Text>
+                  <Text style={styles.summaryText}>
+                    {symptom.symptomName}: {symptom.frequency}% of days, avg {symptom.averageSeverity}/10 ({symptom.trend})
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
+          
+          {/* Changed Symptoms */}
+          {summary.changedSymptoms.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>New or Changed Symptoms</Text>
+              {summary.changedSymptoms.map((change, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryBullet}>•</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.summaryHighlight}>{change.symptomName} ({change.change})</Text>
+                    <Text style={styles.summaryDetail}>{change.details}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+          
+          {/* Activity Limitations */}
+          {summary.recentLimitations.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>Activity Limitations</Text>
+              {summary.recentLimitations.map((limitation, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryBullet}>•</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.summaryText}>
+                      {limitation.activityName} (Impact: {limitation.impactLevel}/10, {limitation.frequency}% of attempts)
+                    </Text>
+                    {limitation.examples.map((example, j) => (
+                      <Text key={j} style={styles.summaryDetail}>  - {example}</Text>
+                    ))}
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+          
+          {/* Medication Changes */}
+          {summary.medicationChanges.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>Medication Updates</Text>
+              {summary.medicationChanges.map((change, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryBullet}>•</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.summaryText}>
+                      {change.medicationName} ({change.status})
+                    </Text>
+                    {change.effectiveness && (
+                      <Text style={styles.summaryDetail}>Effectiveness: {change.effectiveness}</Text>
+                    )}
+                    {change.sideEffects && change.sideEffects.length > 0 && (
+                      <Text style={styles.summaryDetail}>Side effects: {change.sideEffects.join(', ')}</Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+          
+          {/* Discussion Points */}
+          {summary.discussionPoints.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>Key Discussion Points</Text>
+              {summary.discussionPoints.map((point, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryNumber}>{i + 1}.</Text>
+                  <Text style={styles.summaryText}>{point}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+          
+          {/* Questions */}
+          {summary.suggestedQuestions.length > 0 && (
+            <View style={styles.summarySection}>
+              <Text style={styles.summarySectionTitle}>Questions for Provider</Text>
+              {summary.suggestedQuestions.map((question, i) => (
+                <View key={i} style={styles.summaryItem}>
+                  <Text style={styles.summaryNumber}>{i + 1}.</Text>
+                  <Text style={styles.summaryText}>{question}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </ScrollView>
+        
+        <View style={styles.summaryActions}>
+          <TouchableOpacity onPress={onShare} style={styles.shareButton}>
+            <Text style={styles.shareButtonText}>Share Summary</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose} style={styles.closeActionButton}>
+            <Text style={styles.closeActionButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -810,5 +1200,179 @@ const styles = StyleSheet.create({
     ...typography.titleMedium,
     color: colors.error.main,
     paddingHorizontal: spacing.sm,
+  },
+  // Tabs
+  tabContainer: {
+    flexDirection: 'row',
+    marginTop: spacing.md,
+    borderBottomWidth: 2,
+    borderBottomColor: colors.gray200,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+    marginBottom: -2,
+  },
+  activeTab: {
+    borderBottomColor: colors.primaryMain,
+  },
+  tabText: {
+    ...typography.labelLarge,
+    color: colors.gray600,
+  },
+  activeTabText: {
+    color: colors.primaryMain,
+    fontWeight: '600',
+  },
+  // Appointment specific
+  pastApptCard: {
+    borderLeftColor: colors.gray300,
+  },
+  statusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: 4,
+  },
+  status_scheduled: {
+    backgroundColor: colors.primary[100],
+  },
+  status_completed: {
+    backgroundColor: colors.success.light,
+  },
+  status_cancelled: {
+    backgroundColor: colors.gray[200],
+  },
+  status_rescheduled: {
+    backgroundColor: colors.warning.light,
+  },
+  status_no_show: {
+    backgroundColor: colors.error.light,
+  },
+  statusBadgeText: {
+    ...typography.labelSmall,
+    color: colors.gray700,
+    textTransform: 'capitalize',
+  },
+  notesSection: {
+    marginTop: spacing.sm,
+    padding: spacing.sm,
+    backgroundColor: colors.gray50,
+    borderRadius: 6,
+  },
+  primaryActionButton: {
+    backgroundColor: colors.primaryMain,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: 6,
+  },
+  primaryActionButtonText: {
+    ...typography.labelMedium,
+    color: colors.white,
+  },
+  // Summary Modal
+  summaryModalContainer: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: spacing.lg,
+    paddingTop: spacing.xl,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray200,
+  },
+  summaryTitle: {
+    ...typography.displaySmall,
+    color: colors.gray900,
+    marginBottom: spacing.xs,
+  },
+  summarySubtitle: {
+    ...typography.bodyMedium,
+    color: colors.gray600,
+  },
+  closeButton: {
+    padding: spacing.sm,
+  },
+  closeButtonText: {
+    ...typography.titleLarge,
+    color: colors.gray600,
+  },
+  summaryContent: {
+    flex: 1,
+    padding: spacing.lg,
+  },
+  summarySection: {
+    marginBottom: spacing.lg,
+  },
+  summarySectionTitle: {
+    ...typography.titleMedium,
+    color: colors.gray900,
+    marginBottom: spacing.sm,
+    fontWeight: '600',
+  },
+  summaryItem: {
+    flexDirection: 'row',
+    marginBottom: spacing.sm,
+  },
+  summaryBullet: {
+    ...typography.bodyMedium,
+    color: colors.gray600,
+    marginRight: spacing.sm,
+  },
+  summaryNumber: {
+    ...typography.bodyMedium,
+    color: colors.gray600,
+    marginRight: spacing.sm,
+    fontWeight: '600',
+  },
+  summaryText: {
+    ...typography.bodyMedium,
+    color: colors.gray800,
+    flex: 1,
+  },
+  summaryHighlight: {
+    ...typography.bodyMedium,
+    color: colors.gray900,
+    fontWeight: '600',
+  },
+  summaryDetail: {
+    ...typography.bodySmall,
+    color: colors.gray600,
+    marginTop: spacing.xs,
+  },
+  summaryActions: {
+    flexDirection: 'row',
+    padding: spacing.lg,
+    gap: spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: colors.gray200,
+  },
+  shareButton: {
+    flex: 1,
+    backgroundColor: colors.primaryMain,
+    paddingVertical: spacing.md,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  shareButtonText: {
+    ...typography.labelLarge,
+    color: colors.white,
+  },
+  closeActionButton: {
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.gray400,
+    alignItems: 'center',
+  },
+  closeActionButtonText: {
+    ...typography.labelLarge,
+    color: colors.gray700,
   },
 });
