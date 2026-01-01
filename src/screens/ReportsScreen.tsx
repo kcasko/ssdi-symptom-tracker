@@ -20,13 +20,13 @@ import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { BigButton, DateRangePicker, SubmissionPackBuilder } from '../components';
 import { useAppState } from '../state/useAppState';
-import { ReportService, ExportService, CredibilityScorer } from '../services';
+import { ReportService, ExportService, CredibilityScorer, BackupRestoreService } from '../services';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
 export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, activityLogs, limitations, medications, reportDrafts, addReportDraft, updateReportDraft } =
+  const { activeProfile, dailyLogs, activityLogs, limitations, medications, reportDrafts, addReportDraft, updateReportDraft, photos, profiles, settings } =
     useAppState();
 
   const now = new Date();
@@ -36,6 +36,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
   const [endDate, setEndDate] = useState(now.toISOString().split('T')[0]);
   const [generating, setGenerating] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [backing up, setBackingUp] = useState(false);
 
   const profileReports = reportDrafts.filter((r) => r.profileId === activeProfile?.id);
 
@@ -150,6 +151,81 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
     }
   };
 
+  const handleCreateBackup = async () => {
+    if (!activeProfile) return;
+
+    setBackingUp(true);
+    try {
+      const fileUri = await BackupRestoreService.createBackup({
+        profiles,
+        dailyLogs,
+        activityLogs,
+        limitations,
+        medications,
+        appointments: [],
+        reportDrafts,
+        photos,
+        settings,
+      });
+
+      Alert.alert(
+        'Backup Created',
+        'Your data has been backed up successfully. Save this file to a secure location.',
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      Alert.alert('Error', 'Failed to create backup');
+    } finally {
+      setBackingUp(false);
+    }
+  };
+
+  const handleRestoreBackup = async () => {
+    Alert.alert(
+      'Restore from Backup',
+      'This will restore data from a backup file. Current data will be merged with backup data.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Select Backup',
+          onPress: async () => {
+            const backup = await BackupRestoreService.selectBackupFile();
+            if (backup) {
+              Alert.alert(
+                'Confirm Restore',
+                `Restore ${backup.profiles.length} profiles and ${backup.dailyLogs.length + backup.activityLogs.length} logs?`,
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  { text: 'Restore', onPress: () => performRestore(backup) },
+                ]
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const performRestore = async (backup: any) => {
+    try {
+      const result = await BackupRestoreService.restoreFromBackup(backup, {
+        mergeWithExisting: true,
+      });
+
+      if (result.success) {
+        Alert.alert(
+          'Restore Complete',
+          `Restored ${result.profilesRestored} profiles and ${result.logsRestored} logs.`,
+          [{ text: 'OK', onPress: () => navigation.navigate('Dashboard') }]
+        );
+      } else {
+        Alert.alert('Restore Failed', result.errors.join('\n'));
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to restore backup');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -201,6 +277,31 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
             </View>
           </View>
         )}
+
+        {/* Data Backup & Restore */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Data Backup & Restore</Text>
+          <Text style={styles.sectionDescription}>
+            Create backups of all your data and restore from previous backups
+          </Text>
+          <View style={styles.exportButtons}>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={handleCreateBackup}
+              disabled={backingUp}
+            >
+              <Text style={styles.exportButtonText}>
+                {backingUp ? 'Creating Backup...' : '💾 Create Full Backup'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.exportButton} 
+              onPress={handleRestoreBackup}
+            >
+              <Text style={styles.exportButtonText}>📥 Restore from Backup</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* Export Data */}
         <View style={styles.section}>

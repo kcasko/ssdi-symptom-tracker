@@ -75,12 +75,12 @@ npm run web        # Run in browser
 - [ ] Add custom fonts (if desired)
 
 ### Advanced Features (Future)
-- [ ] Data backup/restore functionality
-- [ ] Advanced data visualization charts
+- [x] Data backup/restore functionality
+- [x] Advanced data visualization charts
 - [ ] Custom symptom/activity definitions
 - [ ] Multi-language support
-- [ ] Dark mode theme
-- [ ] Data export formats (CSV, JSON)
+- [x] Dark mode theme
+- [x] Data export formats (CSV, JSON)
 
 ### Production Build
 - [ ] Test on physical devices

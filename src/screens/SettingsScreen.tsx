@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, EvidenceModeControls, SubmissionPackBuilder } from '../components';
+import { BigButton, EvidenceModeControls, SubmissionPackBuilder, ThemeToggle } from '../components';
 import { useAppState } from '../state/useAppState';
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
@@ -65,6 +65,14 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
             onPress={handleSwitchProfile}
             variant="secondary"
             fullWidth
+          />
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Appearance</Text>
+          <ThemeToggle 
+            isDarkMode={settings.darkMode} 
+            onToggle={handleToggleDarkMode} 
           />
         </View>
 

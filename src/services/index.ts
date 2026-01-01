@@ -23,3 +23,4 @@ export * from './EvidenceLogService';
 export * from './StandardizedNarrativeService';
 export * from './EvidenceReportBuilder';
 export * from './EvidencePDFExportService';
+export * from './BackupRestoreService';

@@ -18,3 +18,5 @@ export * from './EvidenceModeControls';
 export * from './LogFinalizationControls';
 export * from './RevisionHistoryViewer';
 export * from './SubmissionPackBuilder';
+export * from './ThemeToggle';
+export * from './SymptomTrendChart';
