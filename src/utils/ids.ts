@@ -42,6 +42,7 @@ export const ids = {
   medication: () => generatePrefixedId('med'),
   appointment: () => generatePrefixedId('appt'),
   photo: () => generatePrefixedId('photo'),
+  report: () => generatePrefixedId('rfc'),
   reportDraft: () => generatePrefixedId('report'),
   section: () => generatePrefixedId('section'),
   textBlock: () => generatePrefixedId('block'),

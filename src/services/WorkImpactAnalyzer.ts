@@ -223,22 +223,19 @@ export class WorkImpactAnalyzer {
     
     // Check for standing limitations
     const standingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'standing' ||
-        l.description.toLowerCase().includes('stand')
-      )
+      l.isActive && l.category === 'standing'
     );
     
     standingLimitations.forEach(limitation => {
       factors.push({
         type: 'limitation',
         id: limitation.id,
-        name: limitation.description,
-        interferenceDescription: `Documented limitation: ${limitation.description}`,
+        name: limitation.category,
+        interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
         occurrencePercentage: 100,
-        averageSeverity: limitation.severity,
-        maxSeverity: limitation.severity,
+        averageSeverity: 7,
+        maxSeverity: 8,
         logIds: [limitation.id],
       });
     });
@@ -310,12 +307,13 @@ export class WorkImpactAnalyzer {
       return activity && (
         activity.name.toLowerCase().includes('walk') ||
         activity.name.toLowerCase().includes('stairs')
-      ) && (log.stoppedEarly || (log.impactSeverity && log.impactSeverity >= 7));
+      ) && (log.stoppedEarly || log.immediateImpact.overallImpact >= 7);
     });
     
     if (walkingActivities.length > 0) {
-      const avgImpact = walkingActivities.reduce((sum, log) => 
-        sum + (log.impactSeverity || 0), 0) / walkingActivities.length;
+      const avgImpact = walkingActivities.reduce((sum, log) => {
+        return sum + log.immediateImpact.overallImpact;
+      }, 0) / walkingActivities.length;
       
       factors.push({
         type: 'limitation',
@@ -332,22 +330,19 @@ export class WorkImpactAnalyzer {
     
     // Check walking limitations
     const walkingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'walking' ||
-        l.description.toLowerCase().includes('walk')
-      )
+      l.isActive && l.category === 'walking'
     );
     
     walkingLimitations.forEach(limitation => {
       factors.push({
         type: 'limitation',
         id: limitation.id,
-        name: limitation.description,
-        interferenceDescription: `Documented limitation: ${limitation.description}`,
+        name: limitation.category,
+        interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
         occurrencePercentage: 100,
-        averageSeverity: limitation.severity,
-        maxSeverity: limitation.severity,
+        averageSeverity: 7,
+        maxSeverity: 8,
         logIds: [limitation.id],
       });
     });
@@ -372,7 +367,7 @@ export class WorkImpactAnalyzer {
         activity.name.toLowerCase().includes('lift') ||
         activity.name.toLowerCase().includes('carry') ||
         activity.name.toLowerCase().includes('groceries')
-      ) && (log.stoppedEarly || (log.impactSeverity && log.impactSeverity >= 7));
+      ) && (log.stoppedEarly || log.immediateImpact.overallImpact >= 7);
     });
     
     if (liftingActivities.length > 0) {
@@ -391,23 +386,19 @@ export class WorkImpactAnalyzer {
     
     // Check lifting limitations
     const liftingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'lifting' ||
-        l.description.toLowerCase().includes('lift') ||
-        l.description.toLowerCase().includes('carry')
-      )
+      l.isActive && (l.category === 'lifting' || l.category === 'carrying')
     );
     
     liftingLimitations.forEach(limitation => {
       factors.push({
         type: 'limitation',
         id: limitation.id,
-        name: limitation.description,
-        interferenceDescription: `${limitation.description} - cannot meet ${requiredWeight} lb requirement`,
+        name: limitation.category,
+        interferenceDescription: `${limitation.category} limitation - cannot meet ${requiredWeight} lb requirement`,
         occurrenceCount: 1,
         occurrencePercentage: 100,
-        averageSeverity: limitation.severity,
-        maxSeverity: limitation.severity,
+        averageSeverity: 7,
+        maxSeverity: 8,
         logIds: [limitation.id],
       });
     });
@@ -705,12 +696,12 @@ export class WorkImpactAnalyzer {
     // Physical demand mismatches
     const exertionLevel = workHistory.physicalDemands.exertionLevel;
     const hasLiftingLimitation = limitations.some(l => 
-      l.limitationType === 'lifting' && !l.resolved
+      (l.category === 'lifting' || l.category === 'carrying') && l.isActive
     );
     
     if (hasLiftingLimitation && (exertionLevel === 'medium' || exertionLevel === 'heavy')) {
       statements.push(
-        `Job requires ${exertionLevel} exertion level with lifting up to ${workHistory.physicalDemands.liftingRequired.maxWeightPounds} lbs. Documented lifting limitations prevent meeting this requirement.`
+        `Job requires ${exertionLevel} exertion level. Documented lifting limitations prevent meeting this requirement.`
       );
     }
     
@@ -720,7 +711,7 @@ export class WorkImpactAnalyzer {
   /**
    * Filter logs by date range
    */
-  private static filterByDateRange<T extends { logDate?: string; date?: string }>(
+  private static filterByDateRange<T extends { logDate?: string; date?: string; activityDate?: string }>(
     logs: T[],
     startDate: string,
     endDate: string
@@ -729,7 +720,7 @@ export class WorkImpactAnalyzer {
     const end = new Date(endDate);
     
     return logs.filter(log => {
-      const logDate = new Date(log.logDate || log.date || '');
+      const logDate = new Date(log.logDate || log.activityDate || log.date || '');
       return logDate >= start && logDate <= end;
     });
   }

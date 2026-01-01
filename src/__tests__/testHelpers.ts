@@ -2,12 +2,12 @@
  * Test helper functions for creating mock data
  */
 
-import { DailyLog, SymptomEntry, TimeOfDay } from '../domain/models/DailyLog';
-import { Limitation } from '../domain/models/Limitation';
-import { WorkHistory, JobDuty } from '../domain/models/WorkHistory';
+import { DailyLog, SymptomEntry, TimeOfDay, SleepEntry } from '../domain/models/DailyLog';
+import { Limitation, LimitationCategory, LimitationFrequency, VariabilityLevel } from '../domain/models/Limitation';
+import { WorkHistory, JobDuty, PhysicalDemands, WorkImpact, DutyImpact } from '../domain/models/WorkHistory';
 import { ActivityLog } from '../domain/models/ActivityLog';
-import { Appointment } from '../domain/models/Appointment';
-import { Medication } from '../domain/models/Medication';
+import { Appointment, AppointmentPurpose } from '../domain/models/Appointment';
+import { Medication, MedicationFrequency } from '../domain/models/Medication';
 
 export function createMockDailyLog(overrides?: Partial<DailyLog>): DailyLog {
   const now = new Date().toISOString();
@@ -17,7 +17,7 @@ export function createMockDailyLog(overrides?: Partial<DailyLog>): DailyLog {
     createdAt: now,
     updatedAt: now,
     logDate: '2024-01-01',
-    timeOfDay: 'morning',
+    timeOfDay: 'morning' as TimeOfDay,
     symptoms: [],
     overallSeverity: 5,
     ...overrides
@@ -38,84 +38,127 @@ export function createMockDailyLogs(count: number, baseOverrides?: Partial<Daily
 }
 
 export function createMockLimitation(overrides?: Partial<Limitation>): Limitation {
+  const now = new Date().toISOString();
   return {
     id: 'lim1',
     profileId: 'profile1',
-    category: 'mobility',
-    description: 'Test limitation',
-    severity: 'moderate',
-    dateStarted: new Date('2024-01-01'),
-    impacts: ['work'],
-    accommodationsNeeded: [],
+    createdAt: now,
+    updatedAt: now,
+    category: 'standing' as LimitationCategory,
+    frequency: 'constant' as LimitationFrequency,
+    consequences: ['Pain increases', 'Fatigue worsens'],
+    variability: 'moderate' as VariabilityLevel,
+    isActive: true,
     ...overrides
   };
 }
 
 export function createMockWorkHistory(overrides?: Partial<WorkHistory>): WorkHistory {
+  const now = new Date().toISOString();
   return {
     id: 'job1',
     profileId: 'profile1',
     jobTitle: 'Test Job',
     employer: 'Test Employer',
-    startDate: new Date('2020-01-01'),
+    startDate: '2020-01-01',
     hoursPerWeek: 40,
-    duties: [],
+    stillEmployed: false,
+    wasFullTime: true,
     physicalDemands: {
       exertionLevel: 'light',
-      liftingRequirement: { maxWeight: 20, frequentWeight: 10 },
-      standingHours: 4,
-      walkingHours: 2,
-      sittingHours: 2
-    },
+      liftingRequired: { maxWeightPounds: 20, frequency: 'occasional' },
+      standing: { required: true, maxHoursPerDay: 4 },
+      walking: { required: true, maxHoursPerDay: 2 }
+    } as PhysicalDemands,
+    duties: [],
+    skillsRequired: [],
+    disabilityRelated: false,
+    ...overrides
+  };
+}
+daily',
+    physicalRequirements: {
+      standing: true,
+      lifting: 20
+    }bDuty(overrides?: Partial<JobDuty>): JobDuty {
+  return {
+    id: 'duty1',
+    description: 'Test duty',
+    frequency: 'frequently',
+    physicalRequirements: [],
+    isEssential: true,
     ...overrides
   };
 }
 
-export function createMockJobDuty(overrides?: Partial<JobDuty>): JobDuty {
+export function createMockSymptomEntry(overrides?: Partial<SymptomEntry>): SymptomEntry {
   return {
-    description: 'Test duty',
-    frequency: 'frequent',
-    physicalRequirements: {},
-    essential: true,
+    symptomId: 'symptom1',
+    severity: 5,
+    duration: 60,
+    ...overrides
+  };
+}
+
+export function createMockSleepEntry(overrides?: Partial<SleepEntry>): SleepEntry {
+  return {
+    hoursSlept: 6,
+    quality: 5,
+    restful: false,
     ...overrides
   };
 }
 
 export function createMockActivityLog(overrides?: Partial<ActivityLog>): ActivityLog {
+  const now = new Date().toISOString();
   return {
     id: 'activity1',
     profileId: 'profile1',
-    logDate: '2024-01-01',
-    activityType: 'housework',
+    crsymptoms: [],
+      overallImpact: 301',
+    activityId: 'housework',
+    activityName: 'Housework',
     duration: 60,
-    difficultyLevel: 'moderate',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    intensity: 'moderate',
+    immediateImpact: {
+      painIncrease: 2,
+      fatigueIncrease: 3,
+      symptomsTriggered: []
+    },
+    recoveryActions: [],
+    stoppedEarly: false,
     ...overrides
   };
 }
 
 export function createMockAppointment(overrides?: Partial<Appointment>): Appointment {
-  return {
-    id: 'appt1',
+  const now = new Date().toISOString();
+  reid: 'appt1',
     profileId: 'profile1',
-    date: new Date('2024-01-15'),
+    createdAt: now,
+    updatedAt: now,
+    appointmentDate: '2024-01-15T10:00:00.000Z',
     providerName: 'Dr. Test',
-    type: 'doctor',
-    purpose: 'Test appointment',
-    location: 'Test Clinic',
+    specialty: 'Primary Care',
+    purpose: 'routine_checkup' as AppointmentPurpose,
     ...overrides
   };
 }
 
 export function createMockMedication(overrides?: Partial<Medication>): Medication {
+  const now = new Date().toISOString();
   return {
     id: 'med1',
     profileId: 'profile1',
+    createdAt: now,
+    updatedAt['Pain management']
     name: 'Test Medication',
     dosage: '100mg',
-    frequency: 'daily',
-    startDate: new Date('2024-01-01'),
+    frequency: 'daily' as MedicationFrequency,
+    startDate: '2024-01-01',
+    prescribedBy: 'Dr. Test',
+    purpose: 'Pain management',
+    active: true,
     ...overrides
   };
 }

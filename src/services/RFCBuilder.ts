@@ -123,11 +123,13 @@ export class RFCBuilder {
     
     // Find activity limitations (stopped early or high impact)
     const activityLimitations = activityLogs
-      .filter(log => log.stoppedEarly || (log.impactSeverity && log.impactSeverity >= 7))
+      .filter(log => {
+        return log.stoppedEarly || log.immediateImpact.overallImpact >= 7;
+      })
       .map(log => log.id);
     
     // Find functional declines
-    const activeLimitations = limitations.filter(l => !l.resolved);
+    const activeLimitations = limitations.filter(l => l.isActive);
     const functionalDeclines = activeLimitations.map(l => l.id);
     
     // Detect patterns
@@ -203,11 +205,7 @@ export class RFCBuilder {
     
     // Check for sitting limitations
     const sittingLimitations = limitations.filter(l => 
-      !l.resolved && (
-        l.limitationType === 'sitting' ||
-        l.description.toLowerCase().includes('sit') ||
-        l.affectedActivities?.some(a => a.includes('sit'))
-      )
+      l.isActive && l.category === 'sitting'
     );
     
     if (sittingLimitations.length > 0 || backPainDays.length > dailyLogs.length * 0.5) {
@@ -251,10 +249,7 @@ export class RFCBuilder {
     );
     
     const standingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'standing' ||
-        l.description.toLowerCase().includes('stand')
-      )
+      l.isActive && l.category === 'standing'
     );
     
     if (standingLimitations.length > 0 || standingSymptoms.length > dailyLogs.length * 0.4) {
@@ -291,28 +286,21 @@ export class RFCBuilder {
       );
     });
     
-    const problemWalking = walkingActivities.filter(log => 
-      log.stoppedEarly || (log.impactSeverity && log.impactSeverity >= 7)
-    );
+    const problemWalking = walkingActivities.filter(log => {
+      return log.stoppedEarly || log.immediateImpact.overallImpact >= 7;
+    });
     
     const walkingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'walking' ||
-        l.description.toLowerCase().includes('walk') ||
-        l.requiresAssistiveDevice
-      )
+      l.isActive && l.category === 'walking'
     );
-    
-    const requiresDevice = walkingLimitations.some(l => l.requiresAssistiveDevice);
-    const deviceType = walkingLimitations.find(l => l.assistiveDeviceType)?.assistiveDeviceType;
     
     if (problemWalking.length > walkingActivities.length * 0.5 || walkingLimitations.length > 0) {
       return {
         maxContinuousMinutes: 15,
         maxTotalHours: 2,
         maxDistanceFeet: 500,
-        requiresAssistiveDevice: requiresDevice,
-        assistiveDeviceType: deviceType,
+        requiresAssistiveDevice: false,
+        assistiveDeviceType: undefined,
         evidence: [
           ...walkingLimitations.map(l => l.id),
           ...problemWalking.map(a => a.id),
@@ -342,16 +330,12 @@ export class RFCBuilder {
       );
     });
     
-    const problemLifting = liftingActivities.filter(log =>
-      log.stoppedEarly || (log.impactSeverity && log.impactSeverity >= 7)
-    );
+    const problemLifting = liftingActivities.filter(log => {
+      const impactScore = (log.immediateImpact?.pain || 0) + (log.immediateImpact?.fatigue || 0);
+      return log.stoppedEarly || log.immediateImpact.overallImpact >= 7
     
     const liftingLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType === 'lifting' ||
-        l.description.toLowerCase().includes('lift') ||
-        l.description.toLowerCase().includes('carry')
-      )
+      l.isActive && (l.category === 'lifting' || l.category === 'carrying')
     );
     
     if (liftingLimitations.length > 0 || problemLifting.length > 0) {
@@ -380,10 +364,7 @@ export class RFCBuilder {
     limitations: Limitation[]
   ): RFC['exertionalLimitations']['pushPull'] {
     const pushPullLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.description.toLowerCase().includes('push') ||
-        l.description.toLowerCase().includes('pull')
-      )
+      l.isActive && (l.notes?.toLowerCase().includes('push') || l.notes?.toLowerCase().includes('pull'))
     );
     
     if (pushPullLimitations.length > 0) {
@@ -419,20 +400,20 @@ export class RFCBuilder {
       'balancing': 'balancing',
     };
     
-    limitations.filter(l => !l.resolved).forEach(limitation => {
-      const limitationType = limitation.limitationType?.toLowerCase() || '';
+    limitations.filter(l => l.isActive).forEach(limitation => {
+      const category = limitation.category;
       
-      if (limitationType in posturalMap) {
-        const category = posturalMap[limitationType] as keyof typeof result;
-        if (category !== 'climbing' && category !== 'evidence') {
-          result[category] = this.getLimitationLevel(limitation);
-          if (!result.evidence[category]) result.evidence[category] = [];
-          result.evidence[category].push(limitation.id);
+      if (category in posturalMap) {
+        const resultCategory = posturalMap[category] as keyof typeof result;
+        if (resultCategory !== 'climbing' && resultCategory !== 'evidence') {
+          result[resultCategory] = this.getLimitationLevel(limitation);
+          if (!result.evidence[resultCategory]) result.evidence[resultCategory] = [];
+          result.evidence[resultCategory].push(limitation.id);
         }
       }
       
       // Check for climbing limitations
-      if (limitationType.includes('climb') || limitationType.includes('stairs')) {
+      if (category === 'climbing') {
         result.climbing.stairs = this.getLimitationLevel(limitation);
         result.climbing.ladders = 'never';
         if (!result.evidence['climbing']) result.evidence['climbing'] = [];
@@ -467,13 +448,7 @@ export class RFCBuilder {
     );
     
     const manipLimitations = limitations.filter(l =>
-      !l.resolved && (
-        l.limitationType?.toLowerCase().includes('reach') ||
-        l.limitationType?.toLowerCase().includes('handle') ||
-        l.limitationType?.toLowerCase().includes('finger') ||
-        l.description.toLowerCase().includes('grasp') ||
-        l.description.toLowerCase().includes('grip')
-      )
+      l.isActive && (l.category === 'reaching' || l.category === 'fine_motor')
     );
     
     if (manipLimitations.length > 0 || handSymptoms.length > 0) {
@@ -610,15 +585,17 @@ export class RFCBuilder {
    * Determine if can work full time based on RFC
    */
   private static canWorkFullTime(rfc: RFC): boolean {
-    const { sitting, walking } = rfc.exertionalLimitations;
-    const { concentration, pace } = rfc.mentalLimitations;
+    const sitting = rfc.exertionalLimitations?.sitting;
+    const standing = rfc.exertionalLimitations?.standing;
+    const walking = rfc.exertionalLimitations?.walking;
+    const { concentration, pace } = rfc.mentalLimitations || {};
     
     // Cannot work full time if:
     // 1. Cannot sit/stand/walk enough hours
     const totalPositionHours = Math.max(
-      sitting.maxTotalHours,
-      standing.maxTotalHours,
-      walking.maxTotalHours
+      sitting?.maxTotalHours || 0,
+      standing?.maxTotalHours || 0,
+      walking?.maxTotalHours || 0
     );
     
     if (totalPositionHours < 6) {
@@ -626,12 +603,12 @@ export class RFCBuilder {
     }
     
     // 2. Severe concentration issues
-    if (concentration.maxContinuousMinutes < 30) {
+    if (concentration && concentration.maxContinuousMinutes < 30) {
       return false;
     }
     
     // 3. Cannot meet production pace
-    if (pace.cannotMeetQuotas || pace.unpredictableAbsences) {
+    if (pace && (pace.cannotMeetQuotas || pace.unpredictableAbsences)) {
       return false;
     }
     
@@ -644,27 +621,33 @@ export class RFCBuilder {
   private static determineAccommodations(rfc: RFC): string[] {
     const accommodations: string[] = [];
     
-    const { sitting, walking } = rfc.exertionalLimitations;
-    const { concentration, pace, social } = rfc.mentalLimitations;
+    const sitting = rfc.exertionalLimitations?.sitting;
+    const standing = rfc.exertionalLimitations?.standing;
+    const walking = rfc.exertionalLimitations?.walking;
+    const { concentration, pace, social } = rfc.mentalLimitations || {};
     
-    if (sitting.requiresBreaks) {
+    if (sitting?.requiresBreaks) {
       accommodations.push('Frequent position changes required');
     }
     
-    if (walking.requiresAssistiveDevice) {
+    if (standing && standing.maxTotalHours) {
+      accommodations.push(`Standing limited to ${standing.maxTotalHours} hours total`);
+    }
+    
+    if (walking?.requiresAssistiveDevice) {
       accommodations.push(`Requires ${walking.assistiveDeviceType || 'assistive device'}`);
     }
     
     if (concentration.requiresFrequentBreaks) {
+      accommodations.?.requiresFrequentBreaks) {
       accommodations.push('Frequent rest breaks needed');
     }
     
-    if (pace.requiresFlexibleSchedule) {
+    if (pace?.requiresFlexibleSchedule) {
       accommodations.push('Flexible schedule required');
     }
     
-    if (social.limitedPublicContact) {
-      accommodations.push('Limited public interaction');
+    if (social?ations.push('Limited public interaction');
     }
     
     return accommodations;
@@ -674,16 +657,17 @@ export class RFCBuilder {
    * Get limitation level from limitation object
    */
   private static getLimitationLevel(limitation: Limitation): LimitationLevel {
-    if (limitation.severity >= 8) return 'never';
-    if (limitation.severity >= 6) return 'occasional';
-    if (limitation.severity >= 4) return 'frequent';
+    const freq = limitation.frequency;
+    if (freq === 'always' || freq === 'usually') return 'never';
+    if (freq === 'often') return 'occasional';
+    if (freq === 'sometimes' || freq === 'occasionally') return 'frequent';
     return 'unlimited';
   }
   
   /**
    * Filter logs by date range
    */
-  private static filterByDateRange<T extends { logDate?: string; date?: string }>(
+  private static filterByDateRange<T extends { logDate?: string; date?: string; activityDate?: string }>(
     logs: T[],
     startDate: string,
     endDate: string
@@ -692,7 +676,7 @@ export class RFCBuilder {
     const end = new Date(endDate);
     
     return logs.filter(log => {
-      const logDate = new Date(log.logDate || log.date || '');
+      const logDate = new Date(log.logDate || log.activityDate || log.date || '');
       return logDate >= start && logDate <= end;
     });
   }
