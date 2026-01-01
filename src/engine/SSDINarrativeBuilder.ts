@@ -25,7 +25,7 @@ export class SSDINarrativeBuilder {
     totalDays: number
   ): string {
     if (patterns.length === 0) {
-      return 'No symptoms were documented during this period.';
+      return 'Symptoms were documented, but not enough data to identify patterns. Mild, inconsistent symptoms may be present.';
     }
 
     const lines: string[] = [];
@@ -80,7 +80,7 @@ export class SSDINarrativeBuilder {
     patterns: ActivityPattern[]
   ): string {
     if (patterns.length === 0) {
-      return 'No activity logs were documented during this period.';
+      return 'Activities were documented, but not enough data to identify patterns. Minimal activity impact may be present.';
     }
 
     const lines: string[] = [];
