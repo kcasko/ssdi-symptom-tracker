@@ -18,3 +18,4 @@ export * from './WorkImpactAnalyzer';
 export * from './SSAFormBuilder';
 export * from './SyncService';
 export * from './CloudBackupService';
+export * from './MultiDeviceSyncService';
