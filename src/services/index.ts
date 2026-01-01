@@ -13,3 +13,4 @@ export * from './CredibilityScorer';
 export * from './ExportService';
 export * from './AppointmentSummaryService';
 export * from './PhotoService';
+export * from './RFCBuilder';
