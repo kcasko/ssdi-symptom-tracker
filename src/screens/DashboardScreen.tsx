@@ -17,7 +17,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SummaryCard } from '../components';
+import { BigButton, SummaryCard, EvidenceModeControls } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
 import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
@@ -76,9 +76,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
+          <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>Welcome back</Text>
             <Text style={styles.profileName}>{activeProfile.displayName}</Text>
+            <View style={{ marginTop: spacing.sm }}>
+              <EvidenceModeControls profileId={activeProfile.id} compact={true} />
+            </View>
           </View>
           <TouchableOpacity
             style={styles.settingsButton}

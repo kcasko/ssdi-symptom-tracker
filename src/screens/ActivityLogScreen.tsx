@@ -23,24 +23,43 @@ import {
   DurationPicker,
   PainScale,
   NotesField,
+  LogFinalizationControls,
+  RevisionHistoryViewer,
 } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService } from '../services';
+import { canModifyLog, updateLogWithRevision } from '../services/EvidenceLogService';
 
 type ActivityLogProps = NativeStackScreenProps<RootStackParamList, 'ActivityLog'>;
 
 export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) => {
-  const { activeProfile, addActivityLog } = useAppState();
+  const { activeProfile, addActivityLog, activityLogs } = useAppState();
   const [date] = useState(new Date().toISOString().split('T')[0]);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [duration, setDuration] = useState(30);
   const [impactSeverity, setImpactSeverity] = useState(5);
   const [stoppedEarly, setStoppedEarly] = useState(false);
   const [notes, setNotes] = useState('');
+  const [showRevisionHistory, setShowRevisionHistory] = useState(false);
+
+  // Check for existing log on this date
+  const existingLog = activityLogs.find(
+    (l) => l.profileId === activeProfile?.id && l.activityDate === date && l.activityId === selectedActivityId
+  );
 
   const handleSave = () => {
     if (!activeProfile || !selectedActivityId) {
       Alert.alert('Missing Info', 'Please select an activity');
+      return;
+    }
+
+    // Check if log can be modified (Evidence Mode finalization check)
+    if (existingLog && !canModifyLog(existingLog, activeProfile.id)) {
+      Alert.alert(
+        'Log Finalized',
+        'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
+        [{ text: 'OK' }]
+      );
       return;
     }
 
@@ -69,9 +88,26 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
       <View style={styles.header}>
         <Text style={styles.title}>Activity Log</Text>
         <Text style={styles.date}>{new Date(date).toLocaleDateString()}</Text>
+        {existingLog?.evidenceTimestamp && (
+          <Text style={styles.evidenceTimestamp}>
+            Evidence recorded: {new Date(existingLog.evidenceTimestamp).toLocaleString()}
+          </Text>
+        )}
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Evidence Mode Controls */}
+        {existingLog && activeProfile && (
+          <View style={styles.section}>
+            <LogFinalizationControls
+              log={existingLog}
+              logType="activity"
+              profileId={activeProfile.id}
+              onRevisionHistoryPress={() => setShowRevisionHistory(true)}
+            />
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Select Activity</Text>
           <ActivityPicker
@@ -124,6 +160,16 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           disabled={!selectedActivityId}
         />
       </View>
+
+      {/* Revision History Modal */}
+      {existingLog && (
+        <RevisionHistoryViewer
+          visible={showRevisionHistory}
+          onClose={() => setShowRevisionHistory(false)}
+          logId={existingLog.id}
+          logType="activity"
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -146,6 +192,12 @@ const styles = StyleSheet.create({
   date: {
     fontSize: typography.sizes.md,
     color: colors.gray600,
+  },
+  evidenceTimestamp: {
+    fontSize: typography.sizes.sm,
+    color: colors.primary600,
+    fontWeight: typography.weights.medium as any,
+    marginTop: spacing.xs,
   },
   scrollView: {
     flex: 1,

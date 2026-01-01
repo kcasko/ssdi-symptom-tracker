@@ -11,6 +11,9 @@ export interface DailyLog {
   createdAt: string;
   updatedAt: string;
   
+  // Evidence Mode: Immutable creation timestamp (set when Evidence Mode is active)
+  evidenceTimestamp?: string;
+  
   // The date this log is for (may differ from createdAt)
   logDate: string;
   
@@ -38,6 +41,11 @@ export interface DailyLog {
   
   // Photo evidence
   photos?: string[]; // Photo attachment IDs
+  
+  // Finalization
+  finalized?: boolean;
+  finalizedAt?: string;
+  finalizedBy?: string; // Profile ID
 }
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night' | 'specific';

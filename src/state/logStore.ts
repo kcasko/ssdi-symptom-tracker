@@ -13,6 +13,7 @@ import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { isSameDayAs } from '../utils/dates';
+import { applyEvidenceTimestamp } from '../services/EvidenceLogService';
 
 interface LogState {
   // Data
@@ -137,13 +138,16 @@ export const useLogStore = create<LogState>((set, get) => ({
       const logId = ids.dailyLog();
       const now = new Date().toISOString();
       
-      const newLog: DailyLog = {
+      let newLog: DailyLog = {
         ...logData,
         id: logId,
         profileId: currentProfileId,
         createdAt: now,
         updatedAt: now,
       };
+      
+      // Apply evidence timestamp if Evidence Mode is enabled
+      newLog = applyEvidenceTimestamp(newLog);
       
       const { dailyLogs } = get();
       const updatedLogs = [...dailyLogs, newLog];
@@ -206,13 +210,16 @@ export const useLogStore = create<LogState>((set, get) => ({
       const logId = ids.activityLog();
       const now = new Date().toISOString();
       
-      const newLog: ActivityLog = {
+      let newLog: ActivityLog = {
         ...logData,
         id: logId,
         profileId: currentProfileId,
         createdAt: now,
         updatedAt: now,
       };
+      
+      // Apply evidence timestamp if Evidence Mode is enabled
+      newLog = applyEvidenceTimestamp(newLog);
       
       const { activityLogs } = get();
       const updatedLogs = [...activityLogs, newLog];

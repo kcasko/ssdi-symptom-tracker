@@ -17,9 +17,10 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery } from '../components';
+import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService, PhotoService } from '../services';
+import { canModifyLog, updateLogWithRevision } from '../services/EvidenceLogService';
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 
@@ -39,6 +40,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const [activeSymptomId, setActiveSymptomId] = useState<string | null>(null);
   const [generalNotes, setGeneralNotes] = useState('');
   const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
+  const [showRevisionHistory, setShowRevisionHistory] = useState(false);
 
   const existingLog = dailyLogs.find(
     (l) => l.profileId === activeProfile?.id && l.logDate === date
@@ -115,6 +117,16 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       return;
     }
 
+    // Check if log can be modified (Evidence Mode finalization check)
+    if (existingLog && !canModifyLog(existingLog, activeProfile.id)) {
+      Alert.alert(
+        'Log Finalized',
+        'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     try {
       const symptoms = selectedSymptomIds.map((id) => ({
         symptomId: id,
@@ -131,7 +143,18 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           notes: generalNotes,
           photos: photoIds,
         });
-        updateDailyLog(updated);
+        
+        // Use revision system if log is finalized
+        if (existingLog.finalized) {
+          const revisedLog = updateLogWithRevision(
+            updated,
+            activeProfile.id,
+            'Updated symptom entries and notes'
+          );
+          updateDailyLog(revisedLog);
+        } else {
+          updateDailyLog(updated);
+        }
       } else {
         const log = LogService.createDailyLog({
           profileId: activeProfile.id,
@@ -176,9 +199,26 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       <View style={styles.header}>
         <Text style={styles.title}>Daily Log</Text>
         <Text style={styles.date}>{new Date(date).toLocaleDateString()}</Text>
+        {existingLog?.evidenceTimestamp && (
+          <Text style={styles.evidenceTimestamp}>
+            Evidence recorded: {new Date(existingLog.evidenceTimestamp).toLocaleString()}
+          </Text>
+        )}
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Evidence Mode Controls */}
+        {existingLog && activeProfile && (
+          <View style={styles.section}>
+            <LogFinalizationControls
+              log={existingLog}
+              logType="daily"
+              profileId={activeProfile.id}
+              onRevisionHistoryPress={() => setShowRevisionHistory(true)}
+            />
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Select Symptoms</Text>
           <SymptomPicker
@@ -247,6 +287,16 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           fullWidth
         />
       </View>
+
+      {/* Revision History Modal */}
+      {existingLog && (
+        <RevisionHistoryViewer
+          visible={showRevisionHistory}
+          onClose={() => setShowRevisionHistory(false)}
+          logId={existingLog.id}
+          logType="daily"
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -269,6 +319,12 @@ const styles = StyleSheet.create({
   date: {
     fontSize: typography.sizes.md,
     color: colors.gray600,
+  },
+  evidenceTimestamp: {
+    fontSize: typography.sizes.sm,
+    color: colors.primary600,
+    fontWeight: typography.weights.medium as any,
+    marginTop: spacing.xs,
   },
   scrollView: {
     flex: 1,

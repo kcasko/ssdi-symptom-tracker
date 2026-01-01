@@ -19,3 +19,7 @@ export * from './SSAFormBuilder';
 export * from './SyncService';
 export * from './CloudBackupService';
 export * from './MultiDeviceSyncService';
+export * from './EvidenceLogService';
+export * from './StandardizedNarrativeService';
+export * from './EvidenceReportBuilder';
+export * from './EvidencePDFExportService';

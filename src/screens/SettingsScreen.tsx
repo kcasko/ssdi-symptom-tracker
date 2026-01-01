@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton } from '../components';
+import { BigButton, EvidenceModeControls, SubmissionPackBuilder } from '../components';
 import { useAppState } from '../state/useAppState';
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
@@ -98,6 +98,18 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
               • You control your data
             </Text>
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Evidence Documentation</Text>
+          {activeProfile && (
+            <>
+              <EvidenceModeControls profileId={activeProfile.id} />
+              <View style={{ marginTop: spacing.lg }}>
+                <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
+              </View>
+            </>
+          )}
         </View>
 
         <View style={styles.section}>

@@ -14,3 +14,7 @@ export * from './DateRangePicker';
 export * from './VoiceRecorder';
 export * from './PhotoPicker';
 export * from './PhotoGallery';
+export * from './EvidenceModeControls';
+export * from './LogFinalizationControls';
+export * from './RevisionHistoryViewer';
+export * from './SubmissionPackBuilder';

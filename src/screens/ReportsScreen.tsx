@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, DateRangePicker } from '../components';
+import { BigButton, DateRangePicker, SubmissionPackBuilder } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService, ExportService, CredibilityScorer } from '../services';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
@@ -237,6 +237,17 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
           </View>
         </View>
 
+        {/* Evidence Mode Submission Packs */}
+        {activeProfile && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Evidence Submission Packs</Text>
+            <Text style={styles.sectionDescription}>
+              Generate legal-compliant evidence packages for SSDI submissions
+            </Text>
+            <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
+          </View>
+        )}
+
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Generate New Report</Text>
           
@@ -328,6 +339,11 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.bold as any,
     color: colors.gray900,
+  },
+  sectionDescription: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
+    marginBottom: spacing.sm,
   },
   emptyState: {
     alignItems: 'center',

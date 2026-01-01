@@ -11,6 +11,9 @@ export interface ActivityLog {
   createdAt: string;
   updatedAt: string;
   
+  // Evidence Mode: Immutable creation timestamp (set when Evidence Mode is active)
+  evidenceTimestamp?: string;
+  
   // When the activity occurred
   activityDate: string;
   startTime?: string; // HH:mm
@@ -46,6 +49,11 @@ export interface ActivityLog {
   
   // Photo evidence
   photos?: string[]; // Photo attachment IDs
+  
+  // Finalization
+  finalized?: boolean;
+  finalizedAt?: string;
+  finalizedBy?: string; // Profile ID
 }
 
 export type ActivityIntensity = 'light' | 'moderate' | 'heavy';
