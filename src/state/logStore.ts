@@ -9,6 +9,7 @@ import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
 import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
+import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { isSameDayAs } from '../utils/dates';
@@ -20,6 +21,7 @@ interface LogState {
   limitations: Limitation[];
   medications: Medication[];
   appointments: Appointment[];
+  photos: PhotoAttachment[];
   
   // Loading states
   loading: boolean;
@@ -60,6 +62,12 @@ interface LogState {
   updateAppointment: (appointment: Appointment) => Promise<void>;
   deleteAppointment: (appointmentId: string) => Promise<void>;
   
+  // Photos
+  addPhoto: (photo: Omit<PhotoAttachment, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updatePhoto: (photo: PhotoAttachment) => Promise<void>;
+  deletePhoto: (photoId: string) => Promise<void>;
+  getPhotosByEntity: (entityType: string, entityId: string) => PhotoAttachment[];
+  
   // Utility
   clearError: () => void;
   clearData: () => void;
@@ -72,6 +80,7 @@ export const useLogStore = create<LogState>((set, get) => ({
   limitations: [],
   medications: [],
   appointments: [],
+  photos: [],
   loading: false,
   error: null,
   currentProfileId: null,
@@ -93,12 +102,13 @@ export const useLogStore = create<LogState>((set, get) => ({
     set({ loading: true, error: null });
     
     try {
-      const [dailyLogs, activityLogs, limitations, medications, appointments] = await Promise.all([
+      const [dailyLogs, activityLogs, limitations, medications, appointments, photos] = await Promise.all([
         LogStorage.getDailyLogs(profileId),
         LogStorage.getActivityLogs(profileId),
         LogStorage.getLimitations(profileId),
         LogStorage.getMedications(profileId),
         LogStorage.getAppointments(profileId),
+        LogStorage.getPhotos(profileId),
       ]);
       
       set({
@@ -107,6 +117,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         limitations,
         medications,
         appointments,
+        photos,
         loading: false,
       });
     } catch (error) {
@@ -452,6 +463,63 @@ export const useLogStore = create<LogState>((set, get) => ({
     }
   },
 
+  // Photos
+  addPhoto: async (photoData) => {
+    const { currentProfileId } = get();
+    if (!currentProfileId) return;
+    
+    try {
+      // Photo already has id, capturedAt, addedAt from PhotoService
+      // Just add it to the store
+      const { photos } = get();
+      const updatedPhotos = [...photos, photoData];
+      
+      await LogStorage.savePhotos(currentProfileId, updatedPhotos);
+      set({ photos: updatedPhotos, error: null });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to add photo' });
+    }
+  },
+
+  updatePhoto: async (updatedPhoto) => {
+    const { currentProfileId } = get();
+    if (!currentProfileId) return;
+    
+    try {
+      const { photos } = get();
+      const updatedPhotos = photos.map(photo => 
+        photo.id === updatedPhoto.id ? updatedPhoto : photo
+      );
+      
+      await LogStorage.savePhotos(currentProfileId, updatedPhotos);
+      set({ photos: updatedPhotos, error: null });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to update photo' });
+    }
+  },
+
+  deletePhoto: async (photoId) => {
+    const { currentProfileId } = get();
+    if (!currentProfileId) return;
+    
+    try {
+      const { photos } = get();
+      const updatedPhotos = photos.filter(photo => photo.id !== photoId);
+      
+      await LogStorage.savePhotos(currentProfileId, updatedPhotos);
+      set({ photos: updatedPhotos, error: null });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to delete photo' });
+    }
+  },
+
+  getPhotosByEntity: (entityType: string, entityId: string) => {
+    const { photos } = get();
+    return photos.filter(photo => 
+      photo.entityType === entityType && photo.entityId === entityId
+    );
+  },
+
   // Utility
   clearError: () => set({ error: null }),
 
@@ -461,6 +529,7 @@ export const useLogStore = create<LogState>((set, get) => ({
     limitations: [],
     medications: [],
     appointments: [],
+    photos: [],
     currentProfileId: null,
     error: null,
   }),

@@ -16,6 +16,7 @@ export const STORAGE_KEYS = {
   LIMITATIONS: '@ssdi/limitations',
   MEDICATIONS: '@ssdi/medications',
   APPOINTMENTS: '@ssdi/appointments',
+  PHOTOS: '@ssdi/photos',
   REPORT_DRAFTS: '@ssdi/reportDrafts',
   SETTINGS: '@ssdi/settings',
   SCHEMA_VERSION: '@ssdi/schemaVersion',

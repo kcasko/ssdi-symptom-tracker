@@ -27,6 +27,7 @@ export interface DailyLogInput {
     notes?: string;
   }>;
   notes?: string;
+  photos?: string[]; // Photo attachment IDs
 }
 
 export interface ActivityLogInput {
@@ -92,6 +93,11 @@ export class LogService {
       log.notes = input.notes;
     }
 
+    // Add photos
+    if (input.photos) {
+      log.photos = input.photos;
+    }
+
     // Recalculate overall severity
     log.overallSeverity = calculateAverageSeverity(log.symptoms);
 
@@ -120,6 +126,11 @@ export class LogService {
     // Update notes if provided
     if (updates.notes !== undefined) {
       updatedLog.notes = updates.notes;
+    }
+
+    // Update photos if provided
+    if (updates.photos !== undefined) {
+      updatedLog.photos = updates.photos;
     }
 
     return updatedLog;

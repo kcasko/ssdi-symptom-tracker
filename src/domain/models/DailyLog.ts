@@ -35,6 +35,9 @@ export interface DailyLog {
   
   // Free-form notes
   notes?: string;
+  
+  // Photo evidence
+  photos?: string[]; // Photo attachment IDs
 }
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night' | 'specific';

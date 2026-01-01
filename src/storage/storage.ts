@@ -225,6 +225,19 @@ export class LogStorage {
     const result = await Storage.set(key, appointments);
     return result.success;
   }
+  
+  // Photo attachments
+  static async getPhotos(profileId: string): Promise<any[]> {
+    const key = `${STORAGE_KEYS.PHOTOS}_${profileId}`;
+    const result = await Storage.get(key, []);
+    return result.data || [];
+  }
+
+  static async savePhotos(profileId: string, photos: any[]): Promise<boolean> {
+    const key = `${STORAGE_KEYS.PHOTOS}_${profileId}`;
+    const result = await Storage.set(key, photos);
+    return result.success;
+  }
 
   static async getReportDrafts(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.REPORT_DRAFTS}_${profileId}`;
@@ -314,6 +327,7 @@ export class BackupStorage {
         limitations,
         medications,
         appointments,
+        photos,
         reportDrafts,
       ] = await Promise.all([
         ProfileStorage.getAllProfiles(),
@@ -322,6 +336,7 @@ export class BackupStorage {
         LogStorage.getLimitations(profileId),
         LogStorage.getMedications(profileId),
         LogStorage.getAppointments(profileId),
+        LogStorage.getPhotos(profileId),
         LogStorage.getReportDrafts(profileId),
       ]);
 
@@ -339,6 +354,7 @@ export class BackupStorage {
         limitations,
         medications,
         appointments,
+        photos,
         reportDrafts,
       };
 

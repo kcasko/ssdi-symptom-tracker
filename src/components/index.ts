@@ -12,3 +12,5 @@ export * from './NotesField';
 export * from './SummaryCard';
 export * from './DateRangePicker';
 export * from './VoiceRecorder';
+export * from './PhotoPicker';
+export * from './PhotoGallery';

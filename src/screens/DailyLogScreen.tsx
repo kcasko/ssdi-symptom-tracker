@@ -17,10 +17,11 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SymptomPicker, PainScale, NotesField } from '../components';
+import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery } from '../components';
 import { useAppState } from '../state/useAppState';
-import { LogService } from '../services';
+import { LogService, PhotoService } from '../services';
 import { getSymptomById } from '../data/symptoms';
+import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 
 type DailyLogProps = NativeStackScreenProps<RootStackParamList, 'DailyLog'>;
 
@@ -31,12 +32,13 @@ interface SymptomEntry {
 }
 
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog } = useAppState();
+  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, photos, addPhoto, deletePhoto, getPhotosByEntity } = useAppState();
   const [date] = useState(new Date().toISOString().split('T')[0]);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<string[]>([]);
   const [symptomEntries, setSymptomEntries] = useState<Record<string, SymptomEntry>>({});
   const [activeSymptomId, setActiveSymptomId] = useState<string | null>(null);
   const [generalNotes, setGeneralNotes] = useState('');
+  const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
 
   const existingLog = dailyLogs.find(
     (l) => l.profileId === activeProfile?.id && l.logDate === date
@@ -61,6 +63,12 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       
       if (ids.length > 0) {
         setActiveSymptomId(ids[0]);
+      }
+
+      // Load photos for this log
+      if (existingLog.id) {
+        const existingPhotos = getPhotosByEntity('daily_log', existingLog.id);
+        setLogPhotos(existingPhotos);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -99,7 +107,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!activeProfile) return;
 
     if (selectedSymptomIds.length === 0) {
@@ -114,10 +122,14 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         notes: symptomEntries[id]?.notes,
       }));
 
+      // Collect photo IDs
+      const photoIds = logPhotos.map(p => p.id);
+
       if (existingLog) {
         const updated = LogService.updateDailyLog(existingLog, {
           symptoms,
           notes: generalNotes,
+          photos: photoIds,
         });
         updateDailyLog(updated);
       } else {
@@ -126,6 +138,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           date,
           symptoms,
           notes: generalNotes,
+          photos: photoIds,
         });
         addDailyLog(log);
       }
@@ -136,6 +149,24 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save log');
     }
+  };
+
+  const handlePhotoAdded = async (photo: PhotoAttachment) => {
+    // Save photo to store
+    await addPhoto(photo);
+    setLogPhotos([...logPhotos, photo]);
+  };
+
+  const handleDeletePhoto = async (photoId: string) => {
+    // Delete from file system
+    const photo = logPhotos.find(p => p.id === photoId);
+    if (photo) {
+      await PhotoService.deletePhoto(photo.uri);
+    }
+    
+    // Remove from store
+    await deletePhoto(photoId);
+    setLogPhotos(logPhotos.filter(p => p.id !== photoId));
   };
 
   const activeSymptom = activeSymptomId ? getSymptomById(activeSymptomId) : null;
@@ -178,6 +209,25 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
             onChange={setGeneralNotes}
             label="General Notes"
             placeholder="Overall day summary, patterns noticed, etc."
+          />
+        </View>
+
+        {/* Photo Evidence Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Photo Evidence</Text>
+          
+          {logPhotos.length > 0 && (
+            <PhotoGallery
+              photos={logPhotos}
+              onDeletePhoto={handleDeletePhoto}
+            />
+          )}
+
+          <PhotoPicker
+            entityType="daily_log"
+            entityId={existingLog?.id || 'temp'}
+            onPhotoAdded={handlePhotoAdded}
+            currentPhotoCount={logPhotos.length}
           />
         </View>
       </ScrollView>

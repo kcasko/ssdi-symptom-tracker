@@ -41,6 +41,7 @@ export const ids = {
   limitation: () => generatePrefixedId('limit'),
   medication: () => generatePrefixedId('med'),
   appointment: () => generatePrefixedId('appt'),
+  photo: () => generatePrefixedId('photo'),
   reportDraft: () => generatePrefixedId('report'),
   section: () => generatePrefixedId('section'),
   textBlock: () => generatePrefixedId('block'),

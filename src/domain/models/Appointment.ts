@@ -40,6 +40,9 @@ export interface Appointment {
   // Notes
   preAppointmentNotes?: string;
   postAppointmentNotes?: string;
+  
+  // Photo evidence
+  photos?: string[]; // Photo attachment IDs
 }
 
 export type ProviderType =

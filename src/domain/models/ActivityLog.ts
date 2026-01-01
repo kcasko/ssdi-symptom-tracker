@@ -43,6 +43,9 @@ export interface ActivityLog {
   
   // Free-form notes
   notes?: string;
+  
+  // Photo evidence
+  photos?: string[]; // Photo attachment IDs
 }
 
 export type ActivityIntensity = 'light' | 'moderate' | 'heavy';

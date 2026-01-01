@@ -37,11 +37,17 @@ interface AppState {
   activityLogs: any[];
   limitations: any[];
   medications: any[];
+  photos: any[];
   
   // Log actions
   addDailyLog: (log: any) => Promise<void>;
   updateDailyLog: (log: any) => Promise<void>;
   addActivityLog: (log: any) => Promise<void>;
+  
+  // Photo actions
+  addPhoto: (photo: any) => Promise<void>;
+  deletePhoto: (photoId: string) => Promise<void>;
+  getPhotosByEntity: (entityType: string, entityId: string) => any[];
   
   // Report data
   reportDrafts: any[];
@@ -248,9 +254,13 @@ export function useAppState(): AppState {
     activityLogs: logStore.activityLogs,
     limitations: logStore.limitations,
     medications: logStore.medications,
+    photos: logStore.photos,
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,
     addActivityLog: logStore.addActivityLog,
+    addPhoto: logStore.addPhoto,
+    deletePhoto: logStore.deletePhoto,
+    getPhotosByEntity: logStore.getPhotosByEntity,
     
     // Report store data and methods
     reportDrafts: reportStore.drafts,
