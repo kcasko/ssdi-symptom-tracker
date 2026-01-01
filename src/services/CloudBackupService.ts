@@ -6,7 +6,6 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
 import * as Crypto from 'expo-crypto';
 import {
   BackupConfig,
@@ -20,11 +19,14 @@ import {
   BackupEntityCount
 } from '../domain/models/BackupModels';
 import { EncryptionService } from '../storage/encryption';
+import { CloudProviderFactory } from './cloudProviders';
+import pako from 'pako';
 
 const BACKUP_CONFIG_KEY = '@backup_config';
 const BACKUP_HISTORY_KEY = '@backup_history';
 const BACKUP_KEY_ID = '@backup_key_id';
 const DATA_VERSION = 1; // Increment when data model changes
+const APP_VERSION = '1.0.0';
 
 export class CloudBackupService {
   private static config: BackupConfig = DEFAULT_BACKUP_CONFIG;
@@ -49,7 +51,6 @@ export class CloudBackupService {
    * Create backup
    */
   static async createBackup(manual = false): Promise<BackupMetadata> {
-    const startTime = Date.now();
     const backupId = `backup_${Date.now()}`;
     
     try {
@@ -82,7 +83,7 @@ export class CloudBackupService {
       const metadata: BackupMetadata = {
         id: backupId,
         createdAt: new Date(),
-        appVersion: '1.0.0', // TODO: Get from package.json
+        appVersion: APP_VERSION,
         dataVersion: DATA_VERSION,
         entities: this.countEntities(data),
         totalSizeBytes,
@@ -188,50 +189,70 @@ export class CloudBackupService {
    * List available backups
    */
   static async listBackups(): Promise<BackupMetadata[]> {
-    // TODO: Implement cloud provider-specific listing
-    // For now, return from history
-    return this.history
-      .filter(h => h.success)
-      .map(h => ({
-        id: h.id,
-        createdAt: h.timestamp,
-        appVersion: '1.0.0',
-        dataVersion: DATA_VERSION,
-        entities: [],
-        totalSizeBytes: h.sizeBytes,
-        encrypted: this.config.encryptionEnabled,
-        provider: h.provider,
-        checksum: ''
-      }));
+    try {
+      const provider = CloudProviderFactory.getProvider(this.config);
+      return await provider.list();
+    } catch (error) {
+      console.error('Failed to list backups:', error);
+      // Fallback to history
+      return this.history
+        .filter(h => h.success)
+        .map(h => ({
+          id: h.id,
+          createdAt: h.timestamp,
+          appVersion: APP_VERSION,
+          dataVersion: DATA_VERSION,
+          entities: [],
+          totalSizeBytes: h.sizeBytes,
+          encrypted: this.config.encryptionEnabled,
+          provider: h.provider,
+          checksum: ''
+        }));
+    }
   }
   
   /**
    * Get cloud storage info
    */
   static async getCloudStorageInfo(): Promise<CloudStorageInfo> {
-    // TODO: Implement provider-specific storage info
-    const backups = await this.listBackups();
-    const timestamps = backups.map(b => new Date(b.createdAt));
-    
-    return {
-      provider: this.config.provider,
-      connected: true, // TODO: Check actual connection
-      backupCount: backups.length,
-      oldestBackup: timestamps.length > 0
-        ? new Date(Math.min(...timestamps.map(d => d.getTime())))
-        : undefined,
-      newestBackup: timestamps.length > 0
-        ? new Date(Math.max(...timestamps.map(d => d.getTime())))
-        : undefined
-    };
+    try {
+      const provider = CloudProviderFactory.getProvider(this.config);
+      const backups = await this.listBackups();
+      const timestamps = backups.map(b => new Date(b.createdAt));
+      const storageInfo = await provider.getStorageInfo();
+      const isConnected = await provider.isAvailable();
+      
+      return {
+        provider: this.config.provider,
+        connected: isConnected,
+        lastSync: this.history.find(h => h.success)?.timestamp,
+        totalSpaceBytes: storageInfo.totalSpace,
+        usedSpaceBytes: storageInfo.usedSpace,
+        availableSpaceBytes: storageInfo.availableSpace,
+        backupCount: backups.length,
+        oldestBackup: timestamps.length > 0
+          ? new Date(Math.min(...timestamps.map(d => d.getTime())))
+          : undefined,
+        newestBackup: timestamps.length > 0
+          ? new Date(Math.max(...timestamps.map(d => d.getTime())))
+          : undefined
+      };
+    } catch (error) {
+      console.error('Failed to get cloud storage info:', error);
+      return {
+        provider: this.config.provider,
+        connected: false,
+        backupCount: 0
+      };
+    }
   }
   
   /**
    * Delete backup
    */
   static async deleteBackup(backupId: string): Promise<void> {
-    // TODO: Implement cloud provider-specific deletion
-    console.log('Deleting backup:', backupId);
+    const provider = CloudProviderFactory.getProvider(this.config);
+    await provider.delete(backupId);
   }
   
   /**
@@ -275,7 +296,7 @@ export class CloudBackupService {
         try {
           await this.decryptData(backupPackage.data.substring(0, 100)); // Test with small sample
           result.checks.encryptionValid = true;
-        } catch (error) {
+        } catch (_error) {
           result.checks.encryptionValid = false;
           result.errors.push('Cannot decrypt - wrong encryption key or corrupted data');
         }
@@ -292,7 +313,7 @@ export class CloudBackupService {
         }
         JSON.parse(testData.substring(0, 1000)); // Test parse with small sample
         result.checks.dataIntegrity = true;
-      } catch (error) {
+      } catch (_error) {
         result.checks.dataIntegrity = false;
         result.errors.push('Invalid JSON structure');
       }
@@ -415,17 +436,27 @@ export class CloudBackupService {
    * Internal: Compress data
    */
   private static async compressData(data: string): Promise<string> {
-    // TODO: Implement actual compression (e.g., using pako or similar)
-    // For now, just return as-is
-    return data;
+    try {
+      const compressed = pako.deflate(data, { level: 9 });
+      return Buffer.from(compressed).toString('base64');
+    } catch (error) {
+      console.error('Compression failed, using uncompressed:', error);
+      return data;
+    }
   }
   
   /**
    * Internal: Decompress data
    */
   private static async decompressData(data: string): Promise<string> {
-    // TODO: Implement actual decompression
-    return data;
+    try {
+      const buffer = Buffer.from(data, 'base64');
+      const decompressed = pako.inflate(buffer, { to: 'string' });
+      return decompressed;
+    } catch (error) {
+      console.error('Decompression failed:', error);
+      throw new Error('Failed to decompress backup data');
+    }
   }
   
   /**
@@ -474,27 +505,17 @@ export class CloudBackupService {
    * Internal: Upload to cloud
    */
   private static async uploadToCloud(backupPackage: BackupPackage): Promise<void> {
-    // TODO: Implement provider-specific upload
-    // For now, save locally
-    const backupDir = `${FileSystem.documentDirectory}backups/`;
-    await FileSystem.makeDirectoryAsync(backupDir, { intermediates: true });
-    
-    const filePath = `${backupDir}${backupPackage.metadata.id}.json`;
-    await FileSystem.writeAsStringAsync(
-      filePath,
-      JSON.stringify(backupPackage)
-    );
+    const provider = CloudProviderFactory.getProvider(this.config);
+    const cloudPath = await provider.upload(backupPackage);
+    backupPackage.metadata.cloudPath = cloudPath;
   }
   
   /**
    * Internal: Download from cloud
    */
   private static async downloadFromCloud(backupId: string): Promise<BackupPackage> {
-    // TODO: Implement provider-specific download
-    // For now, read from local
-    const filePath = `${FileSystem.documentDirectory}backups/${backupId}.json`;
-    const content = await FileSystem.readAsStringAsync(filePath);
-    return JSON.parse(content);
+    const provider = CloudProviderFactory.getProvider(this.config);
+    return await provider.download(backupId);
   }
   
   /**
