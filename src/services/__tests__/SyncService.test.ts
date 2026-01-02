@@ -5,6 +5,15 @@
 import { SyncService } from '../SyncService';
 import { PendingOperation } from '../../domain/models/SyncModels';
 import NetInfo from '@react-native-community/netinfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  getItem: jest.fn(() => Promise.resolve(null)),
+  setItem: jest.fn(() => Promise.resolve()),
+  removeItem: jest.fn(() => Promise.resolve()),
+  clear: jest.fn(() => Promise.resolve()),
+}));
 
 // Mock NetInfo
 jest.mock('@react-native-community/netinfo', () => ({
@@ -14,11 +23,14 @@ jest.mock('@react-native-community/netinfo', () => ({
   fetch: jest.fn(() => Promise.resolve({ isConnected: true, isInternetReachable: true }))
 }));
 
+const MockAsyncStorage = AsyncStorage as jest.Mocked<typeof AsyncStorage>;
 const MockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
 
 describe('SyncService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
+    // Clear AsyncStorage mock state
+    MockAsyncStorage.getItem.mockResolvedValue(null);
     // Initialize SyncService for each test
     await SyncService.initialize();
   });

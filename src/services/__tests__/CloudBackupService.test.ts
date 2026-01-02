@@ -4,10 +4,41 @@
 
 import { CloudBackupService } from '../CloudBackupService';
 import { BackupConfig } from '../../domain/models/BackupModels';
-import * as FileSystem from 'expo-file-system';
 
-jest.mock('expo-file-system');
-jest.mock('expo-crypto');
+// Mock all Expo modules that cause import issues
+jest.mock('expo-file-system', () => ({
+  documentDirectory: 'mock://documents/',
+  writeAsStringAsync: jest.fn(() => Promise.resolve()),
+  readAsStringAsync: jest.fn(() => Promise.resolve('mock file content')),
+  deleteAsync: jest.fn(() => Promise.resolve()),
+  makeDirectoryAsync: jest.fn(() => Promise.resolve()),
+  getInfoAsync: jest.fn(() => Promise.resolve({ exists: true, size: 1024 })),
+}));
+
+jest.mock('expo-crypto', () => ({
+  digestStringAsync: jest.fn(() => Promise.resolve('mock-hash')),
+  CryptoDigestAlgorithm: {
+    SHA256: 'SHA256'
+  }
+}));
+
+jest.mock('expo-secure-store', () => ({
+  setItemAsync: jest.fn(() => Promise.resolve()),
+  getItemAsync: jest.fn(() => Promise.resolve('mock-stored-value')),
+  deleteItemAsync: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock('expo-local-authentication', () => ({
+  authenticateAsync: jest.fn(() => Promise.resolve({ success: true })),
+  isEnrolledAsync: jest.fn(() => Promise.resolve(true)),
+}));
+
+jest.mock('react-native', () => ({
+  Platform: {
+    OS: 'ios',
+    select: jest.fn((obj) => obj.ios || obj.default)
+  }
+}));
 
 describe('CloudBackupService', () => {
   const mockConfig: BackupConfig = {
