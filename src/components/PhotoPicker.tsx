@@ -83,7 +83,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
       if (result) {
         const photo = await PhotoService.createAttachment(
           result,
-          entityType,
+          entityType as PhotoAttachment['entityType'],
           entityId,
           selectedCategory
         );
@@ -115,7 +115,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
       if (result) {
         const photo = await PhotoService.createAttachment(
           result,
-          entityType,
+          entityType as PhotoAttachment['entityType'],
           entityId,
           selectedCategory
         );
@@ -158,7 +158,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         for (const result of photosToAdd) {
           const photo = await PhotoService.createAttachment(
             result,
-            entityType,
+            entityType as PhotoAttachment['entityType'],
             entityId,
             selectedCategory
           );
@@ -176,7 +176,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.primaryMain} />
         <Text style={styles.loadingText}>Processing photo...</Text>
       </View>
     );
@@ -255,7 +255,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
 
       {/* Evidence Tip */}
       <View style={styles.tipContainer}>
-        <MaterialIcons name="lightbulb-outline" size={20} color={COLORS.warning} />
+        <MaterialIcons name="lightbulb-outline" size={20} color={COLORS.warningMain} />
         <Text style={styles.tipText}>
           Visual evidence significantly strengthens your disability case
         </Text>
@@ -276,12 +276,12 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: SPACING.md,
     fontSize: 16,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.sm,
   },
   categoryScroll: {
@@ -290,19 +290,19 @@ const styles = StyleSheet.create({
   categoryChip: {
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.background.secondary,
     borderRadius: 20,
     marginRight: SPACING.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.border.light,
   },
   categoryChipSelected: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primaryMain,
+    borderColor: COLORS.primaryMain,
   },
   categoryChipText: {
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   categoryChipTextSelected: {
     color: COLORS.white,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   },
   categoryDescription: {
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     fontStyle: 'italic',
     marginBottom: SPACING.md,
   },
@@ -321,14 +321,14 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.primaryMain,
     padding: SPACING.md,
     borderRadius: 8,
     alignItems: 'center',
     gap: SPACING.xs,
   },
   actionButtonDisabled: {
-    backgroundColor: COLORS.disabled,
+    backgroundColor: COLORS.text.disabled,
   },
   actionButtonText: {
     color: COLORS.white,
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
   photoCount: {
     textAlign: 'center',
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     marginTop: SPACING.md,
   },
   tipContainer: {
@@ -353,6 +353,6 @@ const styles = StyleSheet.create({
   tipText: {
     flex: 1,
     fontSize: 13,
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
   },
 });

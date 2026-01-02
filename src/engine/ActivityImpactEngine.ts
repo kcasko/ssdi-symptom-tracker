@@ -146,7 +146,7 @@ export class ActivityImpactEngine {
 
     return {
       activityId,
-      activityName: firstlog.activityIdName,
+      activityName: firstLog.activityName,
       averageDuration,
       maxDuration,
       safeThreshold,

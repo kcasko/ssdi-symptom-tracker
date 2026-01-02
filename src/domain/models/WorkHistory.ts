@@ -407,7 +407,6 @@ export const COMMON_JOB_DUTIES: Record<string, JobDuty[]> = {
       percentOfTime: 10,
       physicalRequirements: {
         walking: true,
-        stooping: true,
         reaching: true,
       },
       isEssential: true,

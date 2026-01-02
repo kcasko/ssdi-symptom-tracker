@@ -466,7 +466,7 @@ export class LimitationAnalyzer {
     activityLogs.forEach(log => {
       // Check if activity is relevant to limitation category
       const isRelevantActivity = relevantActivities.some(actId => 
-        log.activityId === actId || log.activityIdName.toLowerCase().includes(actId)
+        log.activityId === actId || log.activityName.toLowerCase().includes(actId)
       );
       
       if (isRelevantActivity) {

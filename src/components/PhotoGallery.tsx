@@ -57,9 +57,9 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const renderThumbnail = (photo: PhotoAttachment) => {
     const evidenceValue = getEvidenceValueLabel(photo.category);
     const evidenceColor = 
-      evidenceValue === 'High' ? COLORS.success :
-      evidenceValue === 'Medium' ? COLORS.warning :
-      COLORS.textSecondary;
+      evidenceValue === 'High' ? COLORS.success.main :
+      evidenceValue === 'Medium' ? COLORS.warning.main :
+      COLORS.text.secondary;
 
     return (
       <TouchableOpacity
@@ -70,7 +70,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
         <Image source={{ uri: photo.uri }} style={styles.thumbnail} />
         
         {/* Evidence Badge */}
-        <View style={[styles.evidenceBadge, { backgroundColor: evidenceColor }]}>
+        <View style={[styles.evidenceBadge, { backgroundColor: evidenceColor as string }]}>
           <Text style={styles.evidenceBadgeText}>
             {evidenceValue}
           </Text>
@@ -133,9 +133,9 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 <View style={styles.photoInfoRow}>
                   <Text style={styles.photoInfoLabel}>Evidence Value:</Text>
                   <Text style={[styles.photoInfoValue, { color: 
-                    evidenceValue === 'High' ? COLORS.success :
-                    evidenceValue === 'Medium' ? COLORS.warning :
-                    COLORS.textSecondary
+                    evidenceValue === 'High' ? COLORS.success.main :
+                    evidenceValue === 'Medium' ? COLORS.warning.main :
+                    COLORS.text.secondary
                   }]}>
                     {evidenceValue}
                   </Text>
@@ -175,7 +175,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialIcons name="photo-library" size={20} color={COLORS.primary} />
+        <MaterialIcons name="photo-library" size={20} color={COLORS.primary[500]} />
         <Text style={styles.title}>Photo Evidence ({photos.length})</Text>
       </View>
 
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   gallery: {
     gap: SPACING.sm,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.background.secondary,
     position: 'relative',
   },
   thumbnail: {
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: COLORS.error,
+    backgroundColor: COLORS.error.main,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   photoInfo: {
     width: '100%',
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.background.secondary,
     borderRadius: 8,
     padding: SPACING.md,
     marginTop: SPACING.md,
@@ -294,13 +294,13 @@ const styles = StyleSheet.create({
   photoInfoLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: COLORS.text.secondary,
     width: 100,
   },
   photoInfoValue: {
     flex: 1,
     fontSize: 14,
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   closeButton: {
     position: 'absolute',

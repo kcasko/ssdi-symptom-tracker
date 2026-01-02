@@ -31,6 +31,10 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
     navigation.replace('ProfilePicker');
   };
 
+  const handleToggleDarkMode = () => {
+    updateSettings({ darkMode: !settings.darkMode });
+  };
+
   const handleToggleEncryption = () => {
     Alert.alert(
       'Encryption',
