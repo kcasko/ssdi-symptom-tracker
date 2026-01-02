@@ -156,7 +156,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           );
           // updateDailyLog will be called by the revision system
         } else {
-          updateDailyLog(updated);
+          await updateDailyLog(updated);
         }
       } else {
         // Pass data to store, which will create the log with proper IDs and timestamps
@@ -171,9 +171,9 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         });
       }
 
-      Alert.alert('Success', 'Daily log saved', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
+      // Navigate back immediately after successful save
+      console.log('Log saved successfully, navigating back');
+      navigation.goBack();
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save log');
     }

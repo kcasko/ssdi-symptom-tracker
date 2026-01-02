@@ -89,10 +89,12 @@ export const useLogStore = create<LogState>((set, get) => ({
   // Actions
   setCurrentProfile: (profileId: string | null) => {
     const current = get().currentProfileId;
+    console.log('setCurrentProfile called:', { current, new: profileId });
     if (current === profileId) return; // Prevent redundant updates
     
     set({ currentProfileId: profileId });
     if (profileId) {
+      console.log('Loading data for profile:', profileId);
       get().loadData(profileId);
     } else {
       get().clearData();
@@ -101,6 +103,7 @@ export const useLogStore = create<LogState>((set, get) => ({
 
   loadData: async (profileId: string) => {
     set({ loading: true, error: null });
+    console.log('loadData called for profile:', profileId);
     
     try {
       const [dailyLogs, activityLogs, limitations, medications, appointments, photos] = await Promise.all([
@@ -112,6 +115,8 @@ export const useLogStore = create<LogState>((set, get) => ({
         LogStorage.getPhotos(profileId),
       ]);
       
+      console.log('Data loaded:', { dailyLogs: dailyLogs.length, activityLogs: activityLogs.length });
+      
       set({
         dailyLogs,
         activityLogs,
@@ -122,6 +127,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         loading: false,
       });
     } catch (error) {
+      console.error('Error loading data:', error);
       set({
         loading: false,
         error: error instanceof Error ? error.message : 'Failed to load data',
@@ -132,7 +138,11 @@ export const useLogStore = create<LogState>((set, get) => ({
   // Daily logs
   addDailyLog: async (logData) => {
     const { currentProfileId } = get();
-    if (!currentProfileId) return;
+    console.log('addDailyLog called, currentProfileId:', currentProfileId);
+    if (!currentProfileId) {
+      console.log('No currentProfileId, cannot add log');
+      return;
+    }
     
     try {
       const logId = ids.dailyLog();
@@ -152,9 +162,12 @@ export const useLogStore = create<LogState>((set, get) => ({
       const { dailyLogs } = get();
       const updatedLogs = [...dailyLogs, newLog];
       
+      console.log('Saving daily log, total logs:', updatedLogs.length);
       await LogStorage.saveDailyLogs(currentProfileId, updatedLogs);
       set({ dailyLogs: updatedLogs, error: null });
+      console.log('Daily log saved successfully');
     } catch (error) {
+      console.error('Error adding daily log:', error);
       set({ error: error instanceof Error ? error.message : 'Failed to add daily log' });
     }
   },

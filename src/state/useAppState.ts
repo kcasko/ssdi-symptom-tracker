@@ -154,8 +154,14 @@ export function useAppState(): AppState {
         const currentActiveProfileId = useProfileStore.getState().activeProfileId;
         console.log('Profiles loaded, activeProfileId:', currentActiveProfileId);
         
-        // Store the active profile ID for later sync
+        // Load data for active profile
         if (currentActiveProfileId) {
+          console.log('Loading data for active profile during initialization');
+          // Set the profile ID and force load data
+          useLogStore.setState({ currentProfileId: currentActiveProfileId });
+          useReportStore.setState({ currentProfileId: currentActiveProfileId });
+          await useLogStore.getState().loadData(currentActiveProfileId);
+          await useReportStore.getState().loadData(currentActiveProfileId);
           lastSyncedProfileId.current = currentActiveProfileId;
         }
         
@@ -263,6 +269,9 @@ export function useAppState(): AppState {
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,
     addActivityLog: logStore.addActivityLog,
+    addLimitation: logStore.addLimitation,
+    updateLimitation: logStore.updateLimitation,
+    deleteLimitation: logStore.deleteLimitation,
     addPhoto: logStore.addPhoto,
     deletePhoto: logStore.deletePhoto,
     getPhotosByEntity: logStore.getPhotosByEntity,
