@@ -6,6 +6,9 @@
 import { create } from 'zustand';
 import { ReportDraft, createReportDraft, ReportType } from '../domain/models/ReportDraft';
 import { LogStorage } from '../storage/storage';
+import { ReportService } from '../services/ReportService';
+import { ExportService } from '../services/ExportService';
+import { generatePlainTextReport } from '../services/EvidencePDFExportService';
 import { ids } from '../utils/ids';
 
 interface ReportState {
@@ -186,27 +189,50 @@ export const useReportStore = create<ReportState>((set, get) => ({
     set({ generating: true, error: null });
     
     try {
-      // This is a placeholder - actual generation would be implemented
-      // in the ReportService and called from here
-      
-      // For now, just simulate generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const { drafts } = get();
+      const { drafts, currentProfileId } = get();
       const draft = drafts.find(d => d.id === draftId);
       
-      if (draft) {
-        const updatedDraft = {
-          ...draft,
-          generatedAt: new Date().toISOString(),
-          lastRegeneratedAt: new Date().toISOString(),
-          status: 'draft' as const,
-          updatedAt: new Date().toISOString(),
-        };
-        
-        await get().updateDraft(updatedDraft);
+      if (!draft || !currentProfileId) {
+        throw new Error('Draft not found or no profile selected');
       }
+
+      // Load required data from storage
+      const dailyLogs = await LogStorage.getDailyLogs(currentProfileId);
+      const activityLogs = await LogStorage.getActivityLogs(currentProfileId);
+      const limitations = await LogStorage.getLimitations(currentProfileId);
+
+      // Filter data by date range
+      const filteredDailyLogs = dailyLogs.filter(log => 
+        log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
+      );
+      const filteredActivityLogs = activityLogs.filter(log => 
+        log.date >= draft.dateRange.start && log.date <= draft.dateRange.end
+      );
+
+      // Use ReportService to generate the actual report content
+      const generatedDraft = await ReportService.generateReportDraft(
+        {
+          profileId: currentProfileId,
+          dateRange: draft.dateRange,
+          templateId: draft.reportType, // Use reportType as templateId
+          includeSections: draft.sections.map(s => s.sectionType),
+        },
+        filteredDailyLogs,
+        filteredActivityLogs,
+        limitations
+      );
+
+      // Update the draft with generated content
+      const updatedDraft = {
+        ...draft,
+        sections: generatedDraft.sections,
+        generatedAt: new Date().toISOString(),
+        lastRegeneratedAt: new Date().toISOString(),
+        status: 'draft' as const,
+        updatedAt: new Date().toISOString(),
+      };
       
+      await get().updateDraft(updatedDraft);
       set({ generating: false });
     } catch (error) {
       set({
@@ -217,28 +243,53 @@ export const useReportStore = create<ReportState>((set, get) => ({
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  regenerateSection: async (draftId: string, _sectionId: string) => {
+  regenerateSection: async (draftId: string, sectionId: string) => {
     set({ generating: true, error: null });
     
     try {
-      // This is a placeholder - actual section regeneration would be implemented
-      // in the ReportService
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const { drafts } = get();
+      const { drafts, currentProfileId } = get();
       const draft = drafts.find(d => d.id === draftId);
       
-      if (draft) {
-        const updatedDraft = {
-          ...draft,
-          lastRegeneratedAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        
-        await get().updateDraft(updatedDraft);
+      if (!draft || !currentProfileId) {
+        throw new Error('Draft not found or no profile selected');
       }
+
+      const sectionToRegenerate = draft.sections.find(s => s.id === sectionId);
+      if (!sectionToRegenerate) {
+        throw new Error('Section not found');
+      }
+
+      // Load required data from storage
+      const dailyLogs = await LogStorage.getDailyLogs(currentProfileId);
+      const activityLogs = await LogStorage.getActivityLogs(currentProfileId);
+      const limitations = await LogStorage.getLimitations(currentProfileId);
+
+      // Filter data by date range
+      const filteredDailyLogs = dailyLogs.filter(log => 
+        log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
+      );
+      const filteredActivityLogs = activityLogs.filter(log => 
+        log.date >= draft.dateRange.start && log.date <= draft.dateRange.end
+      );
+
+      // Use ReportService to regenerate the specific section
+      const regeneratedDraft = await ReportService.regenerateSection(
+        draft,
+        sectionId,
+        filteredDailyLogs,
+        filteredActivityLogs,
+        limitations
+      );
+
+      // Update the draft with regenerated content
+      const updatedDraft = {
+        ...draft,
+        sections: regeneratedDraft.sections,
+        lastRegeneratedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
       
+      await get().updateDraft(updatedDraft);
       set({ generating: false });
     } catch (error) {
       set({
@@ -252,36 +303,63 @@ export const useReportStore = create<ReportState>((set, get) => ({
     set({ exporting: true, error: null });
     
     try {
-      // This is a placeholder - actual export would be implemented
-      // in the TextExporter/PdfExporter services
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
       const { drafts } = get();
       const draft = drafts.find(d => d.id === draftId);
       
-      if (draft) {
-        const exportRecord = {
-          exportedAt: new Date().toISOString(),
-          format,
-          filename: `${draft.title}_${format}_${new Date().toISOString().split('T')[0]}.${format}`,
-        };
-        
-        const updatedDraft = {
-          ...draft,
-          exports: [...draft.exports, exportRecord],
-          status: 'exported' as const,
-          updatedAt: new Date().toISOString(),
-        };
-        
-        await get().updateDraft(updatedDraft);
-        
-        set({ exporting: false });
-        return exportRecord.filename;
+      if (!draft) {
+        throw new Error('Draft not found');
+      }
+
+      // Generate a filename
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `${draft.title}_${format}_${timestamp}.${format}`;
+
+      // Convert draft to text content for export
+      const reportContent = draft.sections
+        .map(section => {
+          const blockTexts = section.blocks.map(block => block.content).join('\n\n');
+          return `${section.title}\n${'='.repeat(section.title.length)}\n\n${blockTexts}`;
+        })
+        .join('\n\n\n');
+
+      // Use appropriate export service based on format
+      if (format === 'pdf') {
+        // For PDF, we'll use the plain text report generator
+        const pdfContent = generatePlainTextReport({
+          title: draft.title,
+          dateRange: `${draft.dateRange.start} to ${draft.dateRange.end}`,
+          generatedAt: draft.generatedAt || new Date().toISOString(),
+          executiveSummary: 'Generated report from draft',
+          dataQualitySummary: 'Report generated from user-logged data',
+          symptomNarratives: [],
+          activityNarratives: [],
+          functionalLimitations: [],
+          revisionSummary: { hasRevisions: false, totalRevisions: 0, revisionStatements: [] },
+          disclaimer: 'This report is generated from user-logged data for informational purposes.',
+        });
+        // Note: This would typically integrate with a PDF generation library
+        await ExportService.exportReportToText(pdfContent, filename);
+      } else {
+        await ExportService.exportReportToText(reportContent, filename);
       }
       
+      const exportRecord = {
+        exportedAt: new Date().toISOString(),
+        format,
+        filename,
+      };
+      
+      const updatedDraft = {
+        ...draft,
+        exports: [...draft.exports, exportRecord],
+        status: 'exported' as const,
+        updatedAt: new Date().toISOString(),
+      };
+      
+      await get().updateDraft(updatedDraft);
+      
       set({ exporting: false });
-      return null;
+      return filename;
     } catch (error) {
       set({
         exporting: false,

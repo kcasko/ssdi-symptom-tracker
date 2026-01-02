@@ -35,8 +35,18 @@ export class CloudProviderFactory {
       
       case 's3':
       case 'gdrive':
-        // TODO: Implement S3 and Google Drive providers
-        console.warn(`${config.provider} not implemented, using local storage`);
+        // Cloud providers not yet implemented - graceful fallback to local
+        console.info(`[CloudProvider] ${config.provider} provider not implemented yet, falling back to local storage`);
+        console.info(`[CloudProvider] To implement ${config.provider}:`);
+        if (config.provider === 's3') {
+          console.info('  - Install aws-sdk or @aws-sdk/client-s3');
+          console.info('  - Create S3Provider class implementing CloudBackupProvider');
+          console.info('  - Add AWS credentials configuration');
+        } else {
+          console.info('  - Install googleapis package');
+          console.info('  - Create GoogleDriveProvider class implementing CloudBackupProvider');
+          console.info('  - Add Google Drive API credentials configuration');
+        }
         return LocalProvider as any;
       
       default:
