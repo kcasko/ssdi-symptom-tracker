@@ -310,6 +310,8 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.bold as any,
     color: colors.gray900,
+    flex: 1,
+    marginRight: spacing.sm,
   },
   statusCard: {
     backgroundColor: colors.successLight,
@@ -352,11 +354,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: spacing.sm,
   },
   viewDetailsLink: {
     fontSize: typography.sizes.sm,
     color: colors.primaryMain,
     fontWeight: typography.weights.semibold as any,
+    flexShrink: 0,
   },
   capacityBar: {
     gap: spacing.xs,

@@ -159,14 +159,16 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           updateDailyLog(updated);
         }
       } else {
-        const log = LogService.createDailyLog({
+        // Pass data to store, which will create the log with proper IDs and timestamps
+        await addDailyLog({
           profileId: activeProfile.id,
-          date,
+          logDate: date,
+          timeOfDay: 'morning',
           symptoms,
+          overallSeverity: symptoms.reduce((sum, s) => sum + s.severity, 0) / symptoms.length,
           notes: generalNotes,
           photos: photoIds,
         });
-        addDailyLog(log);
       }
 
       Alert.alert('Success', 'Daily log saved', [
