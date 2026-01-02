@@ -120,6 +120,7 @@ export class WorkImpactAnalyzer {
       if (duty.physicalRequirements.lifting) {
         const liftingFactors = this.findLiftingInterference(
           activityLogs,
+          dailyLogs,
           limitations,
           duty.physicalRequirements.lifting
         );
@@ -233,7 +234,7 @@ export class WorkImpactAnalyzer {
         name: limitation.category,
         interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
-        occurrencePercentage: 100,
+        occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
         averageSeverity: 7,
         maxSeverity: 8,
         logIds: [limitation.id],
@@ -341,7 +342,7 @@ export class WorkImpactAnalyzer {
         name: limitation.category,
         interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
-        occurrencePercentage: 100,
+        occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
         averageSeverity: 7,
         maxSeverity: 8,
         logIds: [limitation.id],
@@ -356,6 +357,7 @@ export class WorkImpactAnalyzer {
    */
   private static findLiftingInterference(
     activityLogs: ActivityLog[],
+    dailyLogs: DailyLog[],
     limitations: Limitation[],
     requiredWeight: number
   ): InterferingFactor[] {
@@ -378,7 +380,7 @@ export class WorkImpactAnalyzer {
         name: 'Lifting difficulty',
         interferenceDescription: `Cannot safely lift ${requiredWeight} lbs - lifting activities caused severe symptoms in ${liftingActivities.length} documented instances`,
         occurrenceCount: liftingActivities.length,
-        occurrencePercentage: 100,
+        occurrencePercentage: activityLogs.length > 0 ? (liftingActivities.length / activityLogs.length) * 100 : 0,
         averageSeverity: 8,
         maxSeverity: 10,
         logIds: liftingActivities.map(a => a.id),
@@ -397,7 +399,7 @@ export class WorkImpactAnalyzer {
         name: limitation.category,
         interferenceDescription: `${limitation.category} limitation - cannot meet ${requiredWeight} lb requirement`,
         occurrenceCount: 1,
-        occurrencePercentage: 100,
+        occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
         averageSeverity: 7,
         maxSeverity: 8,
         logIds: [limitation.id],

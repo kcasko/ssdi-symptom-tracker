@@ -17,8 +17,10 @@ jest.mock('@react-native-community/netinfo', () => ({
 const MockNetInfo = NetInfo as jest.Mocked<typeof NetInfo>;
 
 describe('SyncService', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
+    // Initialize SyncService for each test
+    await SyncService.initialize();
   });
 
   describe('queueOperation', () => {

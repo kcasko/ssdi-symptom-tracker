@@ -16,7 +16,7 @@ describe('RFCBuilder', () => {
       logDate: '2024-01-01',
       timeOfDay: 'morning',
       symptoms: [
-        { symptomId: 'back-pain', severity: 8, duration: 480, notes: 'Constant' }
+        { symptomId: 'back_pain', severity: 8, duration: 480, notes: 'Constant' }
       ],
       overallSeverity: 8,
       sleepQuality: { hoursSlept: 4, quality: 3, restful: false },
@@ -30,7 +30,7 @@ describe('RFCBuilder', () => {
       logDate: '2024-01-02',
       timeOfDay: 'morning',
       symptoms: [
-        { symptomId: 'back-pain', severity: 9, duration: 480, notes: 'Severe' }
+        { symptomId: 'back_pain', severity: 9, duration: 480, notes: 'Severe' }
       ],
       overallSeverity: 9,
       sleepQuality: { hoursSlept: 3, quality: 2, restful: false },
