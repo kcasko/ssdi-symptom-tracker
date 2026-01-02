@@ -54,7 +54,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
     }
 
     // Check if log can be modified (Evidence Mode finalization check)
-    if (existingLog && !canModifyLog(existingLog, activeProfile.id)) {
+    if (existingLog && !canModifyLog(existingLog.id).canModify) {
       Alert.alert(
         'Log Finalized',
         'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
@@ -103,7 +103,6 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
               log={existingLog}
               logType="activity"
               profileId={activeProfile.id}
-              onRevisionHistoryPress={() => setShowRevisionHistory(true)}
             />
           </View>
         )}
@@ -167,7 +166,6 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           visible={showRevisionHistory}
           onClose={() => setShowRevisionHistory(false)}
           logId={existingLog.id}
-          logType="activity"
         />
       )}
     </SafeAreaView>

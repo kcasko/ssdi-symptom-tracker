@@ -118,7 +118,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     }
 
     // Check if log can be modified (Evidence Mode finalization check)
-    if (existingLog && !canModifyLog(existingLog, activeProfile.id)) {
+    if (existingLog && !canModifyLog(existingLog.id).canModify) {
       Alert.alert(
         'Log Finalized',
         'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
@@ -146,12 +146,15 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         
         // Use revision system if log is finalized
         if (existingLog.finalized) {
-          const revisedLog = updateLogWithRevision(
-            updated,
+          await updateLogWithRevision(
+            existingLog.id,
+            'daily',
             activeProfile.id,
+            existingLog,
+            updated,
             'Updated symptom entries and notes'
           );
-          updateDailyLog(revisedLog);
+          // updateDailyLog will be called by the revision system
         } else {
           updateDailyLog(updated);
         }
@@ -214,7 +217,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
               log={existingLog}
               logType="daily"
               profileId={activeProfile.id}
-              onRevisionHistoryPress={() => setShowRevisionHistory(true)}
             />
           </View>
         )}
@@ -294,7 +296,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           visible={showRevisionHistory}
           onClose={() => setShowRevisionHistory(false)}
           logId={existingLog.id}
-          logType="daily"
         />
       )}
     </SafeAreaView>
