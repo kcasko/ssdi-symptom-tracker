@@ -319,7 +319,12 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
           <View style={[
             styles.toggle,
             formData.dailyLogEnabled && styles.toggleActive,
-          ]} />
+          ]}>
+            <View style={[
+              styles.toggleKnob,
+              formData.dailyLogEnabled && styles.toggleKnobActive,
+            ]} />
+          </View>
         </TouchableOpacity>
 
         {formData.dailyLogEnabled && (
@@ -346,7 +351,12 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
           <View style={[
             styles.toggle,
             formData.activityPromptEnabled && styles.toggleActive,
-          ]} />
+          ]}>
+            <View style={[
+              styles.toggleKnob,
+              formData.activityPromptEnabled && styles.toggleKnobActive,
+            ]} />
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -576,9 +586,25 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: colors.gray300,
     position: 'relative',
+    justifyContent: 'center',
+    padding: 2,
   },
   toggleActive: {
     backgroundColor: colors.primary600,
+  },
+  toggleKnob: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  toggleKnobActive: {
+    alignSelf: 'flex-end',
   },
   footer: {
     padding: spacing.lg,
