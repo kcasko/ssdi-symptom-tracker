@@ -6,7 +6,7 @@ import { DailyLog, SymptomEntry, TimeOfDay, SleepEntry } from '../domain/models/
 import { Limitation, LimitationCategory, LimitationFrequency, VariabilityLevel } from '../domain/models/Limitation';
 import { WorkHistory, JobDuty, PhysicalDemands } from '../domain/models/WorkHistory';
 import { ActivityLog } from '../domain/models/ActivityLog';
-import { Appointment, AppointmentPurpose } from '../domain/models/Appointment';
+import { Appointment, AppointmentPurpose, AppointmentStatus, ProviderType } from '../domain/models/Appointment';
 import { Medication, MedicationFrequency } from '../domain/models/Medication';
 
 export function createMockDailyLog(overrides?: Partial<DailyLog>): DailyLog {
@@ -66,8 +66,32 @@ export function createMockWorkHistory(overrides?: Partial<WorkHistory>): WorkHis
     physicalDemands: {
       exertionLevel: 'light',
       liftingRequired: { maxWeightPounds: 20, frequency: 'occasional' },
-      standing: { required: true, maxHoursPerDay: 4 },
-      walking: { required: true, maxHoursPerDay: 2 }
+      standingRequired: { hoursPerDay: 4, continuous: false },
+      walkingRequired: { hoursPerDay: 2 },
+      sittingRequired: { hoursPerDay: 4, continuous: false },
+      posturalRequirements: {
+        stooping: 'occasional',
+        kneeling: 'never',
+        crouching: 'never',
+        crawling: 'never',
+        climbing: 'never',
+        balancing: 'occasional'
+      },
+      manipulativeRequirements: {
+        reaching: 'frequent',
+        handling: 'frequent',
+        fingering: 'frequent',
+        feeling: 'occasional'
+      },
+      environmentalExposures: {
+        outdoors: false,
+        extremeTemperatures: false,
+        wetness: false,
+        humidity: false,
+        noise: 'moderate',
+        vibration: false,
+        hazards: false
+      }
     } as PhysicalDemands,
     duties: [],
     skillsRequired: [],
@@ -80,12 +104,24 @@ export function mockJobDuty(overrides?: Partial<JobDuty>): JobDuty {
   return {
     id: 'duty1',
     description: 'Test duty',
-    frequency: 'frequently',
-    physicalRequirements: [],
+    frequency: 'daily',
+    percentOfTime: 50,
+    physicalRequirements: {
+      standing: true,
+      sitting: false,
+      walking: true,
+      lifting: 20,
+      reaching: true,
+      fineDexterity: false,
+      concentration: true,
+      memory: true
+    },
     isEssential: true,
     ...overrides
   };
 }
+
+export const createMockJobDuty = mockJobDuty;
 
 export function createMockSymptomEntry(overrides?: Partial<SymptomEntry>): SymptomEntry {
   return {
@@ -136,8 +172,9 @@ export function createMockAppointment(overrides?: Partial<Appointment>): Appoint
     updatedAt: now,
     appointmentDate: '2024-01-15T10:00:00.000Z',
     providerName: 'Dr. Test',
-    specialty: 'Primary Care',
+    providerType: 'primary_care' as ProviderType,
     purpose: 'routine_checkup' as AppointmentPurpose,
+    status: 'scheduled' as AppointmentStatus,
     ...overrides
   };
 }
@@ -153,9 +190,9 @@ export function createMockMedication(overrides?: Partial<Medication>): Medicatio
     dosage: '100mg',
     frequency: 'daily' as MedicationFrequency,
     startDate: '2024-01-01',
-    prescribedBy: 'Dr. Test',
-    purpose: 'Pain management',
-    active: true,
+    prescriber: 'Dr. Test',
+    purpose: ['Pain management'],
+    isActive: true,
     ...overrides
   };
 }

@@ -1,15 +1,20 @@
 import { AppointmentSummaryService } from '../../services/AppointmentSummaryService';
+import { createMockAppointment } from '../../__tests__/testHelpers';
+import { ActivityLog } from '../../domain/models/ActivityLog';
+import { Limitation } from '../../domain/models/Limitation';
+import { Medication } from '../../domain/models/Medication';
+import { DailyLog } from '../../domain/models/DailyLog';
 
 // Minimal fake data for deterministic, auditable tests
-const fakeAppointment = { appointmentDate: '2026-01-10' };
-const fakeDailyLogs = [
-  { logDate: '2026-01-01', overallSeverity: 2 },
-  { logDate: '2026-01-02', overallSeverity: 8 },
-  { logDate: '2026-01-03', overallSeverity: 3 }
+const fakeAppointment = createMockAppointment({ appointmentDate: '2026-01-10' });
+const fakeDailyLogs: DailyLog[] = [
+  { logDate: '2026-01-01', overallSeverity: 2 } as DailyLog,
+  { logDate: '2026-01-02', overallSeverity: 8 } as DailyLog,
+  { logDate: '2026-01-03', overallSeverity: 3 } as DailyLog
 ];
-const fakeActivityLogs = [];
-const fakeLimitations = [];
-const fakeMedications = [];
+const fakeActivityLogs: ActivityLog[] = [];
+const fakeLimitations: Limitation[] = [];
+const fakeMedications: Medication[] = [];
 
 describe('AppointmentSummaryService.generatePreparationSummary', () => {
   it('includes correct date range and summary fields', () => {
