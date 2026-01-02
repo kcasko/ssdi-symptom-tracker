@@ -64,7 +64,7 @@ interface LogState {
   deleteAppointment: (appointmentId: string) => Promise<void>;
   
   // Photos
-  addPhoto: (photo: Omit<PhotoAttachment, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addPhoto: (photo: PhotoAttachment) => Promise<void>;
   updatePhoto: (photo: PhotoAttachment) => Promise<void>;
   deletePhoto: (photoId: string) => Promise<void>;
   getPhotosByEntity: (entityType: string, entityId: string) => PhotoAttachment[];

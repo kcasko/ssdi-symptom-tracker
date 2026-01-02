@@ -355,7 +355,14 @@ export class SyncService {
     
     // Apply resolution
     conflict.resolved = true;
-    conflict.resolution = this.config.conflictStrategy;
+    // Map config strategy to resolution type
+    const resolutionMap: Record<string, 'use_local' | 'use_server' | 'merge' | 'manual'> = {
+      'local_wins': 'use_local',
+      'server_wins': 'use_server',
+      'newest_wins': 'merge',
+      'manual': 'manual'
+    };
+    conflict.resolution = resolutionMap[this.config.conflictStrategy] || 'manual';
     conflict.resolvedAt = new Date();
     conflict.resolvedData = resolvedData;
     

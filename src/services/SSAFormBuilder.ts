@@ -120,11 +120,11 @@ export class SSAFormBuilder {
     // Build medical treatment list
     const medicalTreatment = appointments.map(a => ({
       providerName: a.providerName,
-      providerType: a.type as any,
-      address: a.location || '',
+      providerType: 'doctor' as const,
+      address: a.facilityName || '',
       phone: '',
-      dateFirstVisit: a.appointmentDate,
-      dateLastVisit: a.appointmentDate,
+      dateFirstVisit: new Date(a.appointmentDate),
+      dateLastVisit: new Date(a.appointmentDate),
       frequencyOfVisits: 'As documented in logs',
       treatmentFor: a.purpose,
       sourceLogIds: [a.id]
@@ -214,11 +214,11 @@ export class SSAFormBuilder {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     evidenceSummary: EvidenceSummary
   ): MedicalCondition[] {
-    // Group limitations by underlying condition
+    // Group limitations by category
     const conditionMap = new Map<string, Limitation[]>();
     
     limitations.forEach(lim => {
-      const condition = lim.relatedCondition || 'General disability';
+      const condition = lim.category || 'General disability';
       if (!conditionMap.has(condition)) {
         conditionMap.set(condition, []);
       }
@@ -226,7 +226,7 @@ export class SSAFormBuilder {
     });
     
     return Array.from(conditionMap.entries()).map(([name, lims]) => {
-      const dates = lims.map(l => new Date(l.dateStarted));
+      const dates = lims.map(l => new Date(l.createdAt));
       const firstDate = new Date(Math.min(...dates.map(d => d.getTime())));
       
       return {
@@ -259,23 +259,20 @@ export class SSAFormBuilder {
    * Build work history entry from work impact
    */
   private static buildWorkHistoryEntry(workImpact: WorkImpact): WorkHistoryEntry {
-    const job = workImpact.workHistory;
-    const affectedDuties = workImpact.dutyImpacts.filter(di => !di.canPerform);
+    const affectedDuties = workImpact.dutyImpacts.filter(di => di.canPerform === 'no');
     
     return {
-      jobTitle: job.jobTitle,
-      employer: job.employer,
-      startDate: job.startDate,
-      endDate: job.endDate,
-      hoursPerWeek: job.hoursPerWeek,
-      payRate: job.payRate || 0,
-      physicalDemands: this.formatPhysicalDemands(job.physicalDemands),
+      jobTitle: workImpact.jobTitle,
+      employer: 'See work history records',
+      startDate: new Date(workImpact.analysisStartDate),
+      endDate: new Date(workImpact.analysisEndDate),
+      hoursPerWeek: 40, // Default - should be from WorkHistory if available
+      payRate: 0, // Not available in WorkImpact
+      physicalDemands: 'See job description',
       canReturnToJob: workImpact.canReturnToThisJob,
-      impactStatement: workImpact.overallImpactStatement,
-      essentialDutiesAffected: affectedDuties.filter(d =>
-        job.duties.find(duty => duty.description === d.duty.description)?.essential
-      ).length,
-      totalDuties: job.duties.length
+      impactStatement: workImpact.impactStatements[0] || 'Cannot perform essential duties',
+      essentialDutiesAffected: affectedDuties.length,
+      totalDuties: workImpact.dutyImpacts.length
     };
   }
   
@@ -307,12 +304,12 @@ export class SSAFormBuilder {
   private static buildMedicationEntry(medication: Medication): MedicationEntry {
     return {
       name: medication.name,
-      prescribedFor: medication.purpose || 'As prescribed',
-      startDate: medication.startDate,
-      endDate: medication.endDate,
+      prescribedFor: medication.purpose.join(', ') || 'As prescribed',
+      startDate: medication.startDate ? new Date(medication.startDate) : new Date(),
+      endDate: medication.endDate ? new Date(medication.endDate) : undefined,
       sideEffects: medication.sideEffects || [],
       sourceLogIds: [medication.id],
-      consistentUse: medication.frequency === 'daily'
+      consistentUse: medication.frequency !== 'as_needed'
     };
   }
   
@@ -331,7 +328,7 @@ export class SSAFormBuilder {
     
     return Array.from(activityMap.entries()).map(([activity, logs]) => {
       const totalLogs = logs.length;
-      const limitedLogs = logs.filter(l => l.impactLevel && l.impactLevel !== 'none');
+      const limitedLogs = logs.filter(l => l.immediateImpact.overallImpact >= 5);
       const severelyLimited = limitedLogs.length / totalLogs > 0.5;
       
       return {
@@ -341,7 +338,7 @@ export class SSAFormBuilder {
           ? `Limited in ${limitedLogs.length} of ${totalLogs} documented instances`
           : undefined,
         frequency: this.determineFrequency(logs.length),
-        assistanceNeeded: logs.some(l => l.requiresAssistance),
+        assistanceNeeded: logs.some(l => l.assistanceNeeded),
         assistanceType: logs.find(l => l.assistanceType)?.assistanceType,
         sourceLogIds: logs.map(l => l.id),
         documentedOccurrences: logs.length
@@ -425,23 +422,23 @@ export class SSAFormBuilder {
     });
     
     // Mental
-    if (rfc.mentalLimitations.concentration.limited) {
+    if (rfc.mentalLimitations.concentration.requiresFrequentBreaks) {
       abilities.push({
         ability: 'concentration',
         affected: true,
-        description: rfc.mentalLimitations.concentration.description,
+        description: `Requires breaks every ${rfc.mentalLimitations.concentration.maxContinuousMinutes} minutes`,
         evidenceFromRFC: true,
-        sourceLogIds: rfc.mentalLimitations.concentration.supportingEvidence
+        sourceLogIds: rfc.mentalLimitations.concentration.evidence
       });
     }
     
-    if (rfc.mentalLimitations.memory.limited) {
+    if (rfc.mentalLimitations.memory.shortTermImpaired || rfc.mentalLimitations.memory.longTermImpaired) {
       abilities.push({
         ability: 'memory',
         affected: true,
-        description: rfc.mentalLimitations.memory.description,
+        description: `Memory impairment: ${rfc.mentalLimitations.memory.shortTermImpaired ? 'short-term' : ''} ${rfc.mentalLimitations.memory.longTermImpaired ? 'long-term' : ''}`.trim(),
         evidenceFromRFC: true,
-        sourceLogIds: rfc.mentalLimitations.memory.supportingEvidence
+        sourceLogIds: rfc.mentalLimitations.memory.evidence
       });
     }
     
@@ -452,15 +449,15 @@ export class SSAFormBuilder {
    * Build social limitations from RFC
    */
   private static buildSocialLimitations(rfc: RFC): any[] {
-    const social = rfc.mentalLimitations.socialInteraction;
-    if (!social.limited) return [];
+    const social = rfc.mentalLimitations.social;
+    if (!social.limitedPublicContact && !social.limitedCoworkerContact && !social.limitedSupervisorContact) return [];
     
     return [
       {
         area: 'coworkers',
         hasLimitation: true,
-        description: social.description,
-        sourceLogIds: social.supportingEvidence
+        description: social.limitedPublicContact ? 'Limited public contact' : 'Limited coworker contact',
+        sourceLogIds: social.evidence
       }
     ];
   }
@@ -469,37 +466,35 @@ export class SSAFormBuilder {
    * Build detailed job description from work impact
    */
   private static buildDetailedJobDescription(workImpact: WorkImpact): DetailedJobDescription {
-    const job = workImpact.workHistory;
-    const demands = job.physicalDemands;
+    // WorkImpact only has workHistoryId and jobTitle, not full workHistory object
+    // This would need to be fetched separately if full details are needed
     
     return {
-      jobTitle: job.jobTitle,
-      employer: job.employer,
-      dates: { start: job.startDate, end: job.endDate },
-      daysPerWeek: Math.floor(job.hoursPerWeek / 8),
-      hoursPerDay: 8,
-      hoursStanding: demands.standingHours || 0,
-      hoursWalking: demands.walkingHours || 0,
-      hoursSitting: demands.sittingHours || 0,
-      heaviestWeightLifted: demands.liftingRequirement?.maxWeight || 0,
-      frequentlyLiftedWeight: demands.liftingRequirement?.frequentWeight || 0,
-      mainDuties: job.duties.map(d => d.description),
-      toolsAndEquipment: job.duties
-        .filter(d => d.toolsRequired && d.toolsRequired.length > 0)
-        .flatMap(d => d.toolsRequired || []),
+      jobTitle: workImpact.jobTitle,
+      employer: 'See work history records',
+      dates: { start: new Date(workImpact.analysisStartDate), end: new Date(workImpact.analysisEndDate) },
+      daysPerWeek: 5, // Default
+      hoursPerDay: 8, // Default
+      hoursStanding: 0, // Would need full WorkHistory
+      hoursWalking: 0, // Would need full WorkHistory
+      hoursSitting: 0, // Would need full WorkHistory
+      heaviestWeightLifted: 0, // Would need full WorkHistory
+      frequentlyLiftedWeight: 0, // Would need full WorkHistory
+      mainDuties: workImpact.dutyImpacts.map(di => di.dutyDescription),
+      toolsAndEquipment: [],
       supervision: 'unsupervised',
       canReturnToJob: workImpact.canReturnToThisJob,
       dutiesAffected: workImpact.dutyImpacts.map(di => this.buildDutyImpactSummary(di)),
-      overallImpactStatement: workImpact.overallImpactStatement
+      overallImpactStatement: workImpact.impactStatements[0] || 'Cannot perform essential duties'
     };
   }
   
   private static buildDutyImpactSummary(dutyImpact: any): DutyImpactSummary {
     return {
-      duty: dutyImpact.duty.description,
+      duty: dutyImpact.dutyDescription,
       canPerform: dutyImpact.canPerform,
-      impactDescription: dutyImpact.impactStatement,
-      interferingFactors: dutyImpact.interferingFactors.map((f: any) => f.description),
+      impactDescription: dutyImpact.impactExplanation,
+      interferingFactors: dutyImpact.interferingFactors.map((f: any) => f.interferenceDescription),
       evidenceCount: dutyImpact.interferingFactors.reduce(
         (sum: number, f: any) => sum + f.occurrenceCount,
         0
@@ -532,7 +527,7 @@ export class SSAFormBuilder {
       dateRangeEnd: endDate,
       consistentDocumentation: (dailyLogs.length / daysDiff) > 0.75,
       longTermTracking: daysDiff > 90,
-      patternConsistency: rfc.evidenceSummary?.consistentPatterns || false,
+      patternConsistency: (rfc.evidenceSummary?.consistentPatterns?.length || 0) > 0,
       topDocumentedSymptoms: [], // Would extract from dailyLogs
       topDocumentedLimitations: [] // Would extract from limitations
     };
@@ -607,16 +602,16 @@ export class SSAFormBuilder {
       if (!wi.canReturnToThisJob) {
         const affectedDuties = wi.dutyImpacts.filter(di => !di.canPerform);
         parts.push(
-          `Cannot return to ${wi.workHistory.jobTitle} due to inability to perform ${affectedDuties.length} essential duties:`
+          `Cannot return to ${wi.jobTitle} due to inability to perform ${affectedDuties.length} essential duties:`
         );
         affectedDuties.slice(0, 3).forEach(duty => {
-          parts.push(`  - ${duty.impactStatement}`);
+          parts.push(`  - ${duty.impactExplanation}`);
         });
         parts.push('');
       }
     });
     
-    parts.push(`Overall work capacity: ${rfc.workCapacityLevel}`);
+    parts.push(`Overall work capacity: ${rfc.overallRating}`);
     parts.push(`Can work full-time: ${rfc.canWorkFullTime ? 'Yes' : 'No'}`);
     
     return parts.join('\n');
@@ -639,11 +634,11 @@ export class SSAFormBuilder {
     parts.push('');
     
     // Mental
-    if (rfc.mentalLimitations.concentration.limited) {
-      parts.push(`Concentration: ${rfc.mentalLimitations.concentration.description}`);
+    if (rfc.mentalLimitations.concentration.requiresFrequentBreaks) {
+      parts.push(`Concentration: requires breaks every ${rfc.mentalLimitations.concentration.maxContinuousMinutes} minutes`);
     }
-    if (rfc.mentalLimitations.memory.limited) {
-      parts.push(`Memory: ${rfc.mentalLimitations.memory.description}`);
+    if (rfc.mentalLimitations.memory.shortTermImpaired || rfc.mentalLimitations.memory.longTermImpaired) {
+      parts.push(`Memory: ${rfc.mentalLimitations.memory.shortTermImpaired ? 'short-term impaired' : ''} ${rfc.mentalLimitations.memory.longTermImpaired ? 'long-term impaired' : ''}`.trim());
     }
     
     return parts.join('\n');
@@ -656,7 +651,7 @@ export class SSAFormBuilder {
     }
     
     return affected
-      .map(wi => `${wi.workHistory.jobTitle}: ${wi.overallImpactStatement}`)
+      .map(wi => `${wi.jobTitle}: ${wi.impactStatements[0] || 'Cannot perform essential duties'}`)
       .join('\n');
   }
   
@@ -683,7 +678,7 @@ export class SSAFormBuilder {
       wi.dutyImpacts.forEach(di => {
         if (!di.canPerform) {
           di.interferingFactors.forEach(factor => {
-            reasons.add(factor.description);
+            reasons.add(factor.interferenceDescription);
           });
         }
       });

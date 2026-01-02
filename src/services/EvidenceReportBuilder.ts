@@ -276,7 +276,7 @@ function buildFunctionalLimitations(
       };
       current.days.add(log.activityDate);
       current.totalSeverity += log.immediateImpact.overallImpact;
-      current.activities.add(log.activityIdName);
+      current.activities.add(log.activityName);
       domainImpacts.set(domain, current);
     });
   });

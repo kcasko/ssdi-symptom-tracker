@@ -646,7 +646,7 @@ export class RFCBuilder {
       accommodations.push('Flexible schedule required');
     }
     
-    if (social?.limitedPublicInteraction) {
+    if (social?.limitedPublicContact) {
       accommodations.push('Limited public interaction');
     }
     

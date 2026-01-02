@@ -53,7 +53,7 @@ export class WorkImpactAnalyzer {
     const impactScore = this.calculateOverallImpact(dutyImpacts, workHistory.duties);
     
     // Determine if can return to this job
-    const canReturnToThisJob = this.canReturnToThisJob(dutyImpacts, workHistory.duties);
+    const canReturnToThisJob = this.canReturnToJob(dutyImpacts, workHistory.duties);
     
     // Generate impact statements
     const impactStatements = this.generateImpactStatements(

@@ -203,7 +203,7 @@ export class DayQualityAnalyzer {
 
     const classifications = dailyLogs
       .map(log => this.classifyDay(log))
-      .sort((a, b) => new Date(a.appointmentDate).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     const totalDays = classifications.length;
     const goodDays = classifications.filter(c => c.quality === 'good').length;

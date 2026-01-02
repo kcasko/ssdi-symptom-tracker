@@ -11,27 +11,29 @@ describe('RFCBuilder', () => {
     {
       id: 'log1',
       profileId: 'profile1',
-      date: new Date('2024-01-01'),
+      createdAt: '2024-01-01T08:00:00Z',
+      updatedAt: '2024-01-01T08:00:00Z',
+      logDate: '2024-01-01',
+      timeOfDay: 'morning',
       symptoms: [
-        { name: 'Back Pain', severity: 8, duration: 480, notes: 'Constant' }
+        { symptomId: 'back-pain', severity: 8, duration: 480, notes: 'Constant' }
       ],
-      overallPainLevel: 8,
-      fatigueLevel: 7,
-      sleepQuality: 'poor',
-      sleepHours: 4,
+      overallSeverity: 8,
+      sleepQuality: { hoursSlept: 4, quality: 3, restful: false },
       notes: 'Difficult day'
     },
     {
       id: 'log2',
       profileId: 'profile1',
-      date: new Date('2024-01-02'),
+      createdAt: '2024-01-02T08:00:00Z',
+      updatedAt: '2024-01-02T08:00:00Z',
+      logDate: '2024-01-02',
+      timeOfDay: 'morning',
       symptoms: [
-        { name: 'Back Pain', severity: 9, duration: 480, notes: 'Severe' }
+        { symptomId: 'back-pain', severity: 9, duration: 480, notes: 'Severe' }
       ],
-      overallPainLevel: 9,
-      fatigueLevel: 8,
-      sleepQuality: 'poor',
-      sleepHours: 3,
+      overallSeverity: 9,
+      sleepQuality: { hoursSlept: 3, quality: 2, restful: false },
       notes: 'Very difficult'
     }
   ];
@@ -40,28 +42,46 @@ describe('RFCBuilder', () => {
     {
       id: 'lim1',
       profileId: 'profile1',
-      category: 'mobility',
-      description: 'Cannot stand for more than 30 minutes',
-      severity: 'severe',
-      dateStarted: new Date('2024-01-01'),
-      impacts: ['work', 'daily_activities'],
-      accommodationsNeeded: ['Frequent breaks', 'Sitting workspace']
+      createdAt: '2024-01-01T08:00:00Z',
+      updatedAt: '2024-01-01T08:00:00Z',
+      category: 'standing',
+      timeThreshold: { durationMinutes: 30, confidence: 'high' },
+      frequency: 'always',
+      consequences: ['Severe pain', 'Need to sit'],
+      accommodations: ['Frequent breaks', 'Sitting workspace'],
+      variability: 'consistent',
+      notes: 'Cannot stand for more than 30 minutes',
+      isActive: true
     }
   ];
 
   describe('buildFromLogs', () => {
     it('should build RFC from daily logs and limitations', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc).toBeDefined();
       expect(rfc.profileId).toBe('profile1');
-      expect(rfc.assessmentDate).toBeDefined();
-      expect(rfc.workCapacityLevel).toBeDefined();
+      expect(rfc.assessmentEndDate).toBeDefined();
+      expect(rfc.overallRating).toBeDefined();
       expect(rfc.canWorkFullTime).toBeDefined();
     });
 
     it('should analyze exertional capacity', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.exertionalLimitations).toBeDefined();
       expect(rfc.exertionalLimitations.sitting).toBeDefined();
@@ -71,32 +91,57 @@ describe('RFCBuilder', () => {
     });
 
     it('should determine work capacity level based on limitations', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(['sedentary', 'light', 'medium', 'heavy', 'very_heavy']).toContain(
-        rfc.workCapacityLevel
+        rfc.overallRating
       );
     });
 
     it('should include supporting evidence', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.exertionalLimitations.sitting.evidence.length).toBeGreaterThan(0);
       expect(rfc.evidenceSummary).toBeDefined();
-      expect(rfc.evidenceSummary.totalLogs).toBe(2);
+      expect(rfc.evidenceSummary.totalDailyLogs).toBe(2);
     });
 
     it('should detect consistent patterns', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.evidenceSummary.consistentPatterns).toBeDefined();
     });
 
     it('should handle empty logs gracefully', () => {
-      const rfc = RFCBuilder.buildFromLogs([], []);
-
-      expect(rfc).toBeDefined();
-      expect(rfc.evidenceSummary.totalLogs).toBe(0);
+      expect(() => RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: [],
+        activityLogs: [],
+        limitations: []
+      })).toThrow('Insufficient data');
     });
   });
 
@@ -105,22 +150,37 @@ describe('RFCBuilder', () => {
       const highPainLogs: DailyLog[] = Array(10).fill(null).map((_, i) => ({
         id: `log${i}`,
         profileId: 'profile1',
-        date: new Date(`2024-01-${i + 1}`),
-        symptoms: [{ name: 'Back Pain', severity: 9, duration: 480 }],
-        overallPainLevel: 9,
-        fatigueLevel: 8,
-        sleepQuality: 'poor',
-        sleepHours: 4,
+        createdAt: `2024-01-0${i + 1}T08:00:00Z`,
+        updatedAt: `2024-01-0${i + 1}T08:00:00Z`,
+        logDate: `2024-01-0${i + 1}`,
+        timeOfDay: 'morning' as const,
+        symptoms: [{ symptomId: 'back-pain', severity: 9, duration: 480 }],
+        overallSeverity: 9,
+        sleepQuality: { hoursSlept: 4, quality: 2, restful: false },
         notes: ''
       }));
 
-      const rfc = RFCBuilder.buildFromLogs(highPainLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: highPainLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.exertionalLimitations.standing.maxContinuousMinutes).toBeLessThan(2);
     });
 
     it('should limit lifting capacity based on severity', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.exertionalLimitations.lifting.maxWeightPoundsOccasional).toBeDefined();
       expect(rfc.exertionalLimitations.lifting.maxWeightPoundsFrequent).toBeDefined();
@@ -134,7 +194,14 @@ describe('RFCBuilder', () => {
 
   describe('analyzePosturalLimitations', () => {
     it('should identify postural limitations from pain patterns', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.posturalLimitations).toBeDefined();
       expect(rfc.posturalLimitations.stooping).toBeDefined();
@@ -145,26 +212,41 @@ describe('RFCBuilder', () => {
 
   describe('analyzeMentalLimitations', () => {
     it('should analyze concentration based on fatigue', () => {
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, mockLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations
+      });
 
       expect(rfc.mentalLimitations.concentration).toBeDefined();
-      expect(typeof rfc.mentalLimitations.concentration.limited).toBe('boolean');
+      expect(typeof rfc.mentalLimitations.concentration.requiresFrequentBreaks).toBe('boolean');
     });
 
     it('should identify memory limitations from sleep quality', () => {
       const poorSleepLogs: DailyLog[] = Array(10).fill(null).map((_, i) => ({
         id: `log${i}`,
         profileId: 'profile1',
-        date: new Date(`2024-01-${i + 1}`),
+        createdAt: `2024-01-0${i + 1}T08:00:00Z`,
+        updatedAt: `2024-01-0${i + 1}T08:00:00Z`,
+        logDate: `2024-01-0${i + 1}`,
+        timeOfDay: 'morning' as const,
         symptoms: [],
-        overallPainLevel: 5,
-        fatigueLevel: 8,
-        sleepQuality: 'poor',
-        sleepHours: 3,
+        overallSeverity: 5,
+        sleepQuality: { hoursSlept: 3, quality: 2, restful: false },
         notes: ''
       }));
 
-      const rfc = RFCBuilder.buildFromLogs(poorSleepLogs, []);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: poorSleepLogs,
+        activityLogs: [],
+        limitations: []
+      });
 
       expect(rfc.mentalLimitations.memory).toBeDefined();
     });
@@ -176,28 +258,39 @@ describe('RFCBuilder', () => {
         {
           id: 'lim1',
           profileId: 'profile1',
-          category: 'mobility',
-          description: 'Cannot stand',
-          severity: 'severe',
-          dateStarted: new Date('2024-01-01'),
-          impacts: ['work'],
-          accommodationsNeeded: []
+          createdAt: '2024-01-01T08:00:00Z',
+          updatedAt: '2024-01-01T08:00:00Z',
+          category: 'standing',
+          frequency: 'always',
+          consequences: ['Cannot stand'],
+          variability: 'consistent',
+          notes: 'Cannot stand',
+          isActive: true
         },
         {
           id: 'lim2',
           profileId: 'profile1',
-          category: 'strength',
-          description: 'Cannot lift',
-          severity: 'severe',
-          dateStarted: new Date('2024-01-01'),
-          impacts: ['work'],
-          accommodationsNeeded: []
+          createdAt: '2024-01-01T08:00:00Z',
+          updatedAt: '2024-01-01T08:00:00Z',
+          category: 'lifting',
+          frequency: 'always',
+          consequences: ['Cannot lift'],
+          variability: 'consistent',
+          notes: 'Cannot lift',
+          isActive: true
         }
       ];
 
-      const rfc = RFCBuilder.buildFromLogs(mockDailyLogs, severeLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: severeLimitations
+      });
 
-      expect(rfc.workCapacityLevel).toBe('sedentary');
+      expect(rfc.overallRating).toBe('sedentary');
       expect(rfc.canWorkFullTime).toBe(false);
     });
 
@@ -206,30 +299,41 @@ describe('RFCBuilder', () => {
         {
           id: 'lim1',
           profileId: 'profile1',
-          category: 'mobility',
-          description: 'Limited standing',
-          severity: 'moderate',
-          dateStarted: new Date('2024-01-01'),
-          impacts: ['work'],
-          accommodationsNeeded: []
+          createdAt: '2024-01-01T08:00:00Z',
+          updatedAt: '2024-01-01T08:00:00Z',
+          category: 'standing',
+          timeThreshold: { durationMinutes: 120, confidence: 'moderate' },
+          frequency: 'often',
+          consequences: ['Pain increases'],
+          variability: 'some_variability',
+          notes: 'Limited standing',
+          isActive: true
         }
       ];
 
       const lightPainLogs: DailyLog[] = Array(10).fill(null).map((_, i) => ({
         id: `log${i}`,
         profileId: 'profile1',
-        date: new Date(`2024-01-${i + 1}`),
-        symptoms: [{ name: 'Pain', severity: 4, duration: 240 }],
-        overallPainLevel: 4,
-        fatigueLevel: 4,
-        sleepQuality: 'fair',
-        sleepHours: 6,
+        createdAt: `2024-01-0${i + 1}T08:00:00Z`,
+        updatedAt: `2024-01-0${i + 1}T08:00:00Z`,
+        logDate: `2024-01-0${i + 1}`,
+        timeOfDay: 'morning' as const,
+        symptoms: [{ symptomId: 'pain', severity: 4, duration: 240 }],
+        overallSeverity: 4,
+        sleepQuality: { hoursSlept: 6, quality: 6, restful: true },
         notes: ''
       }));
 
-      const rfc = RFCBuilder.buildFromLogs(lightPainLogs, moderateLimitations);
+      const rfc = RFCBuilder.buildFromLogs({
+        profileId: 'profile1',
+        startDate: '2024-01-01',
+        endDate: '2024-01-31',
+        dailyLogs: lightPainLogs,
+        activityLogs: [],
+        limitations: moderateLimitations
+      });
 
-      expect(['sedentary', 'light']).toContain(rfc.workCapacityLevel);
+      expect(['sedentary', 'light']).toContain(rfc.overallRating);
     });
   });
 });

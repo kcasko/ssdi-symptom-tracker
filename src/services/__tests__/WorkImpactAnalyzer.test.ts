@@ -10,23 +10,26 @@ import { Limitation } from '../../domain/models/Limitation';
 describe('WorkImpactAnalyzer', () => {
   const mockJobDuties: JobDuty[] = [
     {
+      id: 'duty1',
       description: 'Lifting boxes up to 50 lbs',
-      frequency: 'frequent',
+      frequency: 'daily',
+      percentOfTime: 50,
       physicalRequirements: {
         standing: true,
-        lifting: true,
-        maxWeight: 50
+        lifting: 50
       },
-      essential: true
+      isEssential: true
     },
     {
+      id: 'duty2',
       description: 'Walking warehouse floor',
-      frequency: 'constant',
+      frequency: 'daily',
+      percentOfTime: 40,
       physicalRequirements: {
         walking: true,
         standing: true
       },
-      essential: true
+      isEssential: true
     }
   ];
 
@@ -35,99 +38,151 @@ describe('WorkImpactAnalyzer', () => {
     profileId: 'profile1',
     jobTitle: 'Warehouse Worker',
     employer: 'ABC Warehouse',
-    startDate: new Date('2020-01-01'),
-    endDate: new Date('2023-12-31'),
+    startDate: '2020-01-01',
+    endDate: '2023-12-31',
+    stillEmployed: false,
     hoursPerWeek: 40,
-    payRate: 18,
+    wasFullTime: true,
+    salary: 18,
     duties: mockJobDuties,
+    skillsRequired: [],
+    disabilityRelated: false,
     physicalDemands: {
       exertionLevel: 'heavy',
-      liftingRequirement: {
-        maxWeight: 50,
-        frequentWeight: 25
+      liftingRequired: {
+        maxWeightPounds: 50,
+        frequency: 'frequent'
       },
-      standingHours: 6,
-      walkingHours: 5,
-      sittingHours: 1
+      standingRequired: {
+        hoursPerDay: 6,
+        continuous: false
+      },
+      walkingRequired: {
+        hoursPerDay: 5
+      },
+      sittingRequired: {
+        hoursPerDay: 1,
+        continuous: false
+      },
+      posturalRequirements: {
+        stooping: 'occasional',
+        kneeling: 'occasional',
+        crouching: 'never',
+        crawling: 'never',
+        climbing: 'occasional',
+        balancing: 'occasional'
+      },
+      manipulativeRequirements: {
+        reaching: 'frequent',
+        handling: 'frequent',
+        fingering: 'occasional',
+        feeling: 'occasional'
+      },
+      environmentalExposures: {
+        outdoors: true,
+        extremeTemperatures: true,
+        wetness: false,
+        humidity: false,
+        noise: 'loud',
+        vibration: false,
+        hazards: true
+      }
     }
   };
 
   const mockDailyLogs: DailyLog[] = Array(30).fill(null).map((_, i) => ({
     id: `log${i}`,
     profileId: 'profile1',
-    date: new Date(`2024-01-${(i % 30) + 1}`),
+    createdAt: new Date(`2024-01-${(i % 30) + 1}`).toISOString(),
+    updatedAt: new Date(`2024-01-${(i % 30) + 1}`).toISOString(),
+    logDate: `2024-01-${String((i % 30) + 1).padStart(2, '0')}`,
+    timeOfDay: 'evening' as const,
     symptoms: [
-      { name: 'Back Pain', severity: 8, duration: 480, notes: 'Severe' }
+      { symptomId: 'back_pain', severity: 8, duration: 480, notes: 'Severe' }
     ],
-    overallPainLevel: 8,
-    fatigueLevel: 7,
-    sleepQuality: 'poor',
-    sleepHours: 5,
-    notes: ''
+    overallSeverity: 8
   }));
 
   const mockLimitations: Limitation[] = [
     {
       id: 'lim1',
       profileId: 'profile1',
-      category: 'strength',
-      description: 'Cannot lift more than 10 lbs',
-      severity: 'severe',
-      dateStarted: new Date('2024-01-01'),
-      impacts: ['work'],
-      accommodationsNeeded: []
+      createdAt: new Date('2024-01-01').toISOString(),
+      updatedAt: new Date('2024-01-01').toISOString(),
+      category: 'lifting',
+      weightThreshold: {
+        maxPounds: 10,
+        frequency: 'never',
+        notes: 'Cannot lift more than 10 lbs'
+      },
+      frequency: 'always',
+      consequences: ['severe back pain', 'inability to continue work'],
+      variability: 'consistent',
+      isActive: true
     }
   ];
 
   describe('analyzeWorkImpact', () => {
     it('should analyze work impact for a job', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact).toBeDefined();
-      expect(impact.workHistory).toBe(mockWorkHistory);
+      expect(impact.workHistoryId).toBe(mockWorkHistory.id);
       expect(impact.dutyImpacts.length).toBe(mockJobDuties.length);
       expect(impact.canReturnToThisJob).toBeDefined();
     });
 
     it('should determine cannot return to job for severe impacts', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact.canReturnToThisJob).toBe(false);
-      expect(impact.overallImpactStatement).toContain('cannot');
+      expect(impact.impactStatements.length).toBeGreaterThan(0);
     });
 
     it('should analyze each job duty individually', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       impact.dutyImpacts.forEach(dutyImpact => {
-        expect(dutyImpact.duty).toBeDefined();
-        expect(typeof dutyImpact.canPerform).toBe('boolean');
-        expect(dutyImpact.impactStatement).toBeDefined();
+        expect(dutyImpact.dutyDescription).toBeDefined();
+        expect(typeof dutyImpact.canPerform).toBe('string');
+        expect(dutyImpact.impactExplanation).toBeDefined();
         expect(Array.isArray(dutyImpact.interferingFactors)).toBe(true);
       });
     });
 
     it('should identify interfering factors', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       const liftingDuty = impact.dutyImpacts.find(d =>
-        d.duty.description.includes('Lifting')
+        d.dutyDescription.includes('Lifting')
       );
 
       expect(liftingDuty).toBeDefined();
@@ -135,11 +190,14 @@ describe('WorkImpactAnalyzer', () => {
     });
 
     it('should include occurrence counts in interfering factors', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       impact.dutyImpacts.forEach(dutyImpact => {
         dutyImpact.interferingFactors.forEach(factor => {
@@ -151,45 +209,54 @@ describe('WorkImpactAnalyzer', () => {
     });
 
     it('should calculate severity scores', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       impact.dutyImpacts.forEach(dutyImpact => {
         expect(dutyImpact.severityScore).toBeGreaterThanOrEqual(0);
-        expect(dutyImpact.severityScore).toBeLessThanOrEqual(100);
+        expect(dutyImpact.severityScore).toBeLessThanOrEqual(10);
       });
     });
   });
 
   describe('analyzeDutyImpact', () => {
     it('should determine cannot perform for conflicting duties', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       const liftingDuty = impact.dutyImpacts.find(d =>
-        d.duty.description.includes('Lifting')
+        d.dutyDescription.includes('Lifting')
       );
 
-      expect(liftingDuty!.canPerform).toBe(false);
+      expect(liftingDuty!.canPerform).toBe('no');
     });
 
     it('should generate descriptive impact statements', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       impact.dutyImpacts.forEach(dutyImpact => {
-        if (!dutyImpact.canPerform) {
-          expect(dutyImpact.impactStatement).toContain('Cannot');
-          expect(dutyImpact.impactStatement).toContain(dutyImpact.duty.description);
+        if (dutyImpact.canPerform === 'no') {
+          expect(dutyImpact.impactExplanation).toContain('Cannot');
+          expect(dutyImpact.impactExplanation).toContain(dutyImpact.dutyDescription);
         }
       });
     });
@@ -197,43 +264,52 @@ describe('WorkImpactAnalyzer', () => {
 
   describe('interference detection', () => {
     it('should detect lifting interference', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       const liftingDuty = impact.dutyImpacts.find(d =>
-        d.duty.description.includes('Lifting')
+        d.dutyDescription.includes('Lifting')
       );
 
       const liftingInterference = liftingDuty!.interferingFactors.find(f =>
-        f.description.toLowerCase().includes('lift')
+        f.interferenceDescription.toLowerCase().includes('lift')
       );
 
       expect(liftingInterference).toBeDefined();
     });
 
     it('should detect standing/walking interference', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       const walkingDuty = impact.dutyImpacts.find(d =>
-        d.duty.description.includes('Walking')
+        d.dutyDescription.includes('Walking')
       );
 
       expect(walkingDuty!.interferingFactors.length).toBeGreaterThan(0);
     });
 
     it('should calculate occurrence percentages correctly', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       impact.dutyImpacts.forEach(dutyImpact => {
         dutyImpact.interferingFactors.forEach(factor => {
@@ -246,14 +322,20 @@ describe('WorkImpactAnalyzer', () => {
 
   describe('can return to job determination', () => {
     it('should return false if essential duties cannot be performed', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       const hasUnperformableEssentialDuty = impact.dutyImpacts.some(
-        d => d.duty.essential && !d.canPerform
+        d => {
+          const duty = mockJobDuties.find(jd => jd.description === d.dutyDescription);
+          return duty?.isEssential && d.canPerform === 'no';
+        }
       );
 
       if (hasUnperformableEssentialDuty) {
@@ -264,14 +346,17 @@ describe('WorkImpactAnalyzer', () => {
     it('should handle jobs with no essential duties', () => {
       const nonEssentialWorkHistory: WorkHistory = {
         ...mockWorkHistory,
-        duties: mockJobDuties.map(d => ({ ...d, essential: false }))
+        duties: mockJobDuties.map(d => ({ ...d, isEssential: false }))
       };
 
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        nonEssentialWorkHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: nonEssentialWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact.canReturnToThisJob).toBeDefined();
     });
@@ -279,22 +364,28 @@ describe('WorkImpactAnalyzer', () => {
 
   describe('edge cases', () => {
     it('should handle empty daily logs', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        [],
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: [],
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact).toBeDefined();
       expect(impact.dutyImpacts.length).toBe(mockJobDuties.length);
     });
 
     it('should handle empty limitations', () => {
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        mockWorkHistory,
-        mockDailyLogs,
-        []
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: mockWorkHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: [],
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact).toBeDefined();
     });
@@ -305,11 +396,14 @@ describe('WorkImpactAnalyzer', () => {
         duties: []
       };
 
-      const impact = WorkImpactAnalyzer.analyzeWorkImpact(
-        emptyJobHistory,
-        mockDailyLogs,
-        mockLimitations
-      );
+      const impact = WorkImpactAnalyzer.analyzeWorkImpact({
+        workHistory: emptyJobHistory,
+        dailyLogs: mockDailyLogs,
+        activityLogs: [],
+        limitations: mockLimitations,
+        startDate: '2024-01-01',
+        endDate: '2024-01-31'
+      });
 
       expect(impact.dutyImpacts.length).toBe(0);
     });

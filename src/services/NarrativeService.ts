@@ -132,8 +132,8 @@ export class NarrativeService {
     const lines: string[] = [];
 
     // Activity header
-    lines.push(`Activity: ${activitylog.activityIdName}`);
-    lines.push(`Date: ${new Date(activitylog.activityDate).toLocaleDateString()}`);
+    lines.push(`Activity: ${activityLog.activityName}`);
+    lines.push(`Date: ${new Date(activityLog.createdAt).toLocaleDateString()}`);
     lines.push(`Duration: ${activityLog.duration} minutes`);
     lines.push('');
 
@@ -215,8 +215,8 @@ export class NarrativeService {
     const wordCount = narrative.split(/\s+/).filter(w => w.length > 0).length;
 
     return {
-      activityId: activitylog.activityId,
-      activityName: activitylog.activityIdName,
+      activityId: activityLog.activityId,
+      activityName: activityLog.activityName,
       narrative,
       wordCount,
     };
@@ -467,8 +467,8 @@ export class NarrativeService {
     lines.push('');
 
     // Date range
-    const startDate = new Date(narrative.metadata.appointmentDateRange.start).toLocaleDateString();
-    const endDate = new Date(narrative.metadata.appointmentDateRange.end).toLocaleDateString();
+    const startDate = new Date(narrative.metadata.dateRange.start).toLocaleDateString();
+    const endDate = new Date(narrative.metadata.dateRange.end).toLocaleDateString();
     lines.push(`Reporting Period: ${startDate} to ${endDate}`);
     lines.push(`Generated: ${new Date(narrative.metadata.generatedAt).toLocaleDateString()}`);
     lines.push('');

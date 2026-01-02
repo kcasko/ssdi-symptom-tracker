@@ -15,140 +15,222 @@ describe('SSAFormBuilder', () => {
   const mockRFC: RFC = {
     id: 'rfc1',
     profileId: 'profile1',
-    assessmentDate: new Date('2024-01-15'),
-    workCapacityLevel: 'sedentary',
+    assessmentStartDate: '2024-01-01',
+    assessmentEndDate: '2024-01-30',
+    generatedAt: '2024-01-30T00:00:00Z',
+    overallRating: 'sedentary',
     canWorkFullTime: false,
-    exertionalCapacity: {
+    exertionalLimitations: {
       sitting: {
-        hoursWithoutBreak: 1,
-        totalHoursPerDay: 4,
-        supportingEvidence: ['log1', 'log2']
+        maxContinuousMinutes: 60,
+        maxTotalHours: 4,
+        requiresBreaks: true,
+        breakFrequencyMinutes: 60,
+        evidence: ['log1', 'log2']
       },
       standing: {
-        hoursWithoutBreak: 0.5,
-        totalHoursPerDay: 2,
-        supportingEvidence: ['log1', 'log2']
+        maxContinuousMinutes: 30,
+        maxTotalHours: 2,
+        requiresBreaks: true,
+        breakFrequencyMinutes: 30,
+        evidence: ['log1', 'log2']
       },
       walking: {
-        hoursWithoutBreak: 0.25,
-        totalHoursPerDay: 1,
-        supportingEvidence: ['log1', 'log2']
+        maxContinuousMinutes: 15,
+        maxTotalHours: 1,
+        requiresAssistiveDevice: false,
+        evidence: ['log1', 'log2']
       },
-      maxLiftingCapacity: {
-        occasionalWeight: 5,
-        frequentWeight: 2,
-        supportingEvidence: ['log1', 'log2']
+      lifting: {
+        maxWeightPoundsOccasional: 5,
+        maxWeightPoundsFrequent: 2,
+        maxWeightPoundsConstant: 0,
+        evidence: ['log1', 'log2']
       },
       pushPull: {
-        limited: true,
-        description: 'Severely limited',
-        supportingEvidence: ['log1']
+        limitedBeyondLifting: true,
+        maxForcePounds: 10,
+        evidence: ['log1']
       }
     },
     posturalLimitations: {
-      stooping: { frequency: 'never', reason: 'Back pain', supportingEvidence: ['log1'] },
-      kneeling: { frequency: 'never', reason: 'Back pain', supportingEvidence: ['log1'] },
-      crouching: { frequency: 'rarely', reason: 'Back pain', supportingEvidence: ['log1'] },
-      crawling: { frequency: 'never', reason: 'Back pain', supportingEvidence: ['log1'] },
-      climbing: { frequency: 'never', reason: 'Back pain', supportingEvidence: ['log1'] },
-      balancing: { frequency: 'occasionally', reason: 'Dizziness', supportingEvidence: ['log1'] }
+      stooping: 'never',
+      kneeling: 'never',
+      crouching: 'occasional',
+      crawling: 'never',
+      climbing: {
+        stairs: 'occasional',
+        ladders: 'never',
+        ramps: 'occasional'
+      },
+      balancing: 'occasional',
+      evidence: { stooping: ['log1'], kneeling: ['log1'], crouching: ['log1'], crawling: ['log1'], climbing: ['log1'], balancing: ['log1'] }
     },
     manipulativeLimitations: {
-      reaching: { limited: false, description: '', supportingEvidence: [] },
-      handling: { limited: false, description: '', supportingEvidence: [] },
-      fingering: { limited: false, description: '', supportingEvidence: [] },
-      feeling: { limited: false, description: '', supportingEvidence: [] }
+      reaching: {
+        overhead: 'never',
+        forward: 'frequent',
+        lateral: 'frequent'
+      },
+      handling: 'frequent',
+      fingering: 'frequent',
+      feeling: 'unlimited',
+      evidence: { reaching: ['log1'], handling: [], fingering: [], feeling: [] }
     },
     environmentalLimitations: {
-      heights: { mustAvoid: true, severity: 'severe', description: 'Fall risk', supportingEvidence: ['log1'] },
-      movingMachinery: { mustAvoid: true, severity: 'moderate', description: 'Safety risk', supportingEvidence: [] },
-      temperature: { mustAvoid: false, severity: 'none', description: '', supportingEvidence: [] },
-      chemicals: { mustAvoid: false, severity: 'none', description: '', supportingEvidence: [] },
-      dust: { mustAvoid: false, severity: 'none', description: '', supportingEvidence: [] },
-      noise: { mustAvoid: false, severity: 'none', description: '', supportingEvidence: [] },
-      vibration: { mustAvoid: false, severity: 'none', description: '', supportingEvidence: [] }
+      heights: true,
+      movingMechanicalParts: true,
+      operatingVehicle: false,
+      humidity: 'unlimited',
+      wetness: 'unlimited',
+      dust: 'unlimited',
+      odors: 'unlimited',
+      fumes: 'unlimited',
+      temperature: {
+        extremeCold: false,
+        extremeHeat: false,
+        rapidChanges: false
+      },
+      noise: {
+        loudNoise: false,
+        constantNoise: false
+      },
+      vibration: 'unlimited',
+      evidence: { heights: ['log1'], movingMechanicalParts: [], other: [] }
     },
     mentalLimitations: {
-      concentration: { limited: true, description: 'Cannot focus >30 min', supportingEvidence: ['log1'] },
-      memory: { limited: true, description: 'Short-term memory issues', supportingEvidence: ['log1'] },
-      socialInteraction: { limited: false, description: '', supportingEvidence: [] },
-      pace: { limited: true, description: 'Cannot maintain production pace', supportingEvidence: ['log1'] },
-      adaptation: { limited: false, description: '', supportingEvidence: [] }
+      concentration: {
+        maxContinuousMinutes: 30,
+        requiresFrequentBreaks: true,
+        distractedByPain: true,
+        distractedBySymptoms: false,
+        evidence: ['log1']
+      },
+      memory: {
+        shortTermImpaired: true,
+        longTermImpaired: false,
+        forgetsMedications: false,
+        forgetsAppointments: false,
+        evidence: ['log1']
+      },
+      social: {
+        limitedPublicContact: false,
+        limitedCoworkerContact: false,
+        limitedSupervisorContact: false,
+        evidenceOfIsolation: false,
+        evidence: []
+      },
+      pace: {
+        belowNormalPace: true,
+        cannotMeetQuotas: true,
+        requiresFlexibleSchedule: false,
+        unpredictableAbsences: false,
+        evidence: ['log1']
+      },
+      adaptation: {
+        difficultyWithChange: false,
+        needsRoutine: false,
+        stressIntolerant: false,
+        evidence: []
+      }
     },
-    requiredAccommodations: ['Frequent breaks', 'Sitting workspace'],
+    requiresAccommodations: ['Frequent breaks', 'Sitting workspace'],
     evidenceSummary: {
-      totalLogs: 30,
-      dateRangeStart: new Date('2024-01-01'),
-      dateRangeEnd: new Date('2024-01-30'),
-      consistentPatterns: true,
-      worseningTrends: false
+      totalDailyLogs: 30,
+      totalActivityLogs: 0,
+      totalLimitations: 1,
+      totalPhotos: 0,
+      consistentPatterns: ['Daily pain'],
+      worseningTrends: [],
+      medicationEffects: [],
+      mostSevereSymptomDays: ['log1', 'log2'],
+      activityLimitations: [],
+      functionalDeclines: ['lim1'],
+      dateRangeDays: 30,
+      averageLogsPerWeek: 7,
+      hasPhotographicEvidence: false,
+      hasMedicalCorroboration: true
     }
   };
 
   const mockWorkImpact: WorkImpact = {
-    workHistory: {
-      id: 'job1',
-      profileId: 'profile1',
-      jobTitle: 'Warehouse Worker',
-      employer: 'ABC Warehouse',
-      startDate: new Date('2020-01-01'),
-      endDate: new Date('2023-12-31'),
-      hoursPerWeek: 40,
-      duties: [],
-      physicalDemands: {
-        exertionLevel: 'heavy',
-        liftingRequirement: { maxWeight: 50, frequentWeight: 25 },
-        standingHours: 6,
-        walkingHours: 5,
-        sittingHours: 1
-      }
-    },
-    canReturnToJob: false,
+    workHistoryId: 'job1',
+    jobTitle: 'Warehouse Worker',
+    canReturnToThisJob: false,
+    impactScore: 85,
     dutyImpacts: [],
-    overallImpactStatement: 'Cannot return to warehouse work due to lifting limitations',
-    overallImpactScore: 85
+    evidenceBase: {
+      dailyLogIds: ['log1', 'log2'],
+      activityLogIds: [],
+      limitationIds: ['lim1'],
+      photoIds: []
+    },
+    impactStatements: ['Cannot return to warehouse work due to lifting limitations'],
+    analysisStartDate: '2024-01-01',
+    analysisEndDate: '2024-01-30',
+    generatedAt: '2024-01-30T00:00:00Z'
   };
 
   const mockDailyLogs: DailyLog[] = Array(30).fill(null).map((_, i) => ({
     id: `log${i}`,
     profileId: 'profile1',
-    date: new Date(`2024-01-${(i % 30) + 1}`),
-    symptoms: [{ name: 'Pain', severity: 7, duration: 480 }],
-    overallPainLevel: 7,
-    fatigueLevel: 6,
-    sleepQuality: 'poor',
-    sleepHours: 5,
+    createdAt: `2024-01-${String((i % 30) + 1).padStart(2, '0')}T00:00:00Z`,
+    updatedAt: `2024-01-${String((i % 30) + 1).padStart(2, '0')}T00:00:00Z`,
+    logDate: `2024-01-${String((i % 30) + 1).padStart(2, '0')}`,
+    timeOfDay: 'evening' as const,
+    symptoms: [{ symptomId: 's1', severity: 7, location: 'back', notes: '' }],
+    overallSeverity: 7,
+    sleepQuality: {
+      hoursSlept: 5,
+      quality: 3,
+      wakeUps: 2,
+      restful: false
+    },
     notes: ''
   }));
 
   const mockLimitations: Limitation[] = [{
     id: 'lim1',
     profileId: 'profile1',
-    category: 'mobility',
-    description: 'Cannot stand >1 hour',
-    severity: 'severe',
-    dateStarted: new Date('2024-01-01'),
-    impacts: ['work'],
-    accommodationsNeeded: []
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    category: 'standing',
+    timeThreshold: {
+      durationMinutes: 60,
+      confidence: 'high'
+    },
+    frequency: 'always',
+    consequences: ['Cannot work full shift'],
+    variability: 'consistent',
+    notes: 'Cannot stand >1 hour',
+    isActive: true
   }];
 
   const mockActivityLogs: ActivityLog[] = [];
   const mockAppointments: Appointment[] = [{
     id: 'appt1',
     profileId: 'profile1',
-    date: new Date('2024-01-15'),
+    createdAt: '2024-01-15T00:00:00Z',
+    updatedAt: '2024-01-15T00:00:00Z',
+    appointmentDate: '2024-01-15',
     providerName: 'Dr. Smith',
-    type: 'doctor',
-    purpose: 'Back pain evaluation',
-    location: 'Medical Center'
+    providerType: 'primary_care' as const,
+    facilityName: 'Medical Center',
+    purpose: 'follow_up' as const,
+    purposeDetails: 'Back pain evaluation',
+    status: 'completed' as const
   }];
   const mockMedications: Medication[] = [{
     id: 'med1',
     profileId: 'profile1',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     name: 'Ibuprofen',
     dosage: '800mg',
-    frequency: 'daily',
-    startDate: new Date('2024-01-01')
+    frequency: 'as_needed' as const,
+    purpose: ['Pain management'],
+    startDate: '2024-01-01',
+    isActive: true
   }];
 
   describe('buildFormPackage', () => {
@@ -235,7 +317,7 @@ describe('SSAFormBuilder', () => {
       );
 
       const summary = formPackage.rfcSummary;
-      expect(summary.workCapacityLevel).toBe(mockRFC.workCapacityLevel);
+      expect(summary.workCapacityLevel).toBe(mockRFC.overallRating);
       expect(summary.canWorkFullTime).toBe(mockRFC.canWorkFullTime);
       expect(summary.sittingCapacity).toBeDefined();
       expect(summary.standingCapacity).toBeDefined();

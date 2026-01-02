@@ -18,7 +18,7 @@ import {
   DEFAULT_BACKUP_CONFIG,
   BackupEntityCount
 } from '../domain/models/BackupModels';
-import { EncryptionService } from '../storage/encryption';
+import { EncryptionManager } from '../storage/encryption';
 import { CloudProviderFactory } from './cloudProviders';
 import pako from 'pako';
 
@@ -464,14 +464,22 @@ export class CloudBackupService {
    */
   private static async encryptData(data: string): Promise<string> {
     // Use existing encryption service
-    return EncryptionService.encrypt(data);
+    const result = await EncryptionManager.encryptString(data);
+    if (!result.success || !result.data) {
+      throw new Error(result.error || 'Encryption failed');
+    }
+    return result.data;
   }
   
   /**
    * Internal: Decrypt data
    */
   private static async decryptData(data: string): Promise<string> {
-    return EncryptionService.decrypt(data);
+    const result = await EncryptionManager.decryptString(data);
+    if (!result.success || !result.data) {
+      throw new Error(result.error || 'Decryption failed');
+    }
+    return result.data;
   }
   
   /**

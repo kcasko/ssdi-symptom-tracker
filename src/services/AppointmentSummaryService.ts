@@ -314,7 +314,7 @@ export class AppointmentSummaryService {
       // This would require tracking medication history
     });
     
-    return changes.sort((a, b) => b.date.localeCompare(a.appointmentDate));
+    return changes.sort((a, b) => b.date.localeCompare(a.date));
   }
   
   /**
