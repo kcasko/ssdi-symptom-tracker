@@ -26,8 +26,8 @@ describe('AppointmentSummaryService.generatePreparationSummary', () => {
       fakeMedications,
       3 // lookbackDays
     );
-    expect(summary.dateRange.start).toBe('2026-01-07');
-    expect(summary.dateRange.end).toBe('2026-01-09');
+    expect(summary.dateRange.start).toBe('2026-01-06'); // 3 days before end date
+    expect(summary.dateRange.end).toBe('2026-01-09'); // day before appointment
     expect(summary.appointment.appointmentDate).toBe('2026-01-10');
     // Protects: correct date range and inclusion of appointment
   });

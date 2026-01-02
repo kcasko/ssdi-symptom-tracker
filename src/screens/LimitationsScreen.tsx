@@ -41,15 +41,15 @@ const LIMITATION_CATEGORIES: { value: LimitationCategory; label: string; descrip
 
 const FREQUENCY_OPTIONS: { value: LimitationFrequency; label: string }[] = [
   { value: 'always', label: 'Always' },
-  { value: 'most_days', label: 'Most Days' },
-  { value: 'some_days', label: 'Some Days' },
-  { value: 'occasional', label: 'Occasional' },
+  { value: 'usually', label: 'Usually' },
+  { value: 'often', label: 'Often' },
+  { value: 'occasionally', label: 'Occasionally' },
 ];
 
 const VARIABILITY_OPTIONS: { value: VariabilityLevel; label: string }[] = [
   { value: 'consistent', label: 'Consistent' },
-  { value: 'somewhat_variable', label: 'Somewhat Variable' },
-  { value: 'highly_variable', label: 'Highly Variable' },
+  { value: 'some_variability', label: 'Some Variability' },
+  { value: 'high_variability', label: 'High Variability' },
 ];
 
 export const LimitationsScreen: React.FC = () => {
@@ -61,10 +61,10 @@ export const LimitationsScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<LimitationCategory | null>(null);
   const [timeMinutes, setTimeMinutes] = useState('');
   const [weightPounds, setWeightPounds] = useState('');
-  const [frequency, setFrequency] = useState<LimitationFrequency>('most_days');
+  const [frequency, setFrequency] = useState<LimitationFrequency>('usually');
   const [consequences, setConsequences] = useState('');
   const [accommodations, setAccommodations] = useState('');
-  const [variability, setVariability] = useState<VariabilityLevel>('somewhat_variable');
+  const [variability, setVariability] = useState<VariabilityLevel>('some_variability');
   const [variabilityNotes, setVariabilityNotes] = useState('');
   const [notes, setNotes] = useState('');
   const [isActive, setIsActive] = useState(true);
@@ -77,10 +77,10 @@ export const LimitationsScreen: React.FC = () => {
     setSelectedCategory(null);
     setTimeMinutes('');
     setWeightPounds('');
-    setFrequency('most_days');
+    setFrequency('usually');
     setConsequences('');
     setAccommodations('');
-    setVariability('somewhat_variable');
+    setVariability('some_variability');
     setVariabilityNotes('');
     setNotes('');
     setIsActive(true);
@@ -89,8 +89,8 @@ export const LimitationsScreen: React.FC = () => {
 
   const loadLimitationForEdit = (limitation: Limitation) => {
     setSelectedCategory(limitation.category);
-    setTimeMinutes(limitation.timeThreshold?.minutes?.toString() || '');
-    setWeightPounds(limitation.weightThreshold?.pounds?.toString() || '');
+    setTimeMinutes(limitation.timeThreshold?.durationMinutes?.toString() || '');
+    setWeightPounds(limitation.weightThreshold?.maxPounds?.toString() || '');
     setFrequency(limitation.frequency);
     setConsequences(limitation.consequences?.join(', ') || '');
     setAccommodations(limitation.accommodations?.join(', ') || '');
@@ -129,8 +129,8 @@ export const LimitationsScreen: React.FC = () => {
         const mins = parseInt(timeMinutes);
         if (!isNaN(mins) && mins > 0) {
           limitationData.timeThreshold = {
-            minutes: mins,
-            description: `Can only ${selectedCategory} for ${mins} minutes before experiencing problems`,
+            durationMinutes: mins,
+            confidence: 'moderate' as const,
           };
         }
       }
@@ -140,8 +140,8 @@ export const LimitationsScreen: React.FC = () => {
         const lbs = parseInt(weightPounds);
         if (!isNaN(lbs) && lbs > 0) {
           limitationData.weightThreshold = {
-            pounds: lbs,
-            description: `Cannot lift/carry more than ${lbs} pounds`,
+            maxPounds: lbs,
+            frequency: 'occasionally' as const,
           };
         }
       }
@@ -229,7 +229,7 @@ export const LimitationsScreen: React.FC = () => {
                   
                   {limitation.timeThreshold && (
                     <Text style={styles.limitationText}>
-                      ⏱️ Time Limit: {limitation.timeThreshold.minutes} minutes
+                      ⏱️ Time Limit: {limitation.timeThreshold.durationMinutes} minutes
                     </Text>
                   )}
                   
@@ -620,17 +620,17 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   infoCard: {
-    backgroundColor: colors.info.light,
+    backgroundColor: colors.primary[50],
     padding: spacing.md,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: colors.info.main,
+    borderLeftColor: colors.primary[500],
     gap: spacing.xs,
   },
   infoTitle: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.bold as any,
-    color: colors.info.dark,
+    fontSize: typography.sizes.sm,
+    fontWeight: typography.weights.bold,
+    color: colors.primary[700],
   },
   infoText: {
     fontSize: typography.sizes.sm,

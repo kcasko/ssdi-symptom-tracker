@@ -49,7 +49,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     autoSpeakRef.current = autoSpeak;
   }, [onTranscription, onError, autoSpeak]);
 
-  const cleanup = async () => {
+  // Cleanup function for voice resources
+  const cleanupVoice = async () => {
     try {
       await Voice.destroy();
       Voice.removeAllListeners();

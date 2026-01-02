@@ -402,18 +402,16 @@ export class SyncService {
     try {
       console.log(`[SyncService] Applying resolved conflict for ${conflict.entityType}:${conflict.entityId}`);
       
-      // Import storage services dynamically to avoid circular dependencies
-      const { LogStorage } = await import('../storage/storage');
-      
       // Apply the resolved data based on entity type
+      // In a real implementation, this would use storage services
       switch (conflict.entityType) {
-        case 'daily-log':
+        case 'dailyLog':
           // The conflict resolution would have determined the final state
           // Apply the resolved data to the daily logs storage
           console.log('Resolved daily log conflict - data applied to local storage');
           break;
           
-        case 'activity-log':
+        case 'activityLog':
           console.log('Resolved activity log conflict - data applied to local storage');
           break;
           

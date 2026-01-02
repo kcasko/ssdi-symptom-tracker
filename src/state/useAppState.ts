@@ -44,6 +44,9 @@ interface AppState {
   addDailyLog: (log: any) => Promise<void>;
   updateDailyLog: (log: any) => Promise<void>;
   addActivityLog: (log: any) => Promise<void>;
+  addLimitation: (limitation: any) => Promise<void>;
+  updateLimitation: (limitation: any) => Promise<void>;
+  deleteLimitation: (limitationId: string) => Promise<void>;
   
   // Photo actions
   addPhoto: (photo: any) => Promise<void>;
@@ -161,7 +164,7 @@ export function useAppState(): AppState {
           useLogStore.setState({ currentProfileId: currentActiveProfileId });
           useReportStore.setState({ currentProfileId: currentActiveProfileId });
           await useLogStore.getState().loadData(currentActiveProfileId);
-          await useReportStore.getState().loadData(currentActiveProfileId);
+          await useReportStore.getState().loadDrafts(currentActiveProfileId);
           lastSyncedProfileId.current = currentActiveProfileId;
         }
         

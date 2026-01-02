@@ -9,6 +9,7 @@ declare const __DEV__: boolean;
 import { CURRENT_SCHEMA_VERSION } from '../utils/constants';
 import { Storage, SchemaStorage, ProfileStorage, LogStorage } from './storage';
 import { generateId } from '../utils/ids';
+import { createMockDailyLogs, createMockActivityLog, createMockLimitation, createMockMedication, createMockAppointment } from '../__tests__/testHelpers';
 
 export interface MigrationResult {
   success: boolean;
@@ -338,10 +339,6 @@ export class DevUtilities {
     if (__DEV__) {
       try {
         console.log('[Migration] Creating sample data for development...');
-        
-        const { createMockDailyLogs, createMockActivityLog, createMockLimitation, createMockMedication, createMockAppointment } = await import('../__tests__/testHelpers');
-        const { LogStorage } = await import('./storage');
-        const { generateId } = await import('../utils/ids');
         
         // Create a sample profile ID
         const sampleProfileId = 'sample_profile_dev';
