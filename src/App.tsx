@@ -4,13 +4,16 @@
  */
 
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet, LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppNavigator } from './navigation/AppNavigator';
 import { useAppState } from './state/useAppState';
 import { colors } from './theme/colors';
-
+// Suppress known warning from react-native-voice library
+LogBox.ignoreLogs([
+  'new NativeEventEmitter',
+]);
 export default function App() {
   // Initialize app state
   const { isInitialized, hasError, errorMessage } = useAppState();
