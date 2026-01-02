@@ -19,7 +19,7 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
 
   useEffect(() => {
     evidenceStore.loadEvidenceMode();
-  }, [evidenceStore]);
+  }, []);
 
   const handleToggle = async (value: boolean) => {
     if (value) {

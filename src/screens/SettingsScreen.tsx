@@ -62,7 +62,7 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Profile</Text>
           <View style={styles.settingCard}>
             <Text style={styles.settingLabel}>Active Profile</Text>
-            <Text style={styles.settingValue}>{activeProfile?.displayName || 'None'}</Text>
+            <Text style={styles.settingValue}>{activeProfile?.name || 'None'}</Text>
           </View>
           <BigButton
             label="Switch Profile"

@@ -78,7 +78,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>Welcome back</Text>
-            <Text style={styles.profileName}>{activeProfile.displayName}</Text>
+            <Text style={styles.profileName}>{activeProfile.name}</Text>
             <View style={{ marginTop: spacing.sm }}>
               <EvidenceModeControls profileId={activeProfile.id} compact={true} />
             </View>

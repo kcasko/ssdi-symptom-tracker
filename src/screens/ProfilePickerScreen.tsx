@@ -75,19 +75,19 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
               onPress={() => handleSelectProfile(profile.id)}
             >
               <View style={styles.profileInfo}>
-                <Text style={styles.profileName}>{profile.displayName}</Text>
+                <Text style={styles.profileName}>{profile.name}</Text>
                 <Text style={styles.profileMeta}>
                   Created {formatDate(profile.createdAt, DISPLAY_DATE_SHORT)}
                 </Text>
                 <Text style={styles.profileMeta}>
-                  Last updated {formatDate(profile.lastAccessed, DISPLAY_DATE_SHORT)}
+                  Last updated {formatDate(profile.updatedAt, DISPLAY_DATE_SHORT)}
                 </Text>
               </View>
               <Text style={styles.arrow}>→</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => handleDeleteProfile(profile.id, profile.displayName)}
+              onPress={() => handleDeleteProfile(profile.id, profile.name)}
             >
               <Text style={styles.deleteButtonText}>🗑️</Text>
             </TouchableOpacity>

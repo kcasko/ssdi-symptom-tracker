@@ -153,7 +153,11 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     };
 
     initializeVoice();
-    return cleanup;
+    return () => {
+      // Cleanup must be synchronous, so we don't await
+      Voice.destroy().catch(console.error);
+      Voice.removeAllListeners();
+    };
     // Handlers use refs for props, so they don't need to be in dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
