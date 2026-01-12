@@ -12,7 +12,8 @@ import {
   Dimensions,
   TouchableOpacity,
 } from 'react-native';
-import { LineChart, BarChart } from 'react-native-chart-kit';
+import { SimpleBarChart } from '../components/SimpleBarChart';
+import { SimpleLineChart } from '../components/SimpleLineChart';
 import { useAppState, useLogStore } from '../state/useAppState';
 import { DateRangePicker } from '../components/DateRangePicker';
 import { colors as COLORS } from '../theme/colors';
@@ -162,19 +163,6 @@ export function TrendsScreen() {
     }
     return generateChartData(trendData, selectedTrend);
   }, [trendData, selectedTrend, dayRatios]);
-
-  const chartConfig = {
-    backgroundGradientFrom: COLORS.gray50,
-    backgroundGradientTo: COLORS.gray50,
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    strokeWidth: 2,
-    barPercentage: 0.5,
-    useShadowColorFromDataset: false,
-    decimalPlaces: 1,
-    style: {
-      borderRadius: 16,
-    },
-  };
 
   function renderDayRatioInsights() {
     return (
@@ -521,24 +509,17 @@ export function TrendsScreen() {
     }
 
     return selectedTrend === 'patterns' || selectedTrend === 'day-quality' ? (
-      <BarChart
+      <SimpleBarChart
         data={chartData}
-        width={screenWidth - SPACING.xl}
-        height={220}
-        chartConfig={chartConfig}
-        verticalLabelRotation={30}
-        yAxisLabel=""
-        yAxisSuffix=""
-        style={styles.chart}
+        width={screenWidth - SPACING.lg * 2}
+        height={280}
+        showValues
       />
     ) : (
-      <LineChart
+      <SimpleLineChart
         data={chartData}
-        width={screenWidth - SPACING.xl}
-        height={220}
-        chartConfig={chartConfig}
-        bezier
-        style={styles.chart}
+        width={screenWidth - SPACING.lg * 2}
+        height={280}
       />
     );
   };
@@ -886,10 +867,6 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.headlineMedium,
     color: COLORS.gray900,
     marginBottom: SPACING.md,
-  },
-  chart: {
-    marginVertical: SPACING.sm,
-    borderRadius: 16,
   },
   noDataContainer: {
     alignItems: 'center',
