@@ -1,9 +1,9 @@
 
 # Test Suite Documentation
+
 This document describes the comprehensive test suite created for the SSDI Symptom Tracker application.
 
-
-### Test Infrastructure
+## Test Infrastructure
 
 ### Setup
 
