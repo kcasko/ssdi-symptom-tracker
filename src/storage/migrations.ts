@@ -9,7 +9,6 @@ declare const __DEV__: boolean;
 import { CURRENT_SCHEMA_VERSION } from '../utils/constants';
 import { Storage, SchemaStorage, ProfileStorage, LogStorage } from './storage';
 import { generateId } from '../utils/ids';
-import { createMockDailyLogs, createMockActivityLog, createMockLimitation, createMockMedication, createMockAppointment } from '../__tests__/testHelpers';
 
 export interface MigrationResult {
   success: boolean;
@@ -337,91 +336,8 @@ export class DevUtilities {
    */
   static async createSampleData(): Promise<boolean> {
     if (__DEV__) {
-      try {
-        console.log('[Migration] Creating sample data for development...');
-        
-        // Create a sample profile ID
-        const sampleProfileId = 'sample_profile_dev';
-        
-        // Create sample daily logs (30 days of data)
-        const sampleDailyLogs = createMockDailyLogs(30, { profileId: sampleProfileId });
-        console.log(`[Migration] Creating ${sampleDailyLogs.length} sample daily logs`);
-        
-        // Create sample activity logs
-        const sampleActivityLogs = [];
-        for (let i = 0; i < 15; i++) {
-          const activityLog = createMockActivityLog({
-            id: generateId(),
-            profileId: sampleProfileId,
-            activityDate: new Date(Date.now() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-          });
-          sampleActivityLogs.push(activityLog);
-        }
-        console.log(`[Migration] Creating ${sampleActivityLogs.length} sample activity logs`);
-        
-        // Create sample limitations
-        const sampleLimitations = [];
-        const limitationTypes = ['sitting', 'standing', 'walking', 'lifting', 'concentration'];
-        for (const type of limitationTypes) {
-          const limitation = createMockLimitation({
-            id: generateId(),
-            profileId: sampleProfileId,
-            category: type as any,
-            notes: `Sample ${type} limitation for development testing`,
-          });
-          sampleLimitations.push(limitation);
-        }
-        console.log(`[Migration] Creating ${sampleLimitations.length} sample limitations`);
-        
-        // Create sample medications
-        const sampleMedications = [];
-        const medications = ['Sample Pain Relief', 'Sample Anti-inflammatory', 'Sample Muscle Relaxant'];
-        for (const name of medications) {
-          const medication = createMockMedication({
-            id: generateId(),
-            profileId: sampleProfileId,
-            name,
-            dosage: '10mg',
-          });
-          sampleMedications.push(medication);
-        }
-        console.log(`[Migration] Creating ${sampleMedications.length} sample medications`);
-        
-        // Create sample appointments
-        const sampleAppointments = [];
-        const appointmentTypes = ['primary_care', 'specialist', 'physical_therapy'];
-        for (let i = 0; i < appointmentTypes.length; i++) {
-          const appointment = createMockAppointment({
-            id: generateId(),
-            profileId: sampleProfileId,
-            appointmentDate: new Date(Date.now() + (i * 7 * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-            purpose: appointmentTypes[i] as any,
-            preAppointmentNotes: `Sample ${appointmentTypes[i].replace('_', ' ')} appointment for development`,
-          });
-          sampleAppointments.push(appointment);
-        }
-        console.log(`[Migration] Creating ${sampleAppointments.length} sample appointments`);
-        
-        // Store all the sample data using bulk save methods
-        await Promise.all([
-          LogStorage.saveDailyLogs(sampleProfileId, sampleDailyLogs),
-          LogStorage.saveActivityLogs(sampleProfileId, sampleActivityLogs),
-          LogStorage.saveLimitations(sampleProfileId, sampleLimitations),
-          LogStorage.saveMedications(sampleProfileId, sampleMedications),
-          LogStorage.saveAppointments(sampleProfileId, sampleAppointments),
-        ]);
-        
-        console.log('[Migration] ✅ Sample data creation completed successfully');
-        console.log(`[Migration] Use profile ID "${sampleProfileId}" to view the sample data`);
-        return true;
-        
-      } catch (error) {
-        console.error('[Migration] ❌ Failed to create sample data:', error);
-        return false;
-      }
+      console.log('[Migration] Sample data creation is disabled - use test data import feature instead');
     }
-    
-    console.log('[Migration] Sample data creation skipped - not in development mode');
     return false;
   }
 

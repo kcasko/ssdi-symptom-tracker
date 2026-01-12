@@ -216,26 +216,27 @@ export function generateChartData(
   // Limit data points for readability
   const limitedData = trendData.slice(-maxDataPoints);
 
+  // Calculate label interval to avoid overcrowding (show ~7 labels max)
+  const labelInterval = Math.max(1, Math.ceil(limitedData.length / 7));
+
+  // Helper to create sparse labels (show every Nth label, empty string for others)
+  const createSparseLabels = (data: TrendDataPoint[]) =>
+    data.map((d, i) => (i % labelInterval === 0 ? d.date : ''));
+
   switch (type) {
     case 'symptoms':
       return {
-        labels: limitedData.map(d => {
-          const parts = d.date.split('/');
-          return `${parts[1]}/${parts[0]}`; // MM/DD format
-        }),
+        labels: createSparseLabels(limitedData),
         datasets: [{
           data: limitedData.map(d => d.symptomCount),
           color: (opacity = 1) => `rgba(46, 125, 50, ${opacity})`,
           strokeWidth: 2,
         }],
       };
-    
+
     case 'severity':
       return {
-        labels: limitedData.map(d => {
-          const parts = d.date.split('/');
-          return `${parts[1]}/${parts[0]}`; // MM/DD format
-        }),
+        labels: createSparseLabels(limitedData),
         datasets: [{
           data: limitedData.map(d => d.averageSeverity),
           color: (opacity = 1) => `rgba(244, 67, 54, ${opacity})`,
@@ -245,12 +246,14 @@ export function generateChartData(
     
     case 'patterns': {
       const symptomFreqs = calculateSymptomFrequencies(trendData);
-      const topSymptoms = symptomFreqs.slice(0, 6); // Show top 6 symptoms
+      const topSymptoms = symptomFreqs.slice(0, 5); // Show top 5 symptoms
 
       return {
         labels: topSymptoms.map(sf => {
+          // Shorten label: first word only, max 6 chars
           const words = sf.name.split(' ');
-          return words.length > 1 ? words[0] : sf.name.substring(0, 8);
+          const label = words[0];
+          return label.length > 6 ? label.substring(0, 6) : label;
         }),
         datasets: [{
           data: topSymptoms.map(sf => sf.frequency),

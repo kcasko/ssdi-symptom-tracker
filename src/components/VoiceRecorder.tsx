@@ -51,17 +51,30 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 
   // ...existing code...
 
-  const getErrorMessage = (error: string): string => {
-    if (error.includes('network')) {
-      return 'Network error. Please check your internet connection.';
+  const getErrorMessage = (errorCode: string, errorMessage: string): { message: string; isRecoverable: boolean } => {
+    // Handle specific error codes from speech recognition
+    // Code 5: Client side error (cancelled, timeout)
+    // Code 7: No match (speech not recognized)
+    // Code 11: Didn't understand
+    if (errorCode === '5' || errorMessage.includes('Client side')) {
+      return { message: 'Recording stopped. Tap to try again.', isRecoverable: true };
     }
-    if (error.includes('permission')) {
-      return 'Microphone permission required for voice logging.';
+    if (errorCode === '7' || errorMessage.includes('No match')) {
+      return { message: 'No speech detected. Please speak clearly.', isRecoverable: true };
     }
-    if (error.includes('no-speech')) {
-      return 'No speech detected. Please speak clearly and try again.';
+    if (errorCode === '11' || errorMessage.includes('understand')) {
+      return { message: 'Could not understand. Please try again.', isRecoverable: true };
     }
-    return 'Voice recognition failed. Please try again.';
+    if (errorMessage.includes('network')) {
+      return { message: 'Network error. Please check your internet connection.', isRecoverable: false };
+    }
+    if (errorMessage.includes('permission')) {
+      return { message: 'Microphone permission required for voice logging.', isRecoverable: false };
+    }
+    if (errorMessage.includes('no-speech')) {
+      return { message: 'No speech detected. Please speak clearly and try again.', isRecoverable: true };
+    }
+    return { message: 'Voice recognition failed. Please try again.', isRecoverable: true };
   };
 
   const speakFeedback = (text: string) => {
@@ -105,12 +118,21 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   const onSpeechError = (event: any) => {
     setIsRecording(false);
     setIsProcessing(false);
-    console.error('Speech recognition error:', event);
-    
-    const errorMessage = getErrorMessage(event.error?.message || event.error);
-    onErrorRef.current?.(errorMessage);
-    
-    if (autoSpeakRef.current) {
+
+    const errorCode = event.error?.code || '';
+    const errorMsg = event.error?.message || event.error || '';
+    const { message, isRecoverable } = getErrorMessage(errorCode, errorMsg);
+
+    // Use warn for recoverable errors (no speech, cancelled) to avoid alarming red logs
+    if (isRecoverable) {
+      console.warn('Speech recognition:', message);
+    } else {
+      console.error('Speech recognition error:', event);
+    }
+
+    onErrorRef.current?.(message);
+
+    if (autoSpeakRef.current && !isRecoverable) {
       speakFeedback('Sorry, I didn\'t catch that. Please try again.');
     }
   };

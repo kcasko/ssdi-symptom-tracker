@@ -19,7 +19,8 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
 
   useEffect(() => {
     evidenceStore.loadEvidenceMode();
-  }, [evidenceStore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleToggle = async (value: boolean) => {
     if (value) {

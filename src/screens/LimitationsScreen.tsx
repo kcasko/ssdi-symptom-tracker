@@ -200,7 +200,11 @@ export const LimitationsScreen: React.FC = () => {
         <Text style={styles.subtitle}>Track capacity limits and impacts</Text>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Current Limitations */}
         {activeLimitations.length > 0 && !showAddForm && (
           <View style={styles.section}>
@@ -418,13 +422,13 @@ export const LimitationsScreen: React.FC = () => {
                   resetForm();
                 }}
                 variant="secondary"
-                fullWidth
+                style={styles.flexButton}
               />
               <BigButton
                 label={editingId ? 'Update' : 'Save'}
                 onPress={handleSave}
                 variant="primary"
-                fullWidth
+                style={styles.flexButton}
               />
             </View>
           </View>
@@ -485,6 +489,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   section: {
     padding: spacing.lg,
@@ -618,6 +625,9 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     gap: spacing.md,
+  },
+  flexButton: {
+    flex: 1,
   },
   infoCard: {
     backgroundColor: colors.primary[50],

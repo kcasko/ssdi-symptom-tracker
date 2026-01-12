@@ -3,7 +3,7 @@
  * Main hub with quick stats and navigation
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
@@ -27,6 +28,14 @@ type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
 export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
+  const [today, setToday] = useState(() => new Date().toISOString().split('T')[0]);
+
+  // Refresh the date when screen comes into focus (handles day change, navigation back)
+  useFocusEffect(
+    useCallback(() => {
+      setToday(new Date().toISOString().split('T')[0]);
+    }, [])
+  );
 
   // Filter logs for active profile
   const profileDailyLogs = React.useMemo(() => 
@@ -58,7 +67,6 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const last30DayRatios = timeRangeRatios.last30Days;
 
   // Check if logged today
-  const today = new Date().toISOString().split('T')[0];
   const loggedToday = profileDailyLogs.some(l => l.logDate === today);
 
   useEffect(() => {
