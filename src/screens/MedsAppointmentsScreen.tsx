@@ -557,7 +557,7 @@ const MedicationModal: React.FC<MedicationModalProps> = ({ visible, medication, 
               style={styles.checkboxRow}
             >
               <View style={[styles.checkbox, isActive && styles.checkboxChecked]}>
-                {isActive && <Text style={styles.checkmark}>✓</Text>}
+                {isActive && <Text style={styles.checkmark}>X</Text>}
               </View>
               <Text style={styles.checkboxLabel}>Currently taking this medication</Text>
             </TouchableOpacity>
@@ -646,7 +646,7 @@ const SideEffectsModal: React.FC<SideEffectsModalProps> = ({ visible, medication
                 <View key={index} style={styles.sideEffectItem}>
                   <Text style={styles.sideEffectText}>{effect}</Text>
                   <TouchableOpacity onPress={() => handleRemoveSideEffect(index)}>
-                    <Text style={styles.removeSideEffect}>✕</Text>
+                    <Text style={styles.removeSideEffect}>X</Text>
                   </TouchableOpacity>
                 </View>
               ))
@@ -753,7 +753,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
             </Text>
           </View>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>✕</Text>
+            <Text style={styles.closeButtonText}>X</Text>
           </TouchableOpacity>
         </View>
         
@@ -773,7 +773,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>Recent Symptoms</Text>
               {summary.recentSymptoms.slice(0, 5).map((symptom, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryBullet}>•</Text>
+                  <Text style={styles.summaryBullet}>-</Text>
                   <Text style={styles.summaryText}>
                     {symptom.symptomName}: {symptom.frequency}% of days, avg {symptom.averageSeverity}/10 ({symptom.trend})
                   </Text>
@@ -788,7 +788,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>New or Changed Symptoms</Text>
               {summary.changedSymptoms.map((change, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryBullet}>•</Text>
+                  <Text style={styles.summaryBullet}>-</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.summaryHighlight}>{change.symptomName} ({change.change})</Text>
                     <Text style={styles.summaryDetail}>{change.details}</Text>
@@ -804,7 +804,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>Activity Limitations</Text>
               {summary.recentLimitations.map((limitation, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryBullet}>•</Text>
+                  <Text style={styles.summaryBullet}>-</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.summaryText}>
                       {limitation.activityName} (Impact: {limitation.impactLevel}/10, {limitation.frequency}% of attempts)
@@ -824,7 +824,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>Medication Updates</Text>
               {summary.medicationChanges.map((change, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryBullet}>•</Text>
+                  <Text style={styles.summaryBullet}>-</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={styles.summaryText}>
                       {change.medicationName} ({change.status})

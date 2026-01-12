@@ -38,6 +38,7 @@ interface AppState {
   activityLogs: any[];
   limitations: any[];
   medications: any[];
+  appointments: any[];
   photos: any[];
   
   // Log actions
@@ -268,6 +269,7 @@ export function useAppState(): AppState {
     activityLogs: logStore.activityLogs,
     limitations: logStore.limitations,
     medications: logStore.medications,
+    appointments: logStore.appointments,
     photos: logStore.photos,
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,

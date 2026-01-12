@@ -26,8 +26,20 @@ import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
 export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, activityLogs, limitations, medications, reportDrafts, addReportDraft, updateReportDraft, photos, profiles, settings } =
-    useAppState();
+  const {
+    activeProfile,
+    dailyLogs,
+    activityLogs,
+    limitations,
+    medications,
+    appointments,
+    reportDrafts,
+    addReportDraft,
+    updateReportDraft,
+    photos,
+    profiles,
+    settings,
+  } = useAppState();
 
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -162,7 +174,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         activityLogs,
         limitations,
         medications,
-        appointments: [],
+        appointments,
         reportDrafts,
         photos,
         settings,
@@ -270,7 +282,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                 <View style={styles.recommendationsSection}>
                   <Text style={styles.recommendationsTitle}>Recommendations:</Text>
                   {credibilityScore.recommendations.map((rec, idx) => (
-                    <Text key={idx} style={styles.recommendationText}>• {rec}</Text>
+                    <Text key={idx} style={styles.recommendationText}>- {rec}</Text>
                   ))}
                 </View>
               )}
@@ -291,14 +303,14 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
               disabled={backingUp}
             >
               <Text style={styles.exportButtonText}>
-                {backingUp ? 'Creating Backup...' : '💾 Create Full Backup'}
+                {backingUp ? 'Creating Backup...' : 'Create Full Backup'}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.exportButton} 
               onPress={handleRestoreBackup}
             >
-              <Text style={styles.exportButtonText}>📥 Restore from Backup</Text>
+              <Text style={styles.exportButtonText}>Restore from Backup</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -393,13 +405,13 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                       {formatDate(report.dateRange.start, DISPLAY_DATE_SHORT)} - {formatDate(report.dateRange.end, DISPLAY_DATE_SHORT)}
                     </Text>
                     <Text style={styles.reportMeta}>
-                      {stats.totalSections} sections • {stats.totalWords} words
+                      {stats.totalSections} sections - {stats.totalWords} words
                     </Text>
                     <Text style={styles.reportMeta}>
                       Last edited {formatDate(report.lastModified, DISPLAY_DATE_SHORT)}
                     </Text>
                   </View>
-                  <Text style={styles.arrow}>→</Text>
+                  <Text style={styles.arrow}>></Text>
                 </TouchableOpacity>
               );
             })

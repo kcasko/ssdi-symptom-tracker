@@ -14,6 +14,9 @@ import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
 import { ReportDraft } from '../domain/models/ReportDraft';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
+import { LogStorage, ProfileStorage, SettingsStorage, Storage } from '../storage/storage';
+
+const EVIDENCE_MODE_CONFIG_KEY = '@ssdi/evidence_mode_config';
 
 export interface BackupData {
   version: string;
@@ -145,12 +148,95 @@ export class BackupRestoreService {
     };
 
     try {
+      const mergeWithExisting = _options?.mergeWithExisting ?? true;
+      const skipPhotos = _options?.skipPhotos ?? false;
+
       // Version compatibility check
       if (backup.version !== this.BACKUP_VERSION) {
         result.errors.push(
           `Backup version mismatch. Expected ${this.BACKUP_VERSION}, got ${backup.version}`
         );
         // Continue anyway, but warn user
+      }
+
+      const existingProfiles = mergeWithExisting ? await ProfileStorage.getAllProfiles() : [];
+      const mergedProfiles = mergeWithExisting
+        ? this.mergeById(existingProfiles, backup.profiles)
+        : backup.profiles;
+
+      await ProfileStorage.saveProfiles(mergedProfiles);
+
+      const existingActiveProfileId = await ProfileStorage.getActiveProfileId();
+      const resolvedActiveProfileId = mergedProfiles.some(p => p.id === existingActiveProfileId)
+        ? existingActiveProfileId
+        : mergedProfiles[0]?.id || null;
+      await ProfileStorage.setActiveProfileId(resolvedActiveProfileId);
+
+      const dailyByProfile = this.groupByProfile(backup.dailyLogs);
+      const activityByProfile = this.groupByProfile(backup.activityLogs);
+      const limitationsByProfile = this.groupByProfile(backup.limitations || []);
+      const medicationsByProfile = this.groupByProfile(backup.medications || []);
+      const appointmentsByProfile = this.groupByProfile(backup.appointments || []);
+      const draftsByProfile = this.groupByProfile(backup.reportDrafts || []);
+
+      for (const profile of mergedProfiles) {
+        const profileId = profile.id;
+
+        const existingDailyLogs = mergeWithExisting ? await LogStorage.getDailyLogs(profileId) : [];
+        const existingActivityLogs = mergeWithExisting ? await LogStorage.getActivityLogs(profileId) : [];
+        const existingLimitations = mergeWithExisting ? await LogStorage.getLimitations(profileId) : [];
+        const existingMedications = mergeWithExisting ? await LogStorage.getMedications(profileId) : [];
+        const existingAppointments = mergeWithExisting ? await LogStorage.getAppointments(profileId) : [];
+        const existingDrafts = mergeWithExisting ? await LogStorage.getReportDrafts(profileId) : [];
+
+        const mergedDailyLogs = mergeWithExisting
+          ? this.mergeById(existingDailyLogs, dailyByProfile[profileId] || [])
+          : (dailyByProfile[profileId] || []);
+        const mergedActivityLogs = mergeWithExisting
+          ? this.mergeById(existingActivityLogs, activityByProfile[profileId] || [])
+          : (activityByProfile[profileId] || []);
+        const mergedLimitations = mergeWithExisting
+          ? this.mergeById(existingLimitations, limitationsByProfile[profileId] || [])
+          : (limitationsByProfile[profileId] || []);
+        const mergedMedications = mergeWithExisting
+          ? this.mergeById(existingMedications, medicationsByProfile[profileId] || [])
+          : (medicationsByProfile[profileId] || []);
+        const mergedAppointments = mergeWithExisting
+          ? this.mergeById(existingAppointments, appointmentsByProfile[profileId] || [])
+          : (appointmentsByProfile[profileId] || []);
+        const mergedDrafts = mergeWithExisting
+          ? this.mergeById(existingDrafts, draftsByProfile[profileId] || [])
+          : (draftsByProfile[profileId] || []);
+
+        await LogStorage.saveDailyLogs(profileId, mergedDailyLogs);
+        await LogStorage.saveActivityLogs(profileId, mergedActivityLogs);
+        await LogStorage.saveLimitations(profileId, mergedLimitations);
+        await LogStorage.saveMedications(profileId, mergedMedications);
+        await LogStorage.saveAppointments(profileId, mergedAppointments);
+        await LogStorage.saveReportDrafts(profileId, mergedDrafts);
+      }
+
+      if (!skipPhotos && (backup.photos || []).length > 0) {
+        if (mergedProfiles.length === 1) {
+          const profileId = mergedProfiles[0].id;
+          const existingPhotos = mergeWithExisting ? await LogStorage.getPhotos(profileId) : [];
+          const mergedPhotos = mergeWithExisting
+            ? this.mergeById(existingPhotos, backup.photos)
+            : backup.photos;
+          await LogStorage.savePhotos(profileId, mergedPhotos);
+        } else {
+          result.errors.push(
+            'Photo restore skipped: backup does not include profile IDs for photos.'
+          );
+        }
+      }
+
+      if (backup.settings) {
+        await SettingsStorage.saveSettings(backup.settings);
+      }
+
+      if (backup.evidenceModeConfig) {
+        await Storage.set(EVIDENCE_MODE_CONFIG_KEY, backup.evidenceModeConfig);
       }
 
       // Count restored items
@@ -163,6 +249,25 @@ export class BackupRestoreService {
       result.errors.push(error instanceof Error ? error.message : 'Unknown error during restore');
       return result;
     }
+  }
+
+  private static mergeById<T extends { id: string }>(existing: T[], incoming: T[]): T[] {
+    const merged = new Map<string, T>();
+    existing.forEach((item) => merged.set(item.id, item));
+    incoming.forEach((item) => merged.set(item.id, item));
+    return Array.from(merged.values());
+  }
+
+  private static groupByProfile<T extends { profileId: string }>(
+    items: T[]
+  ): Record<string, T[]> {
+    return items.reduce<Record<string, T[]>>((acc, item) => {
+      if (!acc[item.profileId]) {
+        acc[item.profileId] = [];
+      }
+      acc[item.profileId].push(item);
+      return acc;
+    }, {});
   }
 
   /**

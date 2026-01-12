@@ -8,7 +8,7 @@ import { ReportDraft, createReportDraft, ReportType } from '../domain/models/Rep
 import { LogStorage } from '../storage/storage';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
-import { generatePlainTextReport } from '../services/EvidencePDFExportService';
+import { generateHTMLForPDF, generatePlainTextReport } from '../services/EvidencePDFExportService';
 import { ids } from '../utils/ids';
 
 interface ReportState {
@@ -206,7 +206,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
         log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
       );
       const filteredActivityLogs = activityLogs.filter(log => 
-        log.date >= draft.dateRange.start && log.date <= draft.dateRange.end
+        log.activityDate >= draft.dateRange.start && log.activityDate <= draft.dateRange.end
       );
 
       // Use ReportService to generate the actual report content
@@ -269,7 +269,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
         log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
       );
       const filteredActivityLogs = activityLogs.filter(log => 
-        log.date >= draft.dateRange.start && log.date <= draft.dateRange.end
+        log.activityDate >= draft.dateRange.start && log.activityDate <= draft.dateRange.end
       );
 
       // Use ReportService to regenerate the specific section
@@ -324,8 +324,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
       // Use appropriate export service based on format
       if (format === 'pdf') {
-        // For PDF, we'll use the plain text report generator
-        const pdfContent = generatePlainTextReport({
+        const pdfReport = {
           title: draft.title,
           dateRange: `${draft.dateRange.start} to ${draft.dateRange.end}`,
           generatedAt: draft.generatedAt || new Date().toISOString(),
@@ -336,9 +335,9 @@ export const useReportStore = create<ReportState>((set, get) => ({
           functionalLimitations: [],
           revisionSummary: { hasRevisions: false, totalRevisions: 0, revisionStatements: [] },
           disclaimer: 'This report is generated from user-logged data for informational purposes.',
-        });
-        // Note: This would typically integrate with a PDF generation library
-        await ExportService.exportReportToText(pdfContent, filename);
+        };
+        const pdfHtml = generateHTMLForPDF(pdfReport);
+        await ExportService.exportReportToPDF(pdfHtml, filename);
       } else {
         await ExportService.exportReportToText(reportContent, filename);
       }

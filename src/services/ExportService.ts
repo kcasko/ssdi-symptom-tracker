@@ -12,6 +12,7 @@ import { getActivityById } from '../data/activities';
 import { Share, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
+import * as Print from 'expo-print';
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf';
@@ -79,6 +80,37 @@ export class ExportService {
       await this.saveAndShareFile(reportContent, filename, 'text/plain');
     } catch (error) {
       console.error('Export report failed:', error);
+      Alert.alert('Export Failed', 'Could not export report');
+      throw error;
+    }
+  }
+
+  /**
+   * Export report to PDF using HTML content
+   */
+  static async exportReportToPDF(
+    htmlContent: string,
+    filename: string
+  ): Promise<void> {
+    try {
+      const printResult = await Print.printToFileAsync({ html: htmlContent });
+      const isAvailable = await Sharing.isAvailableAsync();
+
+      if (isAvailable) {
+        await Sharing.shareAsync(printResult.uri, {
+          mimeType: 'application/pdf',
+          dialogTitle: 'Export Report',
+          UTI: 'com.adobe.pdf',
+        });
+      } else {
+        await Share.share({
+          message: filename,
+          title: filename,
+          url: printResult.uri,
+        });
+      }
+    } catch (error) {
+      console.error('Export report PDF failed:', error);
       Alert.alert('Export Failed', 'Could not export report');
       throw error;
     }
