@@ -37,11 +37,13 @@ src/
 ## Architecture
 
 ### Three-Layer System
+
 1. **Raw Evidence** → Daily logs, activity logs, limitations
 2. **Analysis** → Pattern detection, RFC assessment, trend analysis
 3. **Narrative** → SSDI-optimized reports with editable sections
 
 ### Key Design Principles
+
 - **Offline-first**: All data stored locally with AsyncStorage
 - **Privacy-focused**: No cloud sync, no accounts, optional encryption
 - **Multi-profile**: Support multiple users on one device
@@ -51,21 +53,25 @@ src/
 ## Development Workflow
 
 ### Adding a New Symptom
+
 1. Add to `src/data/symptoms.ts`
 2. Categorize appropriately (pain/cognitive/physical/etc)
 3. Include SSDI-appropriate description
 
 ### Adding a New Activity
+
 1. Add to `src/data/activities.ts`
 2. Categorize (physical/household/cognitive/social/self-care)
 3. Include functional description
 
 ### Creating a New Report Template
+
 1. Add to `src/data/reportTemplates.ts`
 2. Define sections with placeholders
 3. Map to narrative builder in `ReportService`
 
 ### Adding Analysis Logic
+
 1. Update appropriate engine (`SymptomEngine`, `ActivityImpactEngine`, etc)
 2. Add to `AnalysisService` if coordination needed
 3. Connect to `NarrativeService` for report generation
@@ -100,6 +106,7 @@ Migrations handled automatically via `src/storage/migrations.ts`
 ## Encryption
 
 Optional device-level encryption using:
+
 - `expo-secure-store` for keys
 - `expo-local-authentication` for biometrics
 - AES encryption for data
@@ -109,12 +116,14 @@ Enable in Settings → Privacy → Device Encryption
 ## SSDI Optimization
 
 ### Language Rules
+
 - Use functional terms: "unable to", "limited to", "requires"
 - Avoid diagnostic language: "I feel", "my condition"
 - Focus on consistency and frequency
 - Document recovery requirements
 
 ### RFC Categories
+
 - Sedentary: < 10 lbs lifting
 - Light: 10-20 lbs
 - Medium: 20-50 lbs
@@ -122,6 +131,7 @@ Enable in Settings → Privacy → Device Encryption
 - Very Heavy: > 100 lbs
 
 ### Pattern Detection
+
 - Symptom frequency and severity trends
 - Activity tolerance thresholds
 - Time-of-day patterns

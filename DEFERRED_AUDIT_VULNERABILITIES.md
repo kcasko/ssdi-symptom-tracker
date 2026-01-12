@@ -14,33 +14,39 @@ This document tracks known npm audit vulnerabilities that are present due to Exp
 ## Details
 
 ### 1. send <0.19.0
+
 - **Risk:** Template injection (potential XSS)
 - **Used by:** @expo/cli (dev tool, not bundled in production)
 - **Actual Risk:** Not reachable from runtime user input; only used during development/build.
 - **Action:** Defer. Safe to ignore until Expo updates its dependencies.
 
 ### 2. xml2js <0.5.0
+
 - **Risk:** Prototype pollution
 - **Used by:** @expo/config-plugins (dev/build tool, not bundled in production)
 - **Actual Risk:** Not reachable from runtime user input; only used during build/config.
 - **Action:** Defer. Safe to ignore until Expo/@react-native-voice/voice update dependencies.
 
 ### 3. xmldom
+
 - **Risk:** XML parsing issues (multiple root nodes, misinterpretation)
 - **Used by:** @expo/plist (dev/build tool, not bundled in production)
 - **Actual Risk:** Not reachable from runtime user input; only used during build/config.
 - **Action:** Defer. Safe to ignore until Expo/@react-native-voice/voice update dependencies.
 
 ### 4. Other vulnerabilities
+
 - **Risk:** All are transitive, dev/build-time only, not reachable from runtime user input.
 - **Action:** Defer. No action needed.
 
 ## Policy
+
 - **Do NOT run `npm audit fix --force`.**
 - **Do NOT upgrade Expo or @react-native-voice/voice** unless official compatibility is confirmed.
 - **No major version bumps or speculative fixes.**
 
 ## Next Steps
+
 - Monitor Expo and plugin releases for dependency updates.
 - Re-run `npm audit` after each Expo upgrade cycle.
 - Update this document as vulnerabilities are resolved upstream.

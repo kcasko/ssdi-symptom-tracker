@@ -3,6 +3,7 @@
 ## Key Files at a Glance
 
 ### Core Implementation
+
 ```
 src/
 ├── domain/
@@ -29,6 +30,7 @@ src/
 ## Quick Integration
 
 ### 1. Initialize (App.tsx or useAppState.ts)
+
 ```tsx
 import { useEvidenceModeStore } from './state/evidenceModeStore';
 
@@ -37,6 +39,7 @@ await evidenceStore.loadEvidenceMode();
 ```
 
 ### 2. Settings Screen
+
 ```tsx
 import { EvidenceModeControls, SubmissionPackBuilder } from '../components';
 
@@ -45,11 +48,13 @@ import { EvidenceModeControls, SubmissionPackBuilder } from '../components';
 ```
 
 ### 3. Dashboard
+
 ```tsx
 <EvidenceModeControls profileId={profileId} compact={true} />
 ```
 
 ### 4. Daily Log Screen - Save
+
 ```tsx
 import { applyEvidenceTimestamp, canModifyLog, updateLogWithRevision } from '../services';
 
@@ -65,6 +70,7 @@ if (!canModify) {
 ```
 
 ### 5. Daily Log Screen - Display
+
 ```tsx
 import { LogFinalizationControls, RevisionHistoryViewer } from '../components';
 
@@ -82,6 +88,7 @@ import { LogFinalizationControls, RevisionHistoryViewer } from '../components';
 ```
 
 ### 6. Reports Screen
+
 ```tsx
 import { buildEvidenceReport, generateHTMLForPDF } from '../services';
 
@@ -106,6 +113,7 @@ const html = generateHTMLForPDF(report);
 ## Key Functions
 
 ### Evidence Mode Store
+
 ```tsx
 const evidenceStore = useEvidenceModeStore();
 
@@ -129,6 +137,7 @@ evidenceStore.getSubmissionPacks(profileId?) → SubmissionPack[]
 ```
 
 ### Evidence Log Service
+
 ```tsx
 import { 
   applyEvidenceTimestamp, 
@@ -158,6 +167,7 @@ const { canFinalize, reason } = canFinalizeLog(log);
 ```
 
 ### Standardized Narratives
+
 ```tsx
 import { 
   generateSymptomSummary,
@@ -185,6 +195,7 @@ const text = generateSymptomSummary("back-pain", 45, 60, 7.2);
 ## Common Patterns
 
 ### Pattern 1: Creating a Log with Evidence Mode
+
 ```tsx
 const handleCreateLog = async (logData) => {
   let newLog = {
@@ -203,6 +214,7 @@ const handleCreateLog = async (logData) => {
 ```
 
 ### Pattern 2: Editing a Finalized Log
+
 ```tsx
 const handleEditLog = async (logId, updates) => {
   const { canModify, reason } = canModifyLog(logId);
@@ -231,6 +243,7 @@ const handleEditLog = async (logId, updates) => {
 ```
 
 ### Pattern 3: Finalizing a Log
+
 ```tsx
 const handleFinalizeLog = async () => {
   const { canFinalize, reason } = canFinalizeLog(log);
@@ -246,6 +259,7 @@ const handleFinalizeLog = async () => {
 ```
 
 ### Pattern 4: Generating a Report
+
 ```tsx
 const handleGenerateReport = async (startDate, endDate) => {
   // 1. Filter logs
@@ -274,6 +288,7 @@ const handleGenerateReport = async (startDate, endDate) => {
 ## Troubleshooting
 
 ### Issue: Timestamp not appearing
+
 ```tsx
 // Check: Is Evidence Mode enabled?
 console.log(evidenceStore.config.enabled);
@@ -284,6 +299,7 @@ console.log(log.evidenceTimestamp);
 ```
 
 ### Issue: Can't edit finalized log
+
 ```tsx
 // Expected behavior! Check finalization status:
 console.log(evidenceStore.isLogFinalized(logId));
@@ -292,6 +308,7 @@ console.log(evidenceStore.isLogFinalized(logId));
 ```
 
 ### Issue: Revisions not in report
+
 ```tsx
 // Check: Are revisions in date range?
 const revisions = evidenceStore.getAllRevisions();
@@ -329,6 +346,7 @@ npm run build
 ## Support
 
 For questions or issues:
+
 1. Check documentation files above
 2. Review code comments in implementation files
 3. Test using checklist scenarios

@@ -304,13 +304,13 @@ export class EncryptionManager {
 
       // Import crypto for AES-GCM encryption
       // Convert key to proper format (32 bytes for AES-256)
-      const keyBytes = new TextEncoder().encode(keyResult.data.padEnd(32, '0').slice(0, 32));
+      // ...existing code...
       
       // Generate random IV (12 bytes for GCM)
       const iv = crypto.getRandomBytes(12);
       
       // Convert plaintext to bytes
-      const plaintextBytes = new TextEncoder().encode(plaintext);
+      // ...existing code...
       
       // Encrypt using AES-GCM (simulated with available expo-crypto functions)
       // Note: expo-crypto doesn't directly expose AES-GCM, so we'll use digest for now

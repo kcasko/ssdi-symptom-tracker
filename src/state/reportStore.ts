@@ -242,7 +242,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
     }
   },
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   regenerateSection: async (draftId: string, sectionId: string) => {
     set({ generating: true, error: null });
     

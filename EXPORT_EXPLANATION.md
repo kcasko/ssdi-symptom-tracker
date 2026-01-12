@@ -3,9 +3,11 @@
 ## SSDI Symptom Tracker: How Reports Are Generated
 
 ### Overview
+
 All reports are generated from immutable source logs (symptoms, activities, limitations, medications, appointments) using deterministic analysis engines. The process is fully auditable and repeatable.
 
 ### Report Generation Process
+
 1. **Source Data Collection**
    - Users log daily symptoms, activities, limitations, medications, and appointments.
    - Each entry is timestamped and immutable after creation.
@@ -29,6 +31,7 @@ All reports are generated from immutable source logs (symptoms, activities, limi
    - By default, exports exclude personal identifying information.
 
 ### Explainability
+
 - Every value and statement in a report can be traced back to specific source logs.
 - No "AI black box" logic: all computations are explainable in plain language.
 - If a reviewer questions a value, the app can show exactly how it was derived.

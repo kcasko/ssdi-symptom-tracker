@@ -3,12 +3,14 @@
 ## Pre-Integration Checklist
 
 ### Dependencies
+
 - [ ] Verify zustand is installed (`npm list zustand`)
 - [ ] Verify @react-native-async-storage/async-storage is installed
 - [ ] Verify React Navigation is set up
 - [ ] Verify TypeScript is configured
 
 ### File Structure
+
 - [ ] Confirm all new files are in correct locations
 - [ ] Verify imports in `src/components/index.ts`
 - [ ] Verify imports in `src/services/index.ts`
@@ -17,12 +19,14 @@
 ## Integration Steps
 
 ### Step 1: Initialize Evidence Mode Store
+
 - [ ] Open `src/state/useAppState.ts` or `src/App.tsx`
 - [ ] Import `useEvidenceModeStore`
 - [ ] Call `evidenceStore.loadEvidenceMode()` in app initialization
 - [ ] Test: Launch app and check no errors
 
 ### Step 2: Update Settings Screen
+
 - [ ] Import `EvidenceModeControls` and `SubmissionPackBuilder`
 - [ ] Add Evidence Mode section
 - [ ] Add Submission Pack section
@@ -30,18 +34,21 @@
 - [ ] Test: Toggle Evidence Mode and verify state updates
 
 ### Step 3: Update Dashboard
+
 - [ ] Import `EvidenceModeControls`
 - [ ] Add compact indicator to header
 - [ ] Test: Enable Evidence Mode and verify indicator shows
 - [ ] Test: Disable Evidence Mode and verify indicator hides
 
 ### Step 4: Update Daily Log Screen - Creation
+
 - [ ] Import `applyEvidenceTimestamp` from EvidenceLogService
 - [ ] In `addDailyLog` handler, apply timestamp if Evidence Mode enabled
 - [ ] Test: Enable Evidence Mode, create log, verify `evidenceTimestamp` exists
 - [ ] Test: Disable Evidence Mode, create log, verify no `evidenceTimestamp`
 
 ### Step 5: Update Daily Log Screen - Editing
+
 - [ ] Import `canModifyLog`, `updateLogWithRevision`
 - [ ] Import `LogFinalizationControls`, `RevisionHistoryViewer`
 - [ ] Add finalization status check before allowing edits
@@ -52,6 +59,7 @@
 - [ ] Test: Create revision → should appear in revision history
 
 ### Step 6: Update Daily Log Screen - Display
+
 - [ ] Show evidence timestamp if present
 - [ ] Show finalization status badge
 - [ ] Show revision count if > 0
@@ -59,11 +67,13 @@
 - [ ] Test: Visual indicators appear correctly
 
 ### Step 7: Update Activity Log Screen
+
 - [ ] Repeat Steps 4-6 for Activity Log screen
 - [ ] Use `logType: 'activity'` in function calls
 - [ ] Test: All features work for activity logs
 
 ### Step 8: Update Log Store
+
 - [ ] Open `src/state/logStore.ts`
 - [ ] Import `applyEvidenceTimestamp`
 - [ ] Update `addDailyLog` to apply timestamp
@@ -71,6 +81,7 @@
 - [ ] Test: Create logs through store directly
 
 ### Step 9: Update Reports Screen
+
 - [ ] Import Evidence Report Builder and PDF services
 - [ ] Update report generation to use `buildEvidenceReport`
 - [ ] Update export to use `generateHTMLForPDF` or `generatePlainTextReport`
@@ -79,6 +90,7 @@
 - [ ] Test: Verify revision summary section
 
 ### Step 10: Add Submission Pack Screen (Optional)
+
 - [ ] Create new screen or add to existing
 - [ ] Use `SubmissionPackBuilder` component
 - [ ] Add navigation route
@@ -89,6 +101,7 @@
 ## Testing Checklist
 
 ### Evidence Mode Basics
+
 - [ ] Enable Evidence Mode from Settings
 - [ ] Verify UI shows "Evidence Mode Active" indicator
 - [ ] Create new daily log
@@ -101,6 +114,7 @@
 - [ ] Verify old logs keep their timestamps
 
 ### Log Finalization
+
 - [ ] Create a daily log with at least one symptom
 - [ ] Navigate to log detail view
 - [ ] Verify "Finalize Log" button appears
@@ -112,6 +126,7 @@
 - [ ] Try to delete finalized log (should be blocked if you implement protection)
 
 ### Revision Creation
+
 - [ ] Create and finalize a daily log
 - [ ] Attempt to edit the log
 - [ ] Verify system prompts for revision reason
@@ -128,6 +143,7 @@
   - [ ] Reason
 
 ### Revision History Viewer
+
 - [ ] Open revision history for log with revisions
 - [ ] Verify modal appears
 - [ ] Verify revisions are sorted by date (newest first)
@@ -139,6 +155,7 @@
 - [ ] Verify modal dismisses
 
 ### Standardized Narratives
+
 - [ ] Create multiple daily logs with varying symptoms
 - [ ] Generate a report
 - [ ] Verify opening statement uses format: "The user reports symptom and activity data for the period from X to Y..."
@@ -149,6 +166,7 @@
 - [ ] Generate same report twice, compare output → should be identical
 
 ### Functional Domain Mappings
+
 - [ ] Create logs with back-pain symptom
 - [ ] Generate report
 - [ ] Navigate to "Functional Limitations" section
@@ -160,6 +178,7 @@
 - [ ] Verify desk-work affects concentration, sitting, persistence domains
 
 ### PDF Export
+
 - [ ] Generate a report
 - [ ] Export as PDF (or HTML for PDF)
 - [ ] Verify output contains:
@@ -174,6 +193,7 @@
   - [ ] Neutral disclaimer at end
 
 ### Submission Packs
+
 - [ ] Navigate to Submission Pack Builder
 - [ ] Enter title: "Test Pack Q1"
 - [ ] Enter start date: 2024-01-01
@@ -192,6 +212,7 @@
 - [ ] Verify pack cannot be modified (no edit/delete buttons)
 
 ### Legal Language
+
 - [ ] Review all UI text
 - [ ] Verify NO phrases like:
   - [ ] "This will help you get approved"
@@ -207,6 +228,7 @@
 - [ ] Verify no legal predictions
 
 ### Edge Cases
+
 - [ ] Try to finalize log with no symptoms → should block
 - [ ] Try to finalize log with no activity → should block
 - [ ] Create revision for non-finalized log → should not be needed
@@ -216,6 +238,7 @@
 - [ ] View revision history for log with no revisions → should show "No revisions"
 
 ### Performance
+
 - [ ] Create 100+ daily logs
 - [ ] Enable Evidence Mode
 - [ ] Verify app remains responsive
@@ -225,6 +248,7 @@
 - [ ] Verify pack creation completes in reasonable time
 
 ### Data Persistence
+
 - [ ] Enable Evidence Mode
 - [ ] Create and finalize logs
 - [ ] Create revisions
@@ -239,6 +263,7 @@
 ## Bug Tracking
 
 ### Issues Found
+
 Document any issues found during testing:
 
 | ID | Issue Description | Severity | Status | Notes |

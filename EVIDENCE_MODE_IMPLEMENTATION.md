@@ -11,11 +11,13 @@ Evidence Mode is a comprehensive legal-documentation system designed to support 
 **Location:** `src/state/evidenceModeStore.ts`
 
 Evidence Mode is a global application state that can be enabled/disabled by the user. When enabled:
+
 - All new logs automatically receive an immutable `evidenceTimestamp`
 - Timestamps cannot be edited after creation
 - The system tracks when Evidence Mode was enabled and by which profile
 
 **Key Functions:**
+
 - `enableEvidenceMode(profileId)` - Activate Evidence Mode
 - `disableEvidenceMode()` - Deactivate Evidence Mode
 - `isEvidenceModeEnabled()` - Check current state
@@ -25,12 +27,14 @@ Evidence Mode is a global application state that can be enabled/disabled by the 
 **Location:** `src/domain/models/EvidenceMode.ts`, `src/components/LogFinalizationControls.tsx`
 
 Any daily log or activity log can be finalized. Finalized logs:
+
 - Become read-only
 - Cannot be directly modified
 - Show "Finalized" status in UI
 - Require revision records for any changes
 
 **Finalization Process:**
+
 1. User selects "Finalize Log"
 2. System validates log has minimum required data
 3. Log is marked with `finalized: true` and `finalizedAt` timestamp
@@ -41,6 +45,7 @@ Any daily log or activity log can be finalized. Finalized logs:
 **Location:** `src/domain/models/EvidenceMode.ts`, `src/services/EvidenceLogService.ts`
 
 When a finalized log needs modification, the system creates a revision record instead of editing the original. Each revision contains:
+
 - `originalValue` - What the field contained before
 - `updatedValue` - What the user wants to change it to
 - `revisionTimestamp` - When the revision was made
@@ -48,6 +53,7 @@ When a finalized log needs modification, the system creates a revision record in
 - `fieldPath` - Which field was modified (e.g., "symptoms[0].severity")
 
 **Revision Workflow:**
+
 1. User attempts to edit finalized log
 2. System detects finalization status
 3. User is prompted to provide a reason
@@ -60,12 +66,14 @@ When a finalized log needs modification, the system creates a revision record in
 **Location:** `src/services/StandardizedNarrativeService.ts`
 
 All reports use fixed sentence patterns to ensure consistency. The narrative service provides template functions that:
+
 - Use identical phrasing regardless of when reports are generated
 - Avoid expressive or emotional language
 - Present data factually
 - Use repeatable patterns like "The user reports," "Logs indicate," etc.
 
 **Example Patterns:**
+
 ```typescript
 generateSymptomSummary(symptom, occurrences, totalDays, avgSeverity)
 // Output: "Logs indicate back-pain was recorded on 45 of 60 logged days (75 percent). 
@@ -82,18 +90,21 @@ generateActivityImpactStatement(activity, attempts, stoppedEarly, avgImpact)
 **Location:** `src/domain/rules/functionalDomains.ts`
 
 The system internally maps symptoms and activities to functional domains:
+
 - Sitting, Standing, Walking
 - Lifting, Carrying, Reaching, Handling
 - Concentration, Persistence, Pace
 - Social Interaction, Attendance, Recovery Time
 
 These mappings are:
+
 - NOT labeled as "SSA fields" in the UI
 - Used only for internal data organization
 - Applied to structure summaries and group data logically
 - Aligned with functional capacity assessment domains
 
 **Example Mappings:**
+
 - `back-pain` → [sitting, standing, walking, lifting, carrying, reaching]
 - `desk-work` → [sitting, concentration, persistence, handling]
 - `fatigue` → [persistence, pace, concentration, standing, walking]
@@ -103,6 +114,7 @@ These mappings are:
 **Location:** `src/services/EvidencePDFExportService.ts`
 
 Reports can be exported as clean PDFs with:
+
 - No UI styling, icons, or colors
 - Only app name and generation date
 - Structured sections: Data Summary, Symptoms, Activities, Functional Limitations, Revision History
@@ -111,6 +123,7 @@ Reports can be exported as clean PDFs with:
 - Neutral disclaimer
 
 **Export Formats:**
+
 - Plain text (`.txt`)
 - Structured HTML (for PDF rendering)
 - Structured data (for PDF libraries)
@@ -128,6 +141,7 @@ Instead of charts and graphs, the system generates declarative statements:
 "Sitting causes pain to worsen" or "Patient cannot sit for extended periods"
 
 The system:
+
 - States what was logged, not what it means
 - Provides percentages and frequencies
 - Avoids causation claims
@@ -138,12 +152,14 @@ The system:
 **Location:** `src/components/SubmissionPackBuilder.tsx`
 
 Submission packs are immutable bundles containing:
+
 - Finalized logs for a date range
 - Generated reports
 - Revision summaries
 - Generation metadata (timestamp, app version, Evidence Mode status)
 
 Once created, packs:
+
 - Cannot be modified
 - Are marked with `immutable: true`
 - Include comprehensive metadata
@@ -156,11 +172,13 @@ Once created, packs:
 The application enforces neutral language:
 
 **Included:**
+
 - "This report documents user-reported information only."
 - "Data presented reflects logged entries and does not constitute clinical assessment."
 - "Evidence Mode adds creation timestamps to all logs."
 
 **Never Included:**
+
 - "This will help you get approved"
 - "Log daily for best results"
 - "Recommended logging strategy"
@@ -169,7 +187,9 @@ The application enforces neutral language:
 ## UI Integration
 
 ### Settings Screen
+
 Add Evidence Mode toggle:
+
 ```tsx
 import { EvidenceModeControls } from '../components';
 
@@ -177,7 +197,9 @@ import { EvidenceModeControls } from '../components';
 ```
 
 ### Daily Log Screen
+
 Add finalization controls:
+
 ```tsx
 import { LogFinalizationControls } from '../components';
 
@@ -190,11 +212,13 @@ import { LogFinalizationControls } from '../components';
 ```
 
 ### Compact Indicator (Dashboard/Header)
+
 ```tsx
 <EvidenceModeControls profileId={profileId} compact={true} />
 ```
 
 ### Revision History
+
 ```tsx
 import { RevisionHistoryViewer } from '../components';
 
@@ -208,6 +232,7 @@ const [showRevisions, setShowRevisions] = useState(false);
 ```
 
 ### Submission Pack Builder
+
 ```tsx
 import { SubmissionPackBuilder } from '../components';
 
@@ -221,6 +246,7 @@ import { SubmissionPackBuilder } from '../components';
 ## Data Flow
 
 ### Creating a Log with Evidence Mode
+
 1. User opens DailyLogScreen
 2. UI checks `evidenceStore.isEvidenceModeEnabled()`
 3. If enabled, UI shows indicator
@@ -229,6 +255,7 @@ import { SubmissionPackBuilder } from '../components';
 6. Log is saved with `evidenceTimestamp` field
 
 ### Finalizing a Log
+
 1. User views completed log
 2. User clicks "Finalize Log"
 3. System validates log has required data
@@ -238,6 +265,7 @@ import { SubmissionPackBuilder } from '../components';
 7. UI updates to show read-only state
 
 ### Editing a Finalized Log
+
 1. User attempts to edit finalized log
 2. `canModifyLog()` returns `{ canModify: false, reason: '...' }`
 3. UI shows "Create Revision" option
@@ -248,6 +276,7 @@ import { SubmissionPackBuilder } from '../components';
 8. Both are visible in UI
 
 ### Generating a Report
+
 1. User selects date range
 2. System filters logs in range
 3. `buildEvidenceReport()` analyzes data

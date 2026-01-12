@@ -7,18 +7,23 @@ Evidence Mode transforms the SSDI Symptom Tracker into a credible evidence-gener
 ## Key Principles
 
 ### 1. **Immutability**
+
 When Evidence Mode is enabled, all logs receive creation timestamps that cannot be edited. This establishes a clear record of when data was entered.
 
 ### 2. **Transparency**
+
 All changes to finalized logs are tracked as revisions, preserving the original entry alongside the modification. Nothing is hidden or deleted.
 
 ### 3. **Neutrality**
+
 Reports use standardized, boring language. No emotional descriptors, no speculation, no legal advice.
 
 ### 4. **User Control**
+
 Evidence Mode is opt-in. Users decide when to enable it, when to finalize logs, and what to include in submission packs.
 
 ### 5. **Restraint Over Convenience**
+
 The system favors accuracy and defensibility over ease of use. Finalized logs cannot be casually edited.
 
 ## User Journey
@@ -26,18 +31,21 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 ### For Self-Represented Individuals
 
 **Week 1: Initial Setup**
+
 1. Install app and create profile
 2. Review Evidence Mode in Settings
 3. Decide whether to enable Evidence Mode now or later
 4. Begin logging symptoms and activities
 
 **Week 2-12: Regular Logging**
+
 1. Create daily logs and activity logs
 2. Review entries for accuracy
 3. Finalize logs when confident they're complete
 4. Continue building documentation
 
 **Month 3: Preparing Submission**
+
 1. Review all logs for date range needed
 2. Finalize any remaining logs
 3. Generate evidence report using date range
@@ -48,11 +56,13 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 ### For Attorney-Represented Individuals
 
 **Initial Consultation**
+
 1. Attorney recommends enabling Evidence Mode
 2. User enables Evidence Mode
 3. Begin systematic logging per attorney guidance
 
 **Pre-Hearing Preparation**
+
 1. Review and finalize all logs
 2. Generate evidence report
 3. Share PDF with attorney
@@ -60,6 +70,7 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 5. Create submission pack for hearing
 
 **Post-Hearing**
+
 1. Submission pack is immutable record
 2. Available for appeals or follow-ups
 3. Can generate additional reports from same data
@@ -69,16 +80,19 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 ### Evidence Mode Toggle
 
 **What it does:**
+
 - Adds immutable `evidenceTimestamp` to all new logs
 - Provides visual indicator in UI
 - Tracks when mode was enabled and by whom
 
 **When to use:**
+
 - At start of claims process
 - When preparing for legal proceedings
 - When building documentation for medical providers
 
 **When NOT to use:**
+
 - Casual symptom tracking without legal intent
 - Experimental logging to find patterns
 - Short-term symptom monitoring
@@ -86,22 +100,26 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 ### Log Finalization
 
 **What it does:**
+
 - Marks a log as read-only
 - Prevents accidental modifications
 - Requires revisions for any changes
 
 **When to finalize:**
+
 - When you're confident the entry is complete and accurate
 - Before generating reports
 - When preparing documentation for submission
 
 **What gets finalized:**
+
 - Daily logs (symptoms, severity, notes, environmental factors)
 - Activity logs (activities, impacts, recovery time, assistance)
 
 ### Revision Tracking
 
 **What it does:**
+
 - Creates a record when you need to change a finalized log
 - Preserves the original entry
 - Requires you to explain why the change was made
@@ -111,6 +129,7 @@ The system favors accuracy and defensibility over ease of use. Finalized logs ca
 You finalized a daily log showing back pain severity of 7/10. Later you realize you meant 8/10.
 
 Instead of changing the 7 to 8 directly:
+
 1. System detects log is finalized
 2. Prompts for revision reason: "Initial entry understated severity"
 3. Creates revision record with original value (7) and new value (8)
@@ -120,6 +139,7 @@ Instead of changing the 7 to 8 directly:
 ### Standardized Reports
 
 **What they include:**
+
 - Data summary (date range, coverage, finalization status)
 - Symptom documentation (frequency, severity, patterns)
 - Activity impact documentation (attempts, completion, assistance)
@@ -128,6 +148,7 @@ Instead of changing the 7 to 8 directly:
 - Neutral disclaimer
 
 **What they DON'T include:**
+
 - Medical advice
 - Legal strategy
 - Approval predictions
@@ -135,6 +156,7 @@ Instead of changing the 7 to 8 directly:
 - Speculative causation
 
 **Example language:**
+
 - ✓ "Logs indicate back-pain was recorded on 45 of 60 logged days (75 percent)."
 - ✗ "Patient suffers from severe chronic back pain."
 - ✓ "The user reports requiring assistance for grocery shopping on 12 of 15 logged attempts (80 percent)."
@@ -149,12 +171,14 @@ Internal classifications that group symptoms and activities by functional impact
 To structure reports logically and align with functional capacity assessment frameworks.
 
 **Important:**
+
 - NOT labeled as "SSA fields" in the UI
 - Users don't need to understand them
 - Used only for report organization
 - Aligned with common disability assessment domains
 
 **Example:**
+
 - Back pain internally maps to: sitting, standing, walking, lifting, carrying, reaching
 - Desk work internally maps to: sitting, concentration, persistence, handling
 - Reports group data by these domains for clarity
@@ -165,6 +189,7 @@ To structure reports logically and align with functional capacity assessment fra
 Immutable bundles containing finalized logs, reports, and metadata for a specific date range.
 
 **What's included:**
+
 - All finalized daily logs in range
 - All finalized activity logs in range
 - Generated evidence reports
@@ -172,6 +197,7 @@ Immutable bundles containing finalized logs, reports, and metadata for a specifi
 - Generation metadata (timestamp, app version, Evidence Mode status)
 
 **Why they're useful:**
+
 - Single package for lawyer review
 - Consistent documentation for appeals
 - Immutable record of what was submitted
@@ -269,6 +295,7 @@ A: The app documents user-reported information. It doesn't diagnose or assess di
 ### Storage
 
 All Evidence Mode data is stored locally using AsyncStorage:
+
 - `@ssdi/evidence_mode_config` - Evidence Mode status
 - `@ssdi/log_finalizations` - Finalized log records
 - `@ssdi/revisions` - Revision history
@@ -303,6 +330,7 @@ All Evidence Mode data is stored locally using AsyncStorage:
 ## Support and Questions
 
 This is a documentation tool, not a legal service. For questions about:
+
 - **SSDI eligibility**: Consult Social Security Administration
 - **Legal strategy**: Consult disability attorney
 - **Medical questions**: Consult healthcare provider

@@ -34,14 +34,18 @@ describe('End-to-End Workflow Integration', () => {
       category: 'lifting',
       frequency: 'always',
       consequences: ['Severe pain', 'Unable to work'],
-      accommodations: ['No lifting', 'Frequent breaks']
+      accommodations: ['No lifting', 'Frequent breaks'],
+      variability: 'consistent',
+      isActive: true
     }),
     createMockLimitation({
       id: 'lim2',
       category: 'walking',
       frequency: 'always',
       consequences: ['Fatigue', 'Pain increases'],
-      accommodations: ['Sitting workspace']
+      accommodations: ['Sitting workspace'],
+      variability: 'consistent',
+      isActive: true
     })
   ];
 

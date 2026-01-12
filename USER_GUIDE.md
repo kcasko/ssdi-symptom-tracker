@@ -1,3 +1,4 @@
+
 # SSDI Symptom Tracker - User Guide
 
 **Version 1.0**  
@@ -19,28 +20,10 @@
 
 ---
 
-## Welcome
-
-### What is SSDI Symptom Tracker?
-
-SSDI Symptom Tracker is a **personal health documentation tool** designed specifically for individuals preparing Social Security Disability Insurance (SSDI) applications. It helps you:
-
-- 📝 Track symptoms with severity ratings
-- 🏃 Document how activities impact your condition
-- 📊 Generate professional SSDI-ready reports
-- 🔒 Keep evidence secure with Evidence Mode
-- 📤 Export documentation for attorneys and SSA
-
-### Who Should Use This App?
-
-- Individuals preparing SSDI applications
-- People documenting chronic conditions
-- Anyone needing to track symptom patterns over time
-- Those who need professional documentation for disability claims
-
 ### What This App Is NOT
 
 ⚠️ **Important Disclaimers:**
+
 - **NOT a medical device** - Does not diagnose or treat conditions
 - **NOT legal advice** - Consult a disability attorney for SSDI guidance
 - **NOT a guarantee** - Documentation does not guarantee SSDI approval
@@ -59,6 +42,7 @@ SSDI Symptom Tracker is a **personal health documentation tool** designed specif
 ### Creating Your Profile
 
 Your profile contains:
+
 - **Display Name**: How you'll be identified in reports (e.g., "John D." or "Profile 1")
 - **Date of Birth**: Used for calculating age-related factors
 - **Profile Color** (optional): Helps distinguish multiple profiles visually
@@ -82,7 +66,7 @@ After creating a profile, you'll see the **Dashboard**:
 
 **Purpose**: Track symptoms you experience each day with severity ratings.
 
-#### How to Log Symptoms:
+#### How to Log Symptoms
 
 1. Tap **"Daily Log"** from the Dashboard
 2. **Select Date**: Defaults to today (can change if logging retroactively)
@@ -113,6 +97,7 @@ After creating a profile, you'll see the **Dashboard**:
 8. **Save** your log
 
 **Pro Tips**:
+
 - ✅ Log symptoms **the same day** they occur for accuracy
 - ✅ Be **specific** in notes ("couldn't lift left arm above shoulder")
 - ✅ Use **functional language** ("unable to" rather than "painful")
@@ -124,7 +109,7 @@ After creating a profile, you'll see the **Dashboard**:
 
 **Purpose**: Document how activities affect your symptoms and limitations.
 
-#### How to Log Activities:
+#### How to Log Activities
 
 1. Tap **"Activity Log"** from the Dashboard
 2. **Select Activity**: Choose from 50+ activities across 5 categories:
@@ -149,6 +134,7 @@ After creating a profile, you'll see the **Dashboard**:
 7. **Save** your log
 
 **Pro Tips**:
+
 - ✅ Log activities **immediately after** or the same day
 - ✅ Note if you needed **rest breaks** (e.g., "rested 3 times during 10-minute walk")
 - ✅ Document **assistance needed** (e.g., "spouse had to help with buttons")
@@ -160,7 +146,7 @@ After creating a profile, you'll see the **Dashboard**:
 
 **Purpose**: Document long-term limitations in Activities of Daily Living (ADLs).
 
-#### How to Document Limitations:
+#### How to Document Limitations
 
 1. Navigate to **"Limitations"** screen
 2. Tap **"Add Limitation"**
@@ -183,6 +169,7 @@ After creating a profile, you'll see the **Dashboard**:
 7. **Save** the limitation
 
 **Pro Tips**:
+
 - ✅ Be **quantitative** (e.g., "can lift max 5 lbs" not "can't lift much")
 - ✅ Compare to **before illness** (e.g., "used to walk 3 miles, now max 50 feet")
 - ✅ Note **frequency** (e.g., "happens 4-5 days per week")
@@ -194,7 +181,7 @@ After creating a profile, you'll see the **Dashboard**:
 
 **Purpose**: Track medical treatments and provider visits.
 
-#### Medications:
+#### Medications
 
 1. Navigate to **"Medications & Appointments"**
 2. Tap **"Add Medication"**
@@ -207,7 +194,7 @@ After creating a profile, you'll see the **Dashboard**:
    - Purpose/condition
    - Side effects (if any)
 
-#### Appointments:
+#### Appointments
 
 1. Tap **"Add Appointment"**
 2. Enter:
@@ -218,6 +205,7 @@ After creating a profile, you'll see the **Dashboard**:
    - Follow-up needed
 
 **Why This Matters**:
+
 - Demonstrates **ongoing medical treatment** (SSA requirement)
 - Shows **compliance with treatment**
 - Provides **provider names** for SSA verification
@@ -231,6 +219,7 @@ After creating a profile, you'll see the **Dashboard**:
 ### What is Evidence Mode?
 
 Evidence Mode adds:
+
 - 🕐 **Evidence Timestamps**: Immutable timestamps when logs are created
 - 🔒 **Log Finalization**: Lock logs to prevent accidental changes
 - 📜 **Revision Tracking**: Audit trail of any changes to finalized logs
@@ -239,12 +228,14 @@ Evidence Mode adds:
 ### When to Enable Evidence Mode
 
 **Enable Evidence Mode when**:
+
 - You're preparing for SSDI application
 - You anticipate appeals or hearings
 - You want to maintain evidence integrity
 - Your attorney recommends formal documentation
 
 **Don't enable if**:
+
 - You're just casually tracking symptoms
 - You're still figuring out your condition
 - You make frequent corrections to logs
@@ -262,37 +253,44 @@ Evidence Mode adds:
 ### Evidence Timestamps
 
 **What are they?**
+
 - Timestamps automatically applied to new logs when Evidence Mode is ON
 - Shows when the evidence was documented (not when it occurred)
 - Cannot be removed once applied
 
 **Why they matter**:
+
 - Demonstrates **contemporaneous documentation** (recorded near the time it happened)
 - Shows **consistency** in tracking
 - Provides **chronological evidence** trail
 
 **How to see them**:
+
 - Look for "Evidence recorded: [timestamp]" on log screens
 
 ### Finalizing Logs
 
 **What is finalization?**
+
 - Marks a log as "complete and accurate"
 - Prevents accidental edits or deletions
 - Creates a locked record for evidence purposes
 
 **How to finalize**:
+
 1. Open a daily or activity log
 2. Review it for accuracy
 3. Tap **"Finalize for Evidence"**
 4. Confirm you've reviewed the log
 
 **When to finalize**:
+
 - After you've reviewed the log for accuracy
 - Before including it in a submission pack
 - When your attorney requests locked evidence
 
 **What happens when finalized**:
+
 - ✅ Log becomes read-only
 - ✅ Shows "Finalized" badge
 - ✅ Records who finalized and when
@@ -319,11 +317,13 @@ Evidence Mode uses a **revision system**:
    - Why it changed
 
 **Viewing Revision History**:
+
 1. Open a finalized log
 2. Tap **"View [X] Revisions"** link
 3. Modal shows chronological list of all changes
 
 **Why revisions matter**:
+
 - Maintains **audit trail** for legal proceedings
 - Shows **transparency** (not hiding changes)
 - Demonstrates **accuracy commitment**
@@ -333,6 +333,7 @@ Evidence Mode uses a **revision system**:
 **What is a Submission Pack?**
 
 A submission pack is a **structured PDF package** containing:
+
 - Cover page with claimant information
 - Table of contents
 - Daily logs in standardized narrative format
@@ -368,12 +369,14 @@ A submission pack is a **structured PDF package** containing:
 6. Save the PDF to your device or share directly
 
 **When to create a submission pack**:
+
 - Initial SSDI application submission
 - Reconsideration or appeal
 - Attorney request for evidence compilation
 - Hearing preparation
 
 **Pro Tips**:
+
 - ✅ Create packs for **specific time periods** (e.g., 90 days, 6 months)
 - ✅ Use **multiple packs** for different symptom categories if needed
 - ✅ Always **review the PDF** before submitting
@@ -449,6 +452,7 @@ The app generates 4 types of reports:
    - Share to SSA online portal (if applicable)
 
 **Pro Tips**:
+
 - ✅ Generate reports **every 30-90 days** to track progress
 - ✅ Review reports with your **attorney** before submission
 - ✅ Keep **multiple versions** (e.g., 3-month, 6-month, 12-month)
@@ -462,7 +466,7 @@ The app generates 4 types of reports:
 
 **Critical**: All data is stored locally on your device. If you lose your device or uninstall the app, data is **permanently lost**.
 
-#### How to Back Up:
+#### How to Back Up
 
 1. Navigate to **Reports** screen
 2. Scroll to **"Export Data"** section
@@ -473,14 +477,16 @@ The app generates 4 types of reports:
    - External storage device
 
 **Backup Schedule**:
+
 - 📅 Weekly if actively logging
 - 📅 Before major app updates
 - 📅 Before device changes or resets
 - 📅 Before submitting SSDI application
 
-#### Restoring Data:
+#### Restoring Data
 
 Currently, data restoration requires:
+
 1. Exporting individual CSV files
 2. Manually re-entering from JSON backup
 3. **Future feature**: One-click restore (planned)
@@ -495,6 +501,7 @@ Export individual datasets as CSV:
 4. **Limitations**: Functional limitation descriptions
 
 **Use cases**:
+
 - Share with healthcare providers
 - Import into spreadsheets for analysis
 - Provide raw data to attorneys
@@ -502,14 +509,16 @@ Export individual datasets as CSV:
 
 ### Deleting Data
 
-#### Delete Individual Logs:
+#### Delete Individual Logs
+
 1. Open the log
 2. Swipe left or tap "Delete" button
 3. Confirm deletion
 
 ⚠️ **Note**: If Evidence Mode is enabled and log is finalized, you'll need to use the revision system.
 
-#### Delete Entire Profile:
+#### Delete Entire Profile
+
 1. Navigate to **Settings**
 2. Tap **"Profile Management"**
 3. Select profile to delete
@@ -517,7 +526,8 @@ Export individual datasets as CSV:
 
 ⚠️ **Warning**: This deletes all logs, reports, and data for that profile permanently.
 
-#### Clear All Data:
+#### Clear All Data
+
 1. Settings → Advanced
 2. Tap "Clear All Data"
 3. Triple-confirm (this cannot be undone)
@@ -528,28 +538,34 @@ Export individual datasets as CSV:
 
 ### Documentation Best Practices
 
-**1. Consistency is Key**
+### 1. Consistency is Key
+
 - ✅ Log symptoms **every day** or at least 5 days/week
 - ✅ Create a **routine** (e.g., log before bed)
 - ✅ Don't skip "good days" (SSA needs to see variability)
 
-**2. Be Specific and Quantitative**
+### 2. Be Specific and Quantitative
+
 - ❌ "I was tired" → ✅ "Fatigue prevented me from preparing meals; needed to lie down for 3 hours"
 - ❌ "Pain was bad" → ✅ "Back pain 8/10; couldn't sit for more than 10 minutes"
 - ❌ "Hard to concentrate" → ✅ "Brain fog prevented me from reading more than 1 paragraph without forgetting content"
 
-**3. Use Functional Language**
+### 3. Use Functional Language
+
 - Focus on **what you cannot do**, not just symptoms
 - Example: Instead of "knee pain," write "cannot stand for more than 5 minutes due to knee instability; required sitting breaks every 5 minutes during grocery shopping"
 
-**4. Document Everything**
+### 4. Document Everything
+
 - ✅ Medications and side effects
 - ✅ Doctor visits and recommendations
 - ✅ Assistive devices used (cane, walker, shower chair, etc.)
 - ✅ Help needed from family/caregivers
 - ✅ Activities you've stopped doing
 
-**5. Track Patterns**
+
+### 5. Track Patterns
+
 - Note **triggers** (weather, activity, stress)
 - Document **frequency** (daily, 3x/week, monthly flares)
 - Record **duration** (symptoms last 2 hours, 3 days, constant)
@@ -558,18 +574,21 @@ Export individual datasets as CSV:
 ### Working with Attorneys
 
 **How the app helps attorneys**:
+
 - Provides **chronological evidence** trail
 - Generates **professional narratives** in SSDI language
 - Exports **structured data** for SSA forms
 - Maintains **audit trail** with Evidence Mode
 
 **What to share with your attorney**:
+
 1. **Full Narrative Reports** (6-12 months)
 2. **Submission Packs** (if using Evidence Mode)
 3. **CSV exports** (for their own analysis)
 4. **RFC reports** (for form completion)
 
 **When to involve your attorney**:
+
 - Before finalizing logs for evidence
 - Before creating submission packs
 - When generating reports for hearings
@@ -593,48 +612,61 @@ Export individual datasets as CSV:
 ### Common Issues
 
 #### "App won't start" or crashes on launch
+
 **Solutions**:
+
 - Restart your device
 - Update to the latest app version
 - Clear app cache (Settings → Apps → SSDI Symptom Tracker → Clear Cache)
 - If persists, report issue on GitHub
 
 #### "Data disappeared" after update
+
 **Solutions**:
+
 - Check if you're viewing the correct profile (Profile Picker)
 - Data may be intact but profile switched
 - Restore from backup if you have one
 - Data migration issues are rare but possible; report on GitHub
 
 #### "Can't edit a log"
+
 **Solutions**:
+
 - Check if log is **finalized** in Evidence Mode
 - Use **revision system** instead of direct editing
 - If not finalized and still can't edit, report issue
 
 #### "Reports not generating" or stuck
+
 **Solutions**:
+
 - Ensure you have logs in the selected date range
 - Try a smaller date range (30 days instead of 6 months)
 - Close and restart the app
 - Check device storage space
 
 #### "Export/PDF not working"
+
 **Solutions**:
+
 - Grant storage permissions if prompted
 - Ensure enough device storage space
 - Try exporting smaller datasets
 - Update the app to latest version
 
 #### "Evidence Mode toggle not working"
+
 **Solutions**:
+
 - Ensure you have an active profile selected
 - Restart the app
 - Check that you've confirmed the Evidence Mode dialog
 
 ### Getting Help
 
-**GitHub Issues**: https://github.com/kcasko/ssdi-symptom-tracker/issues
+**GitHub Issues**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>
+
 1. Search existing issues first
 2. Create new issue with:
    - Device type and OS version
@@ -651,6 +683,7 @@ Export individual datasets as CSV:
 ### Data Storage
 
 **Where is my data?**
+
 - Stored in app's private directory on your device
 - Encrypted if you enable device encryption
 - NOT in the cloud
@@ -660,11 +693,13 @@ Export individual datasets as CSV:
 ### Encryption
 
 **How to enable encryption**:
+
 1. Settings → Privacy
 2. Toggle **"Enable Encryption"**
 3. Data is encrypted using device's secure storage
 
 **Biometric Lock**:
+
 1. Settings → Privacy
 2. Toggle **"Require Biometric Authentication"**
 3. App requires fingerprint/face ID to open
@@ -672,6 +707,7 @@ Export individual datasets as CSV:
 ### Sharing Data Safely
 
 **When sharing reports or exports**:
+
 - Use **secure email** (not public forums)
 - Share via **encrypted services** (password-protected files)
 - Only share with **trusted recipients** (doctors, attorneys)
@@ -680,6 +716,7 @@ Export individual datasets as CSV:
 ### Device Security
 
 **Recommendations**:
+
 - ✅ Use a strong device passcode
 - ✅ Enable device encryption (iOS/Android settings)
 - ✅ Keep OS updated
@@ -689,11 +726,13 @@ Export individual datasets as CSV:
 ### Data Retention
 
 **How long is data kept?**
+
 - Forever, until you delete it
 - No automatic deletion
 - No cloud expiration policies
 
 **When to delete old data**:
+
 - After SSDI approval (keep backup first)
 - After case is closed (consult attorney)
 - If switching to different tracking method
@@ -739,25 +778,33 @@ Export individual datasets as CSV:
 
 ## Quick Start Checklist
 
-**Week 1: Setup**
+
+### Week 1: Setup
+
 - [ ] Install app and create profile
 - [ ] Enable Evidence Mode (if planning SSDI application)
 - [ ] Log symptoms daily
 - [ ] Log at least one activity impact
 
-**Week 2-4: Build Consistency**
+
+### Week 2-4: Build Consistency
+
 - [ ] Log symptoms 5+ days per week
 - [ ] Log activity impacts 2-3 times per week
 - [ ] Add medications and appointments
 - [ ] Document 1-2 functional limitations
 
-**Month 2: First Reports**
+
+### Month 2: First Reports
+
 - [ ] Generate 30-day report
 - [ ] Review report for accuracy
 - [ ] Export and back up data
 - [ ] Share report with attorney (if applicable)
 
-**Month 3+: Ongoing**
+
+### Month 3+: Ongoing
+
 - [ ] Maintain consistent logging
 - [ ] Update medications as they change
 - [ ] Generate monthly/quarterly reports
@@ -765,6 +812,7 @@ Export individual datasets as CSV:
 - [ ] Back up data weekly
 
 **Before SSDI Application**:
+
 - [ ] Generate 6-12 month comprehensive report
 - [ ] Create submission pack (if using Evidence Mode)
 - [ ] Review all data with attorney
@@ -791,4 +839,4 @@ SSDI Symptom Tracker is a powerful tool for documenting your disability, but rem
 **Last Updated**: January 1, 2026  
 **App Version**: 1.0.0
 
-**For support**: https://github.com/kcasko/ssdi-symptom-tracker/issues
+**For support**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>

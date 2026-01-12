@@ -44,7 +44,7 @@ Three scripts are provided for asset generation:
 2. **`generate-assets.ps1`**
    - PowerShell script for Windows
    - Requires Inkscape installation
-   
+
 3. **`generate-assets.sh`**
    - Bash script for Linux/macOS
    - Requires rsvg-convert (librsvg2-bin)

@@ -184,7 +184,7 @@ export const LimitationsScreen: React.FC = () => {
           onPress: async () => {
             try {
               await deleteLimitation(limitationId);
-            } catch (error) {
+            } catch {
               Alert.alert('Error', 'Failed to delete limitation');
             }
           },

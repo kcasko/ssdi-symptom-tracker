@@ -508,7 +508,7 @@ export class CloudBackupService {
       // Note: Using fallback hash since expo-crypto API differs
       const hash = btoa(data).replace(/[^a-zA-Z0-9]/g, '').substring(0, 64);
       return hash;
-    } catch (err) {
+    } catch {
       console.warn('[CloudBackup] Crypto signing failed, falling back to checksum');
       return await this.calculateChecksum(data);
     }

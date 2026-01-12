@@ -49,15 +49,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     autoSpeakRef.current = autoSpeak;
   }, [onTranscription, onError, autoSpeak]);
 
-  // Cleanup function for voice resources
-  const cleanupVoice = async () => {
-    try {
-      await Voice.destroy();
-      Voice.removeAllListeners();
-    } catch (error) {
-      console.error('Voice cleanup error:', error);
-    }
-  };
+  // ...existing code...
 
   const getErrorMessage = (error: string): string => {
     if (error.includes('network')) {

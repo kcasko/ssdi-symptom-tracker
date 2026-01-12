@@ -52,8 +52,7 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [selectedMedForSideEffects, setSelectedMedForSideEffects] = useState<Medication | null>(null);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
-  const [showApptModal, setShowApptModal] = useState(false);
-  const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
+  // ...existing code...
 
   const activeMeds = medications.filter(m => m.isActive);
   const inactiveMeds = medications.filter(m => !m.isActive);

@@ -3,7 +3,7 @@
  */
 
 import { DailyLog, SymptomEntry, TimeOfDay, SleepEntry } from '../domain/models/DailyLog';
-import { Limitation, LimitationCategory, LimitationFrequency, VariabilityLevel } from '../domain/models/Limitation';
+import { Limitation } from '../domain/models/Limitation';
 import { WorkHistory, JobDuty, PhysicalDemands } from '../domain/models/WorkHistory';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Appointment, AppointmentPurpose, AppointmentStatus, ProviderType } from '../domain/models/Appointment';
@@ -44,10 +44,10 @@ export function createMockLimitation(overrides?: Partial<Limitation>): Limitatio
     profileId: 'profile1',
     createdAt: timestamp,
     updatedAt: timestamp,
-    category: 'standing' as LimitationCategory,
-    frequency: 'constant' as LimitationFrequency,
+    category: 'standing',
+    frequency: 'always',
     consequences: ['Pain increases', 'Fatigue worsens'],
-    variability: 'moderate' as VariabilityLevel,
+    variability: 'consistent',
     isActive: true,
     ...overrides
   };

@@ -11,6 +11,7 @@ SSDI Symptom Tracker is designed with privacy as a fundamental principle. We bel
 ## Information Collection and Storage
 
 ### What We DON'T Collect
+
 - **No personal information is collected** by the app developers
 - **No data is transmitted** to external servers or third parties
 - **No user accounts** are required or created
@@ -21,6 +22,7 @@ SSDI Symptom Tracker is designed with privacy as a fundamental principle. We bel
 - **No contact information** is requested
 
 ### What IS Stored Locally on Your Device
+
 The app stores the following information **exclusively on your device**:
 
 1. **Profile Information**
@@ -55,6 +57,7 @@ The app stores the following information **exclusively on your device**:
 ## Data Storage Location
 
 All data is stored using:
+
 - **AsyncStorage**: React Native's local storage system
 - **Device File System**: For photos and exported documents
 - **SecureStore** (Optional): Encrypted storage if you enable encryption
@@ -64,12 +67,15 @@ All data is stored using:
 ## Data Security
 
 ### Encryption Options
+
 - **Optional Encryption**: You can enable device-level encryption in Settings
 - **Biometric Protection**: Optional biometric authentication (fingerprint/face ID)
 - **No Network Transmission**: Data never leaves your device unless you explicitly export it
 
 ### Your Responsibility
+
 Since all data is local-only:
+
 - **Backups**: You are responsible for backing up your data
 - **Device Security**: Protect your device with a passcode/password
 - **Lost Device**: Data cannot be recovered remotely if your device is lost
@@ -77,12 +83,14 @@ Since all data is local-only:
 ## Data Access and Control
 
 ### You Have Complete Control
+
 - **Delete anytime**: Delete individual logs, profiles, or all data
 - **Export anytime**: Export your data as PDF, CSV, or JSON
 - **No account recovery**: Since there are no accounts, there's nothing to recover
 - **Uninstall = Delete**: Uninstalling the app deletes all local data permanently
 
 ### Who Can Access Your Data
+
 - **Only you**: On your device with physical access
 - **No remote access**: Developers cannot access your data
 - **No backdoors**: No mechanisms exist for external data access
@@ -90,6 +98,7 @@ Since all data is local-only:
 ## Exported Data
 
 When you export data (PDF, CSV, JSON):
+
 - **You control the file**: The file is created on your device
 - **You choose where to share**: You decide who receives the file
 - **No automatic uploads**: Files are not uploaded anywhere
@@ -98,11 +107,13 @@ When you export data (PDF, CSV, JSON):
 ## Photo and Voice Data
 
 ### Photos
+
 - Stored in app's private directory
 - Not added to device photo gallery
 - Deleted when you delete the log or uninstall the app
 
 ### Voice Recordings
+
 - Processed locally using device speech-to-text
 - No audio sent to external servers
 - Temporary recordings deleted after transcription
@@ -110,6 +121,7 @@ When you export data (PDF, CSV, JSON):
 ## Third-Party Services
 
 ### We Do NOT Use
+
 - Analytics services (Google Analytics, Firebase, etc.)
 - Crash reporting services
 - Advertising networks
@@ -118,6 +130,7 @@ When you export data (PDF, CSV, JSON):
 - AI/ML cloud services
 
 ### Platform Services Used
+
 - **Expo Framework**: Open-source React Native framework (local processing only)
 - **Device APIs**: Camera, microphone (with your permission, local only)
 
@@ -142,11 +155,13 @@ This app is not intended for children under 13. We do not knowingly collect info
 ## Changes to This Privacy Policy
 
 We may update this Privacy Policy to reflect:
+
 - Changes in data practices (though our local-only approach will not change)
 - Legal requirements
 - App feature additions
 
 **Material changes** will be communicated via:
+
 - App update notes
 - In-app notification
 - Updated policy in app repository
@@ -154,17 +169,21 @@ We may update this Privacy Policy to reflect:
 ## Your Rights Under Privacy Laws
 
 ### GDPR (European Union)
+
 Since no data is collected or processed by us, GDPR rights related to data access, rectification, erasure, and portability are entirely under your control on your device.
 
 ### CCPA (California)
+
 California residents: We do not sell personal information because we do not collect it.
 
 ### HIPAA
+
 **Important**: This app is NOT HIPAA-compliant. It is a personal health tracking tool, not a medical record system. Do not use this app where HIPAA compliance is required.
 
 ## Medical Information Disclaimer
 
 This app stores health information locally. While we use industry-standard security practices:
+
 - **You are responsible** for protecting your device
 - **Enable encryption** if storing sensitive medical information
 - **Use device lock** to prevent unauthorized physical access
@@ -173,10 +192,11 @@ This app stores health information locally. While we use industry-standard secur
 ## Contact Information
 
 **Developer**: kcasko  
-**Repository**: https://github.com/kcasko/ssdi-symptom-tracker  
-**Issues**: https://github.com/kcasko/ssdi-symptom-tracker/issues
+**Repository**: <https://github.com/kcasko/ssdi-symptom-tracker>  
+**Issues**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>
 
 For privacy concerns, you may open an issue on GitHub. However, remember:
+
 - We cannot access your data
 - We cannot recover lost data
 - We cannot provide account support (no accounts exist)
@@ -184,15 +204,17 @@ For privacy concerns, you may open an issue on GitHub. However, remember:
 ## Open Source Transparency
 
 This app is open source. You can review the code to verify:
+
 - No data collection mechanisms
 - No network transmission code (except for exports you initiate)
 - No third-party tracking SDKs
 
-**Repository**: https://github.com/kcasko/ssdi-symptom-tracker
+**Repository**: <https://github.com/kcasko/ssdi-symptom-tracker>
 
 ## Data Portability
 
 Your data is always portable:
+
 - **Export formats**: PDF, CSV, JSON
 - **No lock-in**: Standard formats readable by other applications
 - **Evidence Mode**: Submission packs designed for legal proceedings
@@ -204,6 +226,7 @@ Your data is always portable:
 ## Consent
 
 By using this app, you acknowledge:
+
 - All data is stored locally on your device
 - No data is transmitted to developers or third parties
 - You are responsible for data backup and security
@@ -212,6 +235,7 @@ By using this app, you acknowledge:
 ## Summary
 
 **What makes us different:**
+
 - ✅ Zero data collection
 - ✅ Zero tracking
 - ✅ Zero accounts

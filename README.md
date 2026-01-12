@@ -1,3 +1,4 @@
+
 # SSDI Symptom Tracker
 
 Production-ready React Native + Expo app for SSDI documentation.
@@ -30,17 +31,18 @@ npm run web        # Web browser
 
 ## ✨ Core Features
 
-✅ **Offline-First**: All data stored locally. No cloud sync. No accounts.  
-✅ **Multi-Profile**: Support multiple users on one device  
-✅ **SSDI-Optimized**: Controlled vocabulary and templates  
-✅ **Editable Reports**: Edit sections without losing source data  
-✅ **Privacy-Focused**: Optional device encryption with biometric auth  
-✅ **Pattern Detection**: Automatic trend and consistency analysis  
+✅ **Offline-First**: All data stored locally. No cloud sync. No accounts.
+✅ **Multi-Profile**: Support multiple users on one device
+✅ **SSDI-Optimized**: Controlled vocabulary and templates
+✅ **Editable Reports**: Edit sections without losing source data
+✅ **Privacy-Focused**: Optional device encryption with biometric auth
+✅ **Pattern Detection**: Automatic trend and consistency analysis
 ✅ **RFC Assessment**: Generate residual functional capacity reports
 
 ## 📦 What's Included
 
 ### Complete Implementation
+
 - ✅ 7 domain models (Profile, DailyLog, ActivityLog, Limitation, Medication, Appointment, ReportDraft)
 - ✅ 60+ symptoms across 6 categories
 - ✅ 50+ activities across 5 categories
@@ -97,6 +99,7 @@ The app follows a **three-layer truth architecture**:
 ## 🎨 Visual Assets
 
 Professional medical-themed visual identity:
+
 - **SVG-first design system** for scalability
 - **Medical chart theme** with data visualization elements  
 - **Deep blue color scheme** (`#1a365d`) for professional documentation feel
@@ -122,6 +125,7 @@ See [assets/README.md](assets/README.md) for detailed asset documentation and ge
 ## 📖 Development
 
 See [DEVELOPMENT.md](DEVELOPMENT.md) for detailed development guide including:
+
 - Project structure deep dive
 - How to add symptoms/activities/templates
 - Testing with seed data
@@ -202,21 +206,25 @@ const minimal = generateMinimalSeedData();
 ## 📊 Report Types
 
 ### 1. Daily Summary
+
 - **Purpose**: Quick overview for appointments
 - **Length**: 1-2 pages
 - **Content**: Daily patterns, severity trends, key symptoms
 
 ### 2. Activity Impact Summary
+
 - **Purpose**: Work capacity evaluation
 - **Length**: 2-3 pages
 - **Content**: Activity tolerance, recovery times, functional limits
 
 ### 3. Functional Limitations Assessment
+
 - **Purpose**: RFC (Residual Functional Capacity) documentation
 - **Length**: 2-4 pages
 - **Content**: Sitting/standing/walking limits, cognitive capacity
 
 ### 4. Complete SSDI Documentation
+
 - **Purpose**: Full disability application support
 - **Length**: 4-8 pages
 - **Content**: Comprehensive narrative with all evidence types
@@ -224,17 +232,20 @@ const minimal = generateMinimalSeedData();
 ## 🔒 Privacy & Security
 
 ### Data Storage
+
 - All data stored locally using AsyncStorage
 - No cloud synchronization or external data transmission
 - Optional encryption using device secure storage
 - Data keyed by profile ID for complete separation
 
 ### Optional Security Features
+
 - **App Lock**: PIN or biometric authentication
 - **Encryption**: Secure storage for sensitive data
 - **Device Authentication**: Biometric unlock where available
 
 ### Export Privacy
+
 - Personal information excluded from exports by default
 - Configurable data inclusion for different use cases
 - No identifying information in generated filenames
@@ -242,7 +253,9 @@ const minimal = generateMinimalSeedData();
 ## 🧩 Extending the App
 
 ### Adding New Symptoms
+
 Edit [src/data/symptoms.ts](src/data/symptoms.ts):
+
 ```typescript
 export const SYMPTOMS: SymptomDefinition[] = [
   // Add new symptom definition
@@ -260,7 +273,9 @@ export const SYMPTOMS: SymptomDefinition[] = [
 ```
 
 ### Adding New Activities
+
 Edit [src/data/activities.ts](src/data/activities.ts):
+
 ```typescript
 export const ACTIVITIES: ActivityDefinition[] = [
   // Add new activity definition
@@ -282,9 +297,11 @@ export const ACTIVITIES: ActivityDefinition[] = [
 ```
 
 ### Adding New Report Templates
+
 Edit [src/data/reportTemplates.ts](src/data/reportTemplates.ts) to add new report types with appropriate sections and content hints.
 
 ### Customizing SSDI Vocabulary
+
 Edit [src/data/ssdiVocabulary.ts](src/data/ssdiVocabulary.ts) to modify the controlled vocabulary for your specific use case.
 
 ## 🔄 Data Migrations
@@ -308,6 +325,7 @@ Run `npm run typecheck` to validate TypeScript after schema changes.
 ## 🧪 Development
 
 ### Available Scripts
+
 - `npm start`: Start Expo development server
 - `npm run android`: Run on Android
 - `npm run ios`: Run on iOS  
@@ -316,12 +334,14 @@ Run `npm run typecheck` to validate TypeScript after schema changes.
 - `npm run typecheck`: Run TypeScript compiler check
 
 ### Development Features
+
 - Sample data generation for testing
 - Storage statistics logging
 - Debug mode with additional UI elements
 - Hot reloading for rapid iteration
 
 ### Code Organization
+
 - **Domain-Driven Design**: Business logic separated from UI
 - **Clean Architecture**: Clear separation of concerns
 - **Type Safety**: Full TypeScript coverage
@@ -330,6 +350,7 @@ Run `npm run typecheck` to validate TypeScript after schema changes.
 ## 📋 Production Deployment
 
 ### Build for Production
+
 ```bash
 # Build standalone app
 expo build:android
@@ -341,6 +362,7 @@ eas build --platform ios
 ```
 
 ### Pre-Deployment Checklist
+
 - [ ] Replace placeholder icons with actual assets
 - [ ] Test on multiple devices and screen sizes  
 - [ ] Verify SSDI vocabulary accuracy with legal/medical professionals
@@ -350,6 +372,7 @@ eas build --platform ios
 - [ ] Accessibility testing
 
 ### App Store Guidelines
+
 - Clearly communicate medical disclaimer
 - Ensure compliance with health data regulations
 - Include appropriate privacy policy
@@ -379,6 +402,7 @@ This project is designed to help people with disabilities access benefits they'r
 ## 📞 Support
 
 For issues related to SSDI applications, consult:
+
 - Qualified disability attorneys
 - Social Security Administration resources
 - Disability advocacy organizations
@@ -387,6 +411,7 @@ For app technical issues, refer to the project's issue tracker and documentation
 
 ---
 
-**Built with ❤️ for the disability community**
+### Built with ❤️ for the disability community
+This app represents thousands of hours of research into SSDI requirements, accessibility best practices, and the real needs of people navigating the disability system. Use it to collect the evidence you need to tell your story clearly and professionally.
 
 This app represents thousands of hours of research into SSDI requirements, accessibility best practices, and the real needs of people navigating the disability system. Use it to collect the evidence you need to tell your story clearly and professionally.

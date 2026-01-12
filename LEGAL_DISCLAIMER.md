@@ -14,7 +14,8 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 
 ## 1. Not a Medical Device or Medical Advice
 
-### This App Is NOT:
+### This App Is NOT
+
 - ❌ A medical device
 - ❌ A diagnostic tool
 - ❌ A substitute for professional medical advice
@@ -22,7 +23,8 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 - ❌ FDA-approved or regulated medical software
 - ❌ A clinical decision support system
 
-### This App IS:
+### This App IS
+
 - ✅ A personal symptom tracking tool
 - ✅ A documentation aid for Social Security Disability Insurance (SSDI) applications
 - ✅ A data organization and export tool
@@ -35,6 +37,7 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 ## 2. Not Legal Advice
 
 ### Legal Services Disclaimer
+
 - This app **does not provide legal advice**
 - This app **does not guarantee SSDI application success**
 - This app **does not constitute an attorney-client relationship**
@@ -43,7 +46,9 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 **CONSULT A QUALIFIED DISABILITY ATTORNEY** or advocate for SSDI application assistance. The app's templates, terminology, and Evidence Mode features are tools to organize your information—they do not replace professional legal guidance.
 
 ### SSDI Application Disclaimer
+
 While this app is designed to help document symptoms for SSDI applications:
+
 - **No guarantee of approval**: Documenting symptoms does not guarantee SSDI benefits
 - **SSA independence**: The Social Security Administration makes all eligibility determinations
 - **Professional representation**: Consider hiring a disability attorney or advocate
@@ -53,6 +58,7 @@ While this app is designed to help document symptoms for SSDI applications:
 ## 3. No Warranty
 
 ### "AS IS" Provision
+
 THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:
 
 - **Accuracy**: No warranty that data entry, calculations, or reports are error-free
@@ -62,6 +68,7 @@ THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, E
 - **Timeliness**: No warranty regarding SSA regulatory compliance as regulations change
 
 ### Known Limitations
+
 - Pattern detection algorithms are **estimates**, not diagnostic tools
 - Credibility scores are **subjective metrics**, not official assessments
 - SSDI vocabulary may not reflect current SSA terminology if regulations change
@@ -72,6 +79,7 @@ THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, E
 ## 4. Limitation of Liability
 
 ### Maximum Liability
+
 TO THE FULLEST EXTENT PERMITTED BY LAW, THE DEVELOPERS, CONTRIBUTORS, AND DISTRIBUTORS OF THIS APP SHALL NOT BE LIABLE FOR:
 
 1. **Direct Damages**: Any loss of data, denied SSDI claims, medical complications
@@ -80,10 +88,13 @@ TO THE FULLEST EXTENT PERMITTED BY LAW, THE DEVELOPERS, CONTRIBUTORS, AND DISTRI
 4. **Incidental Damages**: Costs of substitute services or data recovery
 
 ### Cap on Liability
+
 IN NO EVENT SHALL TOTAL LIABILITY EXCEED THE AMOUNT PAID FOR THE APP (which is $0, as the app is free).
 
 ### Your Assumption of Risk
+
 By using this app, you acknowledge:
+
 - You assume all risks associated with symptom tracking and SSDI documentation
 - You are solely responsible for the accuracy of information you enter
 - You are responsible for verifying all exported data before submission
@@ -93,16 +104,19 @@ By using this app, you acknowledge:
 ## 5. Data Accuracy and Reliability
 
 ### User Responsibility
+
 - **You are responsible** for entering accurate symptom information
 - **You are responsible** for reviewing reports before submission
 - **You are responsible** for validating that exports are complete and correct
 
 ### No Verification
+
 - The app does **not verify** the medical accuracy of symptom descriptions
 - The app does **not validate** that limitations match SSA criteria
 - The app does **not confirm** that documentation is sufficient for SSDI
 
 ### Errors and Omissions
+
 - Software bugs may exist despite testing
 - Data loss may occur due to device failure, OS updates, or app errors
 - **Back up your data regularly**
@@ -112,6 +126,7 @@ By using this app, you acknowledge:
 ## 6. Evidence Mode and Legal Documentation
 
 ### Evidence Mode Disclaimer
+
 Evidence Mode provides **documentation tools**, not legal certification:
 
 - **Timestamps are not legally certified**: Evidence timestamps are user-generated metadata
@@ -120,11 +135,13 @@ Evidence Mode provides **documentation tools**, not legal certification:
 - **Submission packs are not legal filings**: PDF exports require review before submission
 
 ### No Guarantee of Admissibility
+
 - Evidence Mode features do **not guarantee** that documentation will be accepted in legal proceedings
 - **Consult an attorney** regarding evidence requirements for your jurisdiction
 - SSA may require different documentation formats
 
 ### No Certification
+
 - The app does **not certify** that documentation meets SSA requirements
 - The app does **not authenticate** the truthfulness of recorded information
 - **You are responsible** for the truthfulness and accuracy of all entries
@@ -134,6 +151,7 @@ Evidence Mode provides **documentation tools**, not legal certification:
 ## 7. HIPAA Non-Compliance
 
 ### Not HIPAA-Covered
+
 This app is **NOT HIPAA-compliant** and should not be used in settings where HIPAA compliance is required:
 
 - ❌ Not for use by healthcare providers maintaining medical records
@@ -142,6 +160,7 @@ This app is **NOT HIPAA-compliant** and should not be used in settings where HIP
 - ❌ Not for sharing protected health information (PHI) with covered entities
 
 ### Personal Use Only
+
 This app is for **personal health tracking** by individuals. If you are a covered entity under HIPAA, do not use this app for storing patient data.
 
 ---
@@ -149,6 +168,7 @@ This app is for **personal health tracking** by individuals. If you are a covere
 ## 8. Third-Party Content Disclaimer
 
 ### SSA Terminology
+
 While the app uses Social Security Administration (SSA) terminology and references SSA forms (RFC, Form 3368, etc.):
 
 - This app is **not endorsed by** the Social Security Administration
@@ -157,7 +177,9 @@ While the app uses Social Security Administration (SSA) terminology and referenc
 - **Verify current SSA requirements** before submitting documentation
 
 ### Medical Symptoms Database
+
 The symptom list in this app is compiled from various sources:
+
 - Symptoms are **general descriptions**, not medical diagnoses
 - The list may not include all possible symptoms
 - Symptom categories are for organization, not medical classification
@@ -179,9 +201,11 @@ By using this app, you agree to **indemnify and hold harmless** the developers, 
 ## 10. Jurisdictional Issues
 
 ### Export Compliance
+
 This app is subject to U.S. export control laws. By using the app, you represent that you are not located in a country subject to U.S. embargo.
 
 ### State-Specific Laws
+
 - Some states have specific laws regarding health tracking apps
 - You are responsible for ensuring your use complies with local laws
 - The app is provided for use in the United States; international users use at their own risk
@@ -191,6 +215,7 @@ This app is subject to U.S. export control laws. By using the app, you represent
 ## 11. Changes to Disclaimer
 
 This disclaimer may be updated to reflect:
+
 - Changes in applicable law
 - Changes in app functionality
 - Clarifications based on user feedback
@@ -214,6 +239,7 @@ This disclaimer, together with the Privacy Policy and Terms of Service, constitu
 ## 14. Important Recommendations
 
 ### Before Using This App
+
 ✅ **Consult your doctor** about symptom tracking  
 ✅ **Consult a disability attorney** about SSDI applications  
 ✅ **Read SSA's current requirements** for disability documentation  
@@ -221,12 +247,14 @@ This disclaimer, together with the Privacy Policy and Terms of Service, constitu
 ✅ **Back up your data** regularly  
 
 ### When Using Evidence Mode
+
 ✅ **Review all entries** before finalizing  
 ✅ **Verify timestamps** are accurate  
 ✅ **Have an attorney review** submission packs before filing  
 ✅ **Keep independent records** of all submissions  
 
 ### Before Submitting Documentation
+
 ✅ **Review all exported data** for accuracy  
 ✅ **Verify completeness** against SSA requirements  
 ✅ **Consult a professional** before submitting  
@@ -251,11 +279,12 @@ By using this app, you acknowledge that you understand:
 
 **This app does not provide legal advice.** For questions about this disclaimer:
 
-**GitHub Repository**: https://github.com/kcasko/ssdi-symptom-tracker  
-**Issues**: https://github.com/kcasko/ssdi-symptom-tracker/issues
+**GitHub Repository**: <https://github.com/kcasko/ssdi-symptom-tracker>  
+**Issues**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>
 
 For SSDI legal questions, contact:
-- **Social Security Administration**: https://www.ssa.gov
+
+- **Social Security Administration**: <https://www.ssa.gov>
 - **A qualified disability attorney** in your jurisdiction
 
 ---

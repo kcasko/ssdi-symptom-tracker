@@ -15,6 +15,7 @@ The test suite successfully identified **59 type errors** across RFCBuilder and 
 **Problem:** Services are accessing `log.impactSeverity` which doesn't exist on ActivityLog model.
 
 **Lines:**
+
 - RFCBuilder.ts: Lines 126, 295, 346 (6 occurrences total)
 - WorkImpactAnalyzer.ts: Lines 313, 318, 375 (6 occurrences total)
 
@@ -81,6 +82,7 @@ The test suite successfully identified **59 type errors** across RFCBuilder and 
 **Problem:** `filterByDateRange` is being called with ActivityLog[] but expects objects with `logDate` or `date` properties. ActivityLog uses `activityDate`.
 
 **Lines:**
+
 - RFCBuilder.ts: Line 41
 - WorkImpactAnalyzer.ts: Line 45
 
@@ -109,9 +111,11 @@ The test suite successfully identified **59 type errors** across RFCBuilder and 
 ## Test Status
 
 ### Passing Tests
+
 - ✅ basic.test.ts (4/4 tests pass) - Infrastructure working correctly
 
 ### Failing Due to Production Bugs
+
 - ❌ RFCBuilder.simple.test.ts - Cannot compile due to 46 type errors in RFCBuilder.ts
 - ❌ WorkImpactAnalyzer.simple.test.ts - Cannot compile due to 34 type errors in WorkImpactAnalyzer.ts
 
@@ -125,6 +129,7 @@ The test suite successfully identified **59 type errors** across RFCBuilder and 
    - Add missing fields to models or update services to not rely on them
 
 2. **Fix ActivityLog Usage:** Services need to calculate impact severity from the `immediateImpact` object
+
    ```typescript
    // Instead of: log.impactSeverity
    // Use: (log.immediateImpact.painIncrease + log.immediateImpact.fatigueIncrease) / 2
@@ -139,6 +144,7 @@ The test suite successfully identified **59 type errors** across RFCBuilder and 
 ### Testing Strategy
 
 Once the production bugs are fixed:
+
 1. Run simple tests again - they should pass
 2. Expand test coverage to other services
 3. Add integration tests
