@@ -5,7 +5,13 @@ Production-ready React Native + Expo app for SSDI documentation.
 
 ## 🎯 Overview
 
-This is **NOT a wellness app**. It is an evidence collection and report drafting tool optimized for SSDI documentation. The focus is on functional impact, pattern consistency, and generating appropriate narrative documentation.
+This is **NOT a wellness app**.
+It is an evidence collection and report drafting tool optimized for SSDI documentation.
+This is **NOT a wellness app**.
+It is an evidence collection and report drafting tool optimized for SSDI
+documentation.
+The focus is on functional impact, pattern consistency,
+and generating appropriate narrative documentation.
 
 ## 🚀 Quick Start
 
@@ -43,7 +49,11 @@ npm run web        # Web browser
 
 ### Complete Implementation
 
-- ✅ 7 domain models (Profile, DailyLog, ActivityLog, Limitation, Medication, Appointment, ReportDraft)
+- ✅ 7 domain models (Profile, DailyLog, ActivityLog, Limitation,
+  Medication, Appointment, ReportDraft)
+- ✅ 60+ symptoms across 6 categories
+- ✅ 7 domain models (Profile, DailyLog, ActivityLog, Limitation,
+  Medication, Appointment, ReportDraft)
 - ✅ 60+ symptoms across 6 categories
 - ✅ 50+ activities across 5 categories
 - ✅ SSDI vocabulary and language rules
@@ -107,7 +117,8 @@ Professional medical-themed visual identity:
 - **Complete icon set** including iOS, Android adaptive, and web favicon
 - **Multi-device splash screens** optimized for all screen sizes
 
-See [assets/README.md](assets/README.md) for detailed asset documentation and generation instructions.
+See [assets/README.md](assets/README.md) for detailed asset documentation
+and generation instructions.
 
 ## 🛠️ Tech Stack
 
@@ -298,11 +309,13 @@ export const ACTIVITIES: ActivityDefinition[] = [
 
 ### Adding New Report Templates
 
-Edit [src/data/reportTemplates.ts](src/data/reportTemplates.ts) to add new report types with appropriate sections and content hints.
+Edit [src/data/reportTemplates.ts](src/data/reportTemplates.ts)
+to add new report types with appropriate sections and content hints.
 
 ### Customizing SSDI Vocabulary
 
-Edit [src/data/ssdiVocabulary.ts](src/data/ssdiVocabulary.ts) to modify the controlled vocabulary for your specific use case.
+Edit [src/data/ssdiVocabulary.ts](src/data/ssdiVocabulary.ts)
+to modify the controlled vocabulary for your specific use case.
 
 ## 🔄 Data Migrations
 
@@ -390,13 +403,18 @@ This app is designed for people with disabilities and their advocates. When cont
 
 ## 📄 License
 
-This project is designed to help people with disabilities access benefits they're entitled to. Please use responsibly and consider the privacy and security implications for vulnerable populations.
+This project is designed to help people with disabilities access benefits
+they're entitled to. Please use responsibly and consider the privacy and
+security implications for vulnerable populations.
 
 ## ⚠️ Important Disclaimers
 
-- **Not Medical Advice**: This app is for documentation only, not medical diagnosis or treatment
-- **Legal Consultation**: Always consult with qualified professionals for SSDI applications  
-- **Data Responsibility**: Users are responsible for the accuracy of their logged data
+- **Not Medical Advice**: This app is for documentation only,
+not medical diagnosis or treatment
+- **Legal Consultation**: Always consult with qualified professionals
+for SSDI applications
+- **Data Responsibility**: Users are responsible for the accuracy
+of their logged data
 - **Privacy Notice**: App stores data locally - users should back up important information
 
 ## 📞 Support
@@ -412,6 +430,18 @@ For app technical issues, refer to the project's issue tracker and documentation
 ---
 
 ### Built with ❤️ for the disability community
-This app represents thousands of hours of research into SSDI requirements, accessibility best practices, and the real needs of people navigating the disability system. Use it to collect the evidence you need to tell your story clearly and professionally.
 
-This app represents thousands of hours of research into SSDI requirements, accessibility best practices, and the real needs of people navigating the disability system. Use it to collect the evidence you need to tell your story clearly and professionally.
+This app represents thousands of hours of research into SSDI requirements,
+accessibility best practices, and the real needs of people navigating the
+disability system.
+This app represents thousands of hours of research into SSDI requirements,
+accessibility best practices, and the real needs of people navigating the
+disability system.
+Use it to collect the evidence you need to tell your story clearly and
+professionally.
+
+This app represents thousands of hours of research into SSDI requirements,
+accessibility best practices, and the real needs of people navigating the
+disability system.
+Use it to collect the evidence you need to tell your story clearly and
+professionally.

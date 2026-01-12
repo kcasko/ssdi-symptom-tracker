@@ -8,7 +8,7 @@
 
 ## Table of Contents
 
-1. [Welcome](#welcome)
+1. [Welcome](#ssdi-symptom-tracker---user-guide)
 2. [Getting Started](#getting-started)
 3. [Core Features](#core-features)
 4. [Evidence Mode](#evidence-mode)
@@ -43,7 +43,8 @@
 
 Your profile contains:
 
-- **Display Name**: How you'll be identified in reports (e.g., "John D." or "Profile 1")
+- **Display Name**: How you'll be identified in reports
+   (e.g., "John D." or "Profile 1")
 - **Date of Birth**: Used for calculating age-related factors
 - **Profile Color** (optional): Helps distinguish multiple profiles visually
 
@@ -92,7 +93,8 @@ After creating a profile, you'll see the **Dashboard**:
 
 6. **General Notes**: Overall day summary, patterns noticed
 
-7. **Add Photos** (optional): Visual evidence of swelling, rashes, mobility aids, etc.
+7. **Add Photos** (optional): Visual evidence of swelling, rashes,
+   mobility aids, etc.
 
 8. **Save** your log
 
@@ -214,7 +216,8 @@ After creating a profile, you'll see the **Dashboard**:
 
 ## Evidence Mode
 
-**Evidence Mode** is an advanced feature that adds **legal documentation standards** to your logs for SSDI submission.
+**Evidence Mode** is an advanced feature that adds
+**legal documentation standards** to your logs for SSDI submission.
 
 ### What is Evidence Mode?
 
@@ -464,7 +467,8 @@ The app generates 4 types of reports:
 
 ### Backing Up Your Data
 
-**Critical**: All data is stored locally on your device. If you lose your device or uninstall the app, data is **permanently lost**.
+**Critical**: All data is stored locally on your device.
+If you lose your device or uninstall the app, data is **permanently lost**.
 
 #### How to Back Up
 
@@ -546,8 +550,10 @@ Export individual datasets as CSV:
 
 ### 2. Be Specific and Quantitative
 
-- ❌ "I was tired" → ✅ "Fatigue prevented me from preparing meals; needed to lie down for 3 hours"
-- ❌ "Pain was bad" → ✅ "Back pain 8/10; couldn't sit for more than 10 minutes"
+- ❌ "I was tired" → ✅ "Fatigue prevented me from preparing meals;
+   needed to lie down for 3 hours"
+- ❌ "Pain was bad" → ✅ "Back pain 8/10; couldn't sit for more than
+   10 minutes"
 - ❌ "Hard to concentrate" → ✅ "Brain fog prevented me from reading more than 1 paragraph without forgetting content"
 
 ### 3. Use Functional Language
@@ -562,7 +568,6 @@ Export individual datasets as CSV:
 - ✅ Assistive devices used (cane, walker, shower chair, etc.)
 - ✅ Help needed from family/caregivers
 - ✅ Activities you've stopped doing
-
 
 ### 5. Track Patterns
 
@@ -778,14 +783,12 @@ Export individual datasets as CSV:
 
 ## Quick Start Checklist
 
-
 ### Week 1: Setup
 
 - [ ] Install app and create profile
 - [ ] Enable Evidence Mode (if planning SSDI application)
 - [ ] Log symptoms daily
 - [ ] Log at least one activity impact
-
 
 ### Week 2-4: Build Consistency
 
@@ -794,14 +797,12 @@ Export individual datasets as CSV:
 - [ ] Add medications and appointments
 - [ ] Document 1-2 functional limitations
 
-
 ### Month 2: First Reports
 
 - [ ] Generate 30-day report
 - [ ] Review report for accuracy
 - [ ] Export and back up data
 - [ ] Share report with attorney (if applicable)
-
 
 ### Month 3+: Ongoing
 

@@ -31,22 +31,30 @@ This opens the Expo developer tools. You'll see:
 ### 3. Run on Platform
 
 ### Option A: Mobile Device (Recommended)
+
 1. Install "Expo Go" app on your phone
+
 2. Scan the QR code from step 2
 3. App will load on your device
 
 ### Option B: iOS Simulator (Mac only)
+
 ```bash
+
 npm run ios
 ```
 
 ### Option C: Android Emulator  
+
 ```bash
+
 npm run android
 ```
 
 ### Option D: Web Browser (Limited functionality)
+
 ```bash
+
 npm run web
 ```
 
