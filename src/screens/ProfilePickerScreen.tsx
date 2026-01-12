@@ -83,7 +83,7 @@ export const ProfilePickerScreen: React.FC<ProfilePickerProps> = ({ navigation }
                   Last updated {formatDate(profile.updatedAt, DISPLAY_DATE_SHORT)}
                 </Text>
               </View>
-              <Text style={styles.arrow}>></Text>
+              <Text style={styles.arrow}>{'>'}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteButton}

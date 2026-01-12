@@ -411,7 +411,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                       Last edited {formatDate(report.lastModified, DISPLAY_DATE_SHORT)}
                     </Text>
                   </View>
-                  <Text style={styles.arrow}>></Text>
+                  <Text style={styles.arrow}>{'>'}</Text>
                 </TouchableOpacity>
               );
             })
