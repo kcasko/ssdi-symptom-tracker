@@ -41,4 +41,5 @@
 
 **This file documents the app's defensible security and compliance posture.**
 
-For any change to these guarantees, explicit review and approval is required.
+For any change to these promises, explicit review and approval is required.
+

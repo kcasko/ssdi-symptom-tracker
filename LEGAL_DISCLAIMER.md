@@ -39,7 +39,7 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 ### Legal Services Disclaimer
 
 - This app **does not provide legal advice**
-- This app **does not guarantee SSDI application success**
+- This app **does not promise SSDI application success**
 - This app **does not constitute an attorney-client relationship**
 - Templates and narratives are **guidance only**, not legal documents
 
@@ -49,7 +49,7 @@ This legal disclaimer governs your use of the SSDI Symptom Tracker application (
 
 While this app is designed to help document symptoms for SSDI applications:
 
-- **No guarantee of approval**: Documenting symptoms does not guarantee SSDI benefits
+- **No promise of approval**: Documenting symptoms does not promise SSDI benefits
 - **SSA independence**: The Social Security Administration makes all eligibility determinations
 - **Professional representation**: Consider hiring a disability attorney or advocate
 
@@ -65,7 +65,7 @@ THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, E
 - **Reliability**: No warranty of continuous, uninterrupted, or secure operation
 - **Fitness for Purpose**: No warranty the app will meet your specific SSDI documentation needs
 - **Completeness**: No warranty that templates cover all SSDI requirements
-- **Timeliness**: No warranty regarding SSA regulatory compliance as regulations change
+- **Timeliness**: No warranty regarding SSA regulatory meeting requirements as regulations change
 
 ### Known Limitations
 
@@ -136,7 +136,7 @@ Evidence Mode provides **documentation tools**, not legal certification:
 
 ### No Guarantee of Admissibility
 
-- Evidence Mode features do **not guarantee** that documentation will be accepted in legal proceedings
+- Evidence Mode features do **not promise** that documentation will be accepted in legal proceedings
 - **Consult an attorney** regarding evidence requirements for your jurisdiction
 - SSA may require different documentation formats
 
@@ -152,7 +152,7 @@ Evidence Mode provides **documentation tools**, not legal certification:
 
 ### Not HIPAA-Covered
 
-This app is **NOT HIPAA-compliant** and should not be used in settings where HIPAA compliance is required:
+This app is **NOT designed to meet HIPAA requirements** and should not be used in settings where HIPAA meeting requirements is required:
 
 - ❌ Not for use by healthcare providers maintaining medical records
 - ❌ Not for use by health plans processing claims
@@ -293,7 +293,7 @@ For SSDI legal questions, contact:
 
 **CRITICAL REMINDERS:**
 
-⚠️ **This app does not guarantee SSDI approval**  
+⚠️ **This app does not promise SSDI approval**  
 ⚠️ **Always consult healthcare professionals for medical advice**  
 ⚠️ **Always consult legal professionals for SSDI application guidance**  
 ⚠️ **Back up your data—local-only storage means data loss is permanent**  
@@ -307,3 +307,5 @@ For SSDI legal questions, contact:
 **Effective Date**: January 1, 2026
 
 **BY USING THIS APP, YOU ACCEPT THIS DISCLAIMER IN FULL.**
+
+

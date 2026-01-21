@@ -150,7 +150,7 @@ You agree to:
 ### Legal Disclaimer
 
 - **Not legal advice**: The App does not provide legal advice
-- **No guarantee of SSDI approval**: Using the App does not guarantee disability benefits
+- **No promise of SSDI approval**: Using the App does not promise disability benefits
 - **Consult attorneys**: Seek qualified legal counsel for SSDI applications
 
 ### No Warranty
@@ -323,7 +323,7 @@ The App is designed with accessibility in mind:
 
 ### No Guarantee
 
-While we strive for accessibility, we do not guarantee the App meets all WCAG standards or works with all assistive technologies.
+While we strive for accessibility, we do not promise the App meets all WCAG standards or works with all assistive technologies.
 
 ---
 
@@ -439,7 +439,7 @@ By using the SSDI Symptom Tracker, you acknowledge that:
 - ❌ Use for medical diagnosis or treatment
 - ❌ Use for providing legal advice
 - ❌ Submit fraudulent SSDI claims
-- ❌ Expect guarantees of SSDI approval
+- ❌ Expect promises of SSDI approval
 
 **What WE do:**
 
@@ -455,3 +455,4 @@ By using the SSDI Symptom Tracker, you acknowledge that:
 - ❌ Take liability for SSDI outcomes
 
 **Read the full Terms above for complete details.**
+

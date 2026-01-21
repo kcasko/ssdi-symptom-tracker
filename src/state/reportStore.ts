@@ -8,8 +8,9 @@ import { ReportDraft, createReportDraft, ReportType } from '../domain/models/Rep
 import { LogStorage } from '../storage/storage';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
-import { generateHTMLForPDF, generatePlainTextReport } from '../services/EvidencePDFExportService';
+import { generateHTMLForPDF, generatePlainTextReport, generateStrictPDFHtml } from '../services/EvidencePDFExportService';
 import { ids } from '../utils/ids';
+import { ProfileStorage, LogStorage } from '../storage/storage';
 
 interface ReportState {
   // Data
@@ -303,10 +304,10 @@ export const useReportStore = create<ReportState>((set, get) => ({
     set({ exporting: true, error: null });
     
     try {
-      const { drafts } = get();
+      const { drafts, currentProfileId } = get();
       const draft = drafts.find(d => d.id === draftId);
       
-      if (!draft) {
+      if (!draft || !currentProfileId) {
         throw new Error('Draft not found');
       }
 
@@ -324,19 +325,79 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
       // Use appropriate export service based on format
       if (format === 'pdf') {
-        const pdfReport = {
-          title: draft.title,
-          dateRange: `${draft.dateRange.start} to ${draft.dateRange.end}`,
-          generatedAt: draft.generatedAt || new Date().toISOString(),
-          executiveSummary: 'Generated report from draft',
-          dataQualitySummary: 'Report generated from user-logged data',
-          symptomNarratives: [],
-          activityNarratives: [],
-          functionalLimitations: [],
-          revisionSummary: { hasRevisions: false, totalRevisions: 0, revisionStatements: [] },
-          disclaimer: 'This report is generated from user-logged data for informational purposes.',
-        };
-        const pdfHtml = generateHTMLForPDF(pdfReport);
+        // Load supporting data for strict, doctor-first PDF
+        const [profiles, dailyLogs, activityLogs, medications, appointments] = await Promise.all([
+          ProfileStorage.getAllProfiles(),
+          LogStorage.getDailyLogs(currentProfileId),
+          LogStorage.getActivityLogs(currentProfileId),
+          LogStorage.getMedications(currentProfileId),
+          LogStorage.getAppointments(currentProfileId),
+        ]);
+
+        const profile = profiles.find((p: any) => p.id === currentProfileId);
+        const filteredDailyLogs = dailyLogs.filter((log: any) =>
+          log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
+        );
+        const filteredActivityLogs = activityLogs.filter((log: any) =>
+          log.activityDate >= draft.dateRange.start && log.activityDate <= draft.dateRange.end
+        );
+        const filteredMeds = medications; // meds are not date-bound in data model; include all for context
+        const filteredAppointments = appointments.filter((appt: any) =>
+          appt.date ? appt.date >= draft.dateRange.start && appt.date <= draft.dateRange.end : true
+        );
+
+        const gatherText = (types: string[]) =>
+          draft.sections
+            .filter((s) => s.included && types.includes(s.sectionType))
+            .map((s) => s.blocks.map((b) => b.content).join(' '))
+            .join(' ')
+            .trim();
+
+        const narrativeSections = draft.sections.filter(
+          (s) => s.included && (s.sectionType === 'narrative' || s.sectionType === 'custom')
+        );
+
+        const sourceDates = [
+          ...filteredDailyLogs.map((l: any) => l.logDate),
+          ...filteredActivityLogs.map((l: any) => l.activityDate),
+        ];
+
+        const narratives = narrativeSections.map((s) => ({
+          heading: s.title,
+          paragraphs: s.blocks.map((b) => b.content),
+          sourceDates,
+        }));
+
+        const pdfHtml = generateStrictPDFHtml({
+          title: draft.title || 'Symptom & Functional Log',
+          profileName: profile?.name || profile?.id || 'Profile',
+          dateRange: draft.dateRange,
+          exportDate: new Date().toISOString(),
+          disclaimer:
+            'This document records user-entered health and activity information. It assists review and does not make legal, medical, or disability determinations.',
+          rawDailyLogs: filteredDailyLogs,
+          rawActivityLogs: filteredActivityLogs,
+          medications: filteredMeds,
+          appointments: filteredAppointments,
+          summaries: {
+            frequency: gatherText(['summary', 'patterns']),
+            activity: gatherText(['activity_impact']),
+            limitations: gatherText(['functional_limitations']),
+          },
+          analyses: {
+            rfc: draft.sections
+              .filter((s) => s.included && s.sectionType === 'functional_limitations')
+              .map((s) => s.blocks.map((b) => b.content).join(' ')),
+            workImpact: draft.sections
+              .filter((s) => s.included && s.sectionType === 'activity_impact')
+              .map((s) => s.blocks.map((b) => b.content).join(' ')),
+            consistency: draft.sections
+              .filter((s) => s.included && s.sectionType === 'patterns')
+              .map((s) => s.blocks.map((b) => b.content).join(' ')),
+          },
+          narratives,
+        });
+
         await ExportService.exportReportToPDF(pdfHtml, filename);
       } else {
         await ExportService.exportReportToText(reportContent, filename);

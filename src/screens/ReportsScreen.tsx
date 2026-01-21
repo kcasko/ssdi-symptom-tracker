@@ -355,7 +355,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Evidence Submission Packs</Text>
             <Text style={styles.sectionDescription}>
-              Generate legal-compliant evidence packages for SSDI submissions
+              Generate attorney-ready evidence packages for SSDI review
             </Text>
             <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
           </View>

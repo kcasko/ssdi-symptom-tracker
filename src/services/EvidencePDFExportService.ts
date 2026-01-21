@@ -4,6 +4,10 @@
  */
 
 import { EvidenceReport } from './EvidenceReportBuilder';
+import { DailyLog } from '../domain/models/DailyLog';
+import { ActivityLog } from '../domain/models/ActivityLog';
+import { Medication } from '../domain/models/Medication';
+import { Appointment } from '../domain/models/Appointment';
 
 /**
  * PDF export configuration
@@ -122,6 +126,33 @@ export function generatePlainTextReport(
   lines.push('');
 
   return lines.join('\n');
+}
+
+export interface StrictPDFPayload {
+  title: string;
+  profileName: string;
+  dateRange: { start: string; end: string };
+  exportDate: string;
+  disclaimer: string;
+  rawDailyLogs: DailyLog[];
+  rawActivityLogs: ActivityLog[];
+  medications: Medication[];
+  appointments: Appointment[];
+  summaries: {
+    frequency?: string;
+    activity?: string;
+    limitations?: string;
+  };
+  analyses: {
+    rfc?: string[];
+    workImpact?: string[];
+    consistency?: string[];
+  };
+  narratives: Array<{
+    heading: string;
+    paragraphs: string[];
+    sourceDates: string[];
+  }>;
 }
 
 /**
@@ -301,6 +332,136 @@ export function generateHTMLForPDF(
   html += `
 </body>
 </html>`;
+
+  return html;
+}
+
+/**
+ * Generate strict, ordered HTML for PDF rendering with clear separation of raw logs, summaries, analysis, and narrative.
+ */
+export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
+  const { title, profileName, dateRange, exportDate, disclaimer } = payload;
+
+  const styles = `
+    body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; margin: 1in; color: #000; }
+    h1, h2, h3 { font-weight: bold; margin: 0 0 8pt 0; }
+    h1 { font-size: 20pt; }
+    h2 { font-size: 14pt; margin-top: 14pt; }
+    h3 { font-size: 12pt; margin-top: 10pt; }
+    p { margin: 6pt 0; }
+    ul { margin: 4pt 0 8pt 16pt; }
+    li { margin: 2pt 0; }
+    .section-divider { border-top: 1px solid #000; margin: 12pt 0; }
+    .footnote { font-size: 9pt; color: #333; }
+  `;
+
+  const formatDate = (d: string) => {
+    const date = new Date(d);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  const uniqueDates = (dates: string[]) => Array.from(new Set(dates)).sort();
+  const listDates = (dates: string[]) => uniqueDates(dates).join(', ') || 'Not specified';
+
+  const renderDailyLogs = () => {
+    if (payload.rawDailyLogs.length === 0) return '<p>No daily symptom entries in this range.</p>';
+    const sorted = [...payload.rawDailyLogs].sort((a, b) => a.logDate.localeCompare(b.logDate));
+    return `<ul>${sorted
+      .map((log) => {
+        const symptoms = log.symptoms.map((s) => `${s.symptomId} (sev ${s.severity}${s.duration ? `, ${s.duration}m` : ''})`).join('; ');
+        return `<li>${formatDate(log.logDate)} — Severity ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}; Last modified: ${formatDate(log.updatedAt || log.createdAt)}</li>`;
+      })
+      .join('')}</ul>`;
+  };
+
+  const renderActivityLogs = () => {
+    if (payload.rawActivityLogs.length === 0) return '<p>No activity logs in this range.</p>';
+    const sorted = [...payload.rawActivityLogs].sort((a, b) => a.activityDate.localeCompare(b.activityDate));
+    return `<ul>${sorted
+      .map((log) => {
+        const impact = log.immediateImpact?.overallImpact ?? 0;
+        const recovery = log.recoveryDuration || 0;
+        return `<li>${formatDate(log.activityDate)} — ${escapeHTML(log.activityName)}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'yes' : 'no'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}; Last modified: ${formatDate(log.updatedAt || log.createdAt)}</li>`;
+      })
+      .join('')}</ul>`;
+  };
+
+  const renderMeds = () => {
+    if (!payload.medications || payload.medications.length === 0) return '<p>No medications recorded in this range.</p>';
+    return `<ul>${payload.medications
+      .map((med) => `<li>${escapeHTML(med.name || med.id || 'Medication')} — ${escapeHTML(med.dosage || '')} ${escapeHTML(med.frequency || '')}; Last modified: ${formatDate((med as any).updatedAt || (med as any).createdAt || exportDate)}</li>`)
+      .join('')}</ul>`;
+  };
+
+  const renderAppointments = () => {
+    if (!payload.appointments || payload.appointments.length === 0) return '<p>No appointments recorded in this range.</p>';
+    const sorted = [...payload.appointments].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    return `<ul>${sorted
+      .map((appt) => `<li>${formatDate(appt.date)} — ${escapeHTML(appt.providerName || 'Provider')} (${escapeHTML(appt.purpose || 'Purpose not specified')}); Status: ${escapeHTML((appt as any).status || 'unknown')}; Last modified: ${formatDate((appt as any).updatedAt || (appt as any).createdAt || exportDate)}</li>`)
+      .join('')}</ul>`;
+  };
+
+  const renderNarratives = () =>
+    payload.narratives
+      .map((narr) => {
+        const footnote = `<p class="footnote">Draft narrative prepared from recorded entries; editable by user. Derived from entries dated ${escapeHTML(listDates(narr.sourceDates))}.</p>`;
+        const paragraphs = narr.paragraphs.map((p) => `<p>${escapeHTML(p)}</p>`).join('');
+        return `<h3>${escapeHTML(narr.heading)}</h3>${paragraphs}${footnote}`;
+      })
+      .join('');
+
+  const renderStringArraySection = (label: string, items?: string[]) => {
+    if (!items || items.length === 0) return `<p>${label}: Not provided.</p>`;
+    return `<h3>${escapeHTML(label)}</h3><ul>${items.map((i) => `<li>${escapeHTML(i)}</li>`).join('')}</ul>`;
+  };
+
+  const html = `
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>${escapeHTML(title)}</title>
+    <style>${styles}</style>
+  </head>
+  <body>
+    <h1>${escapeHTML(title)}</h1>
+    <p><strong>Profile:</strong> ${escapeHTML(profileName || 'Not specified')}</p>
+    <p><strong>Date Range:</strong> ${escapeHTML(formatDate(dateRange.start))} to ${escapeHTML(formatDate(dateRange.end))}</p>
+    <p><strong>Exported:</strong> ${escapeHTML(formatDate(exportDate))}</p>
+    <p><strong>Note:</strong> This document contains user-recorded health and activity information collected over time.</p>
+    <div class="section-divider"></div>
+
+    <h2>Raw Logs</h2>
+    <h3>Daily Symptom Entries</h3>
+    ${renderDailyLogs()}
+    <h3>Activity Logs</h3>
+    ${renderActivityLogs()}
+    <h3>Medications & Appointments</h3>
+    ${renderMeds()}
+    ${renderAppointments()}
+
+    <div class="section-divider"></div>
+    <h2>Summaries</h2>
+    <p>${escapeHTML(payload.summaries.frequency || 'Frequency and pattern summaries: Not provided.')}</p>
+    <p>${escapeHTML(payload.summaries.activity || 'Activity tolerance summaries: Not provided.')}</p>
+    <p>${escapeHTML(payload.summaries.limitations || 'Functional limitations summaries: Not provided.')}</p>
+
+    <div class="section-divider"></div>
+    <h2>Analysis</h2>
+    ${renderStringArraySection('RFC-style sections', payload.analyses.rfc)}
+    ${renderStringArraySection('Work-impact analysis', payload.analyses.workImpact)}
+    ${renderStringArraySection('Consistency indicators', payload.analyses.consistency)}
+
+    <div class="section-divider"></div>
+    <h2>Narrative Drafts</h2>
+    ${renderNarratives()}
+
+    <div class="section-divider"></div>
+    <h2>Disclaimer</h2>
+    <p>${escapeHTML(disclaimer || 'Draft narrative prepared from recorded entries; editable by user. This document assists review and does not make legal or medical determinations.')}</p>
+  </body>
+  </html>
+  `;
 
   return html;
 }

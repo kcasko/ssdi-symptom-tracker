@@ -26,8 +26,8 @@
 
 - **NOT a medical device** - Does not diagnose or treat conditions
 - **NOT legal advice** - Consult a disability attorney for SSDI guidance
-- **NOT a guarantee** - Documentation does not guarantee SSDI approval
-- **NOT HIPAA-compliant** - For personal use only, not healthcare provider use
+- **NOT a promise** - Documentation does not ensure SSDI approval
+- **NOT designed to meet HIPAA requirements** - For personal use only, not healthcare provider use
 
 ---
 
@@ -209,7 +209,7 @@ After creating a profile, you'll see the **Dashboard**:
 **Why This Matters**:
 
 - Demonstrates **ongoing medical treatment** (SSA requirement)
-- Shows **compliance with treatment**
+- Shows **meeting requirements with treatment**
 - Provides **provider names** for SSA verification
 
 ---
@@ -607,7 +607,7 @@ Export individual datasets as CSV:
 ❌ **Not backing up data** → Back up weekly; losing months of logs is devastating  
 ❌ **Waiting to enable Evidence Mode** → Enable it early if planning SSDI application  
 ❌ **Not reviewing reports before submission** → Always review; generated text may need clarification  
-❌ **Ignoring medication compliance** → SSA expects you to follow prescribed treatment  
+❌ **Ignoring medication meeting requirements** → SSA expects you to follow prescribed treatment  
 ❌ **Logging retrospectively weeks later** → Log same-day for accuracy and credibility  
 
 ---
@@ -841,3 +841,5 @@ SSDI Symptom Tracker is a powerful tool for documenting your disability, but rem
 **App Version**: 1.0.0
 
 **For support**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>
+
+

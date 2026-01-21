@@ -178,7 +178,7 @@ California residents: We do not sell personal information because we do not coll
 
 ### HIPAA
 
-**Important**: This app is NOT HIPAA-compliant. It is a personal health tracking tool, not a medical record system. Do not use this app where HIPAA compliance is required.
+**Important**: This app is NOT designed to meet HIPAA requirements. It is a personal health tracking tool, not a medical record system. Do not use this app where HIPAA meeting HIPAA requirements is required.
 
 ## Medical Information Disclaimer
 
@@ -250,3 +250,4 @@ By using this app, you acknowledge:
 **Document Version**: 1.0  
 **Last Updated**: January 1, 2026  
 **Effective Date**: January 1, 2026
+
