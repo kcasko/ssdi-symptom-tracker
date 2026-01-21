@@ -36,6 +36,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+typecheck_output*.txt
+*_typecheck.txt
 
 # User data (privacy-focused - never commit user data)
 **/storage/*.json
@@ -52,3 +54,7 @@ backups/
 # Testing
 coverage/
 .nyc_output/
+
+# Temporary scripts and one-off fixes
+fix-*.ps1
+fix-*.sh
