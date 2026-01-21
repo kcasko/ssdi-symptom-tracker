@@ -217,7 +217,7 @@ After creating a profile, you'll see the **Dashboard**:
 ## Evidence Mode
 
 **Evidence Mode** is an advanced feature that adds
-**legal documentation standards** to your logs for SSDI submission.
+structured documentation standards to your logs for SSDI submission.
 
 ### What is Evidence Mode?
 
@@ -226,7 +226,7 @@ Evidence Mode adds:
 - 🕐 **Evidence Timestamps**: Immutable timestamps when logs are created
 - 🔒 **Log Finalization**: Lock logs to prevent accidental changes
 - 📜 **Revision Tracking**: Audit trail of any changes to finalized logs
-- 📦 **Submission Packs**: Structured PDF packages for legal submission
+- 📦 **Submission Packs**: Structured PDF packages for professional review
 
 ### When to Enable Evidence Mode
 
@@ -327,7 +327,7 @@ Evidence Mode uses a **revision system**:
 
 **Why revisions matter**:
 
-- Maintains **audit trail** for legal proceedings
+- Maintains **audit trail** for professional review
 - Shows **transparency** (not hiding changes)
 - Demonstrates **accuracy commitment**
 
@@ -828,7 +828,7 @@ SSDI Symptom Tracker is a powerful tool for documenting your disability, but rem
 
 ✅ **This app is a tool, not a solution** - Consult professionals  
 ✅ **Consistency is critical** - Log regularly for best results  
-✅ **Evidence Mode is optional** - Use if you need legal-grade documentation  
+✅ **Evidence Mode is optional** - Use if you want structured documentation  
 ✅ **Back up your data** - Local-only storage means you're responsible  
 ✅ **Review before submitting** - Always have attorney review your documentation  
 

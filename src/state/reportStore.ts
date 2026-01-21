@@ -8,7 +8,7 @@ import { ReportDraft, createReportDraft, ReportType } from '../domain/models/Rep
 import { LogStorage } from '../storage/storage';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
-import { generateHTMLForPDF, generatePlainTextReport, generateStrictPDFHtml } from '../services/EvidencePDFExportService';
+import { generatePlainTextReport, generateStrictPDFHtml } from '../services/EvidencePDFExportService';
 import { ids } from '../utils/ids';
 import { ProfileStorage, LogStorage } from '../storage/storage';
 

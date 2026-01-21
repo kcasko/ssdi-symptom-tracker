@@ -52,8 +52,8 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
   const profileReports = reportDrafts.filter((r) => r.profileId === activeProfile?.id);
 
-  // Calculate credibility score
-  const credibilityScore = activeProfile
+  // Calculate qualitative credibility indicators
+  const credibilityIndicators = activeProfile
     ? CredibilityScorer.calculateCredibility(
         dailyLogs.filter(l => l.profileId === activeProfile.id),
         activityLogs.filter(l => l.profileId === activeProfile.id),
@@ -247,41 +247,37 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Credibility Score */}
-        {credibilityScore && (
+        {credibilityIndicators && (
           <View style={styles.credibilitySection}>
             <Text style={styles.sectionTitle}>Documentation Strength</Text>
             <View style={styles.credibilityCard}>
               <View style={styles.credibilityHeader}>
-                <Text style={styles.credibilityScore}>{credibilityScore.overallScore}</Text>
-                <View style={styles.credibilityGrade}>
-                  <Text style={styles.credibilityGradeText}>{credibilityScore.grade}</Text>
-                  <Text style={styles.credibilityLabel}>Documentation Quality</Text>
-                </View>
+                <Text style={styles.credibilityLabel}>Consistency indicators (qualitative)</Text>
               </View>
               
               <View style={styles.credibilityIndicators}>
                 <View style={styles.indicatorRow}>
                   <Text style={styles.indicatorLabel}>Logging Consistency:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.loggingConsistency.rating}</Text>
+                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.loggingConsistency.rating}</Text>
                 </View>
                 <View style={styles.indicatorRow}>
                   <Text style={styles.indicatorLabel}>Duration Coverage:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.durationCoverage.rating}</Text>
+                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.durationCoverage.rating}</Text>
                 </View>
                 <View style={styles.indicatorRow}>
                   <Text style={styles.indicatorLabel}>Data Completeness:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.dataCompleteness.rating}</Text>
+                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.dataCompleteness.rating}</Text>
                 </View>
                 <View style={styles.indicatorRow}>
                   <Text style={styles.indicatorLabel}>Pattern Stability:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityScore.indicators.patternStability.rating}</Text>
+                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.patternStability.rating}</Text>
                 </View>
               </View>
 
-              {credibilityScore.recommendations.length > 0 && (
+              {credibilityIndicators.recommendations.length > 0 && (
                 <View style={styles.recommendationsSection}>
                   <Text style={styles.recommendationsTitle}>Recommendations:</Text>
-                  {credibilityScore.recommendations.map((rec, idx) => (
+                  {credibilityIndicators.recommendations.map((rec, idx) => (
                     <Text key={idx} style={styles.recommendationText}>- {rec}</Text>
                   ))}
                 </View>
@@ -513,26 +509,13 @@ const styles = StyleSheet.create({
   },
   credibilityHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
+    justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  credibilityScore: {
-    fontSize: 56,
-    fontWeight: typography.weights.bold as any,
-    color: colors.primaryMain,
-  },
-  credibilityGrade: {
-    flex: 1,
-  },
-  credibilityGradeText: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold as any,
-    color: colors.gray900,
-  },
   credibilityLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray600,
+    fontSize: typography.sizes.md,
+    color: colors.gray700,
+    fontWeight: typography.weights.bold as any,
   },
   credibilityIndicators: {
     gap: spacing.sm,

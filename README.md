@@ -75,7 +75,7 @@ npm run web        # Web browser
 4. **Daily Log** - Log symptoms with severity (0-10 scale) and context
 5. **Activity Log** - Track activity impact and recovery requirements
 6. **Limitations** - Document functional capacity limits
-7. **Meds & Appointments** - Treatment compliance tracking
+7. **Meds & Appointments** - Treatment follow-up tracking
 8. **Reports** - Generate SSDI documentation for date ranges
 9. **Report Editor** - Edit sections and export as PDF
 10. **Settings** - Privacy controls and profile management
@@ -387,7 +387,7 @@ eas build --platform ios
 ### App Store Guidelines
 
 - Clearly communicate medical disclaimer
-- Ensure compliance with health data regulations
+- Ensure alignment with applicable health data regulations (user responsibility)
 - Include appropriate privacy policy
 - Test with disability advocacy groups
 
@@ -398,7 +398,7 @@ This app is designed for people with disabilities and their advocates. When cont
 1. **Test with real users** - Include people with disabilities in testing
 2. **Maintain accessibility** - Follow WCAG guidelines
 3. **Preserve privacy** - No features that compromise local-only storage
-4. **Validate SSDI compliance** - Ensure language remains appropriate
+4. **Validate SSDI appropriateness** - Ensure language remains appropriate
 5. **Document changes** - Update migration system for schema changes
 
 ## 📄 License

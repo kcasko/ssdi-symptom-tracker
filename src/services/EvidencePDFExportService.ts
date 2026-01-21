@@ -242,98 +242,11 @@ export function generateStructuredPDFContent(report: EvidenceReport): PDFSection
 }
 
 /**
- * Generate HTML for PDF rendering
- * Clean HTML with minimal styling for consistent PDF output
+ * Legacy PDF generator is intentionally disabled to prevent unsafe exports.
+ * Use generateStrictPDFHtml instead.
  */
-export function generateHTMLForPDF(
-  report: EvidenceReport,
-  config: PDFExportConfig = DEFAULT_CONFIG
-): string {
-  const sections = generateStructuredPDFContent(report);
-  
-  const styles = `
-    body {
-      font-family: 'Times New Roman', Times, serif;
-      font-size: ${config.fontSize}pt;
-      line-height: ${config.lineHeight};
-      margin: 1in;
-      color: #000000;
-    }
-    h1 {
-      font-size: 18pt;
-      font-weight: bold;
-      margin-top: 0;
-      margin-bottom: 12pt;
-    }
-    h2 {
-      font-size: 14pt;
-      font-weight: bold;
-      margin-top: 18pt;
-      margin-bottom: 6pt;
-    }
-    h3 {
-      font-size: 12pt;
-      font-weight: bold;
-      margin-top: 12pt;
-      margin-bottom: 6pt;
-    }
-    p {
-      margin: 6pt 0;
-      text-align: justify;
-    }
-    ul {
-      margin: 6pt 0;
-      padding-left: 24pt;
-    }
-    li {
-      margin: 3pt 0;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #000000;
-      margin: 12pt 0;
-    }
-  `;
-
-  let html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${report.title}</title>
-  <style>${styles}</style>
-</head>
-<body>
-`;
-
-  sections.forEach((section) => {
-    switch (section.type) {
-      case 'heading':
-        html += `<h${section.level || 1}>${escapeHTML(section.content as string)}</h${section.level || 1}>\n`;
-        break;
-      case 'subheading':
-        html += `<h${section.level || 2}>${escapeHTML(section.content as string)}</h${section.level || 2}>\n`;
-        break;
-      case 'paragraph':
-        html += `<p>${escapeHTML(section.content as string)}</p>\n`;
-        break;
-      case 'list':
-        html += '<ul>\n';
-        (section.content as string[]).forEach((item) => {
-          html += `  <li>${escapeHTML(item)}</li>\n`;
-        });
-        html += '</ul>\n';
-        break;
-      case 'divider':
-        html += '<hr>\n';
-        break;
-    }
-  });
-
-  html += `
-</body>
-</html>`;
-
-  return html;
+export function generateHTMLForPDF(): string {
+  throw new Error('generateHTMLForPDF is deprecated. Use generateStrictPDFHtml.');
 }
 
 /**
@@ -428,7 +341,7 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     <p><strong>Profile:</strong> ${escapeHTML(profileName || 'Not specified')}</p>
     <p><strong>Date Range:</strong> ${escapeHTML(formatDate(dateRange.start))} to ${escapeHTML(formatDate(dateRange.end))}</p>
     <p><strong>Exported:</strong> ${escapeHTML(formatDate(exportDate))}</p>
-    <p><strong>Note:</strong> This document contains user-recorded health and activity information collected over time.</p>
+    <p><strong>Context:</strong> This document contains user-recorded symptom and activity information collected over time and organized for review.</p>
     <div class="section-divider"></div>
 
     <h2>Raw Logs</h2>
