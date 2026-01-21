@@ -20,6 +20,7 @@ import {
   SettingsScreen,
   TrendsScreen,
   VoiceLogScreen,
+  AboutScreen,
 } from '../screens';
 
 // Type definitions
@@ -37,6 +38,7 @@ export type RootStackParamList = {
   Settings: undefined;
   Trends: undefined;
   VoiceLog: undefined;
+  About: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -63,6 +65,7 @@ export function AppNavigator() {
         <Stack.Screen name="Trends" component={TrendsScreen} />
         <Stack.Screen name="VoiceLog" component={VoiceLogScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="About" component={AboutScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -114,6 +114,12 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
+          <BigButton
+            label="About This App"
+            onPress={() => navigation.navigate('About')}
+            variant="secondary"
+            fullWidth
+          />
           <View style={styles.settingCard}>
             <Text style={styles.settingLabel}>Version</Text>
             <Text style={styles.settingValue}>1.0.0</Text>

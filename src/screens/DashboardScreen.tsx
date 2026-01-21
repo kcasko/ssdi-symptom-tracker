@@ -99,6 +99,23 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
+        {/* Persistent Explanation Block */}
+        <View style={styles.explanationBlock}>
+          <Text style={styles.explanationPrimary}>
+            This app helps you keep a simple, honest record of how you're feeling and how daily life affects you. You don't need perfect wording or medical terms. Just log what you experience. Over time, patterns and summaries appear automatically.
+          </Text>
+
+          <View style={styles.explanationInstructions}>
+            <Text style={styles.instructionLine}>Log symptoms once per day.</Text>
+            <Text style={styles.instructionLine}>Log activity impact when it happens.</Text>
+            <Text style={styles.instructionLine}>Review trends when you're ready.</Text>
+          </View>
+
+          <Text style={styles.explanationReassurance}>
+            If you haven't logged yet, that's okay. Start when you're ready.
+          </Text>
+        </View>
+
         {/* Today's Status */}
         <View style={styles.todaySection}>
           <Text style={styles.sectionTitle}>Today</Text>
@@ -111,7 +128,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             </View>
           ) : (
             <BigButton
-              label="Log Today's Symptoms"
+              label={profileDailyLogs.length === 0 ? "Start Your First Log" : "Log Today's Symptoms"}
               onPress={() => navigation.navigate('DailyLog')}
               variant="primary"
               fullWidth
@@ -122,11 +139,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
         {/* Quick Stats - Last 7 Days */}
         <View style={styles.statsSection}>
           <Text style={styles.sectionTitle}>Last 7 Days</Text>
+          <Text style={styles.sectionHelper}>Low or zero values usually mean you haven't logged yet.</Text>
           <View style={styles.statsGrid}>
             <SummaryCard
               title="Symptoms"
               value={stats.last7Days.symptomCount}
-              subtitle="Unique symptoms"
+              subtitle="Unique symptoms you've logged"
               variant={stats.last7Days.symptomCount > 5 ? 'warning' : 'default'}
             />
             <SummaryCard
@@ -140,18 +158,18 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             <SummaryCard
               title="Good Days"
               value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
-              subtitle="Functional capacity"
+              subtitle="Based on logged functional capacity"
               variant={
-                last7DayRatios.goodDayPercentage >= 60 ? 'success' : 
+                last7DayRatios.goodDayPercentage >= 60 ? 'success' :
                 last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
               }
             />
             <SummaryCard
               title="Bad Days"
               value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
-              subtitle="Limited function"
+              subtitle="Days where symptoms significantly limited function"
               variant={
-                last7DayRatios.badDayPercentage >= 60 ? 'error' : 
+                last7DayRatios.badDayPercentage >= 60 ? 'error' :
                 last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
               }
             />
@@ -215,41 +233,56 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
         {/* Quick Actions */}
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          
-          <BigButton
-            label="Log Activity Impact"
-            onPress={() => navigation.navigate('ActivityLog')}
-            variant="secondary"
-            fullWidth
-          />
 
-          <BigButton
-            label="🎤 Voice Log Symptoms"
-            onPress={() => navigation.navigate('VoiceLog')}
-            variant="secondary"
-            fullWidth
-          />
+          <View style={styles.actionItem}>
+            <BigButton
+              label="Log Activity Impact"
+              onPress={() => navigation.navigate('ActivityLog')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>Record how an activity affected you afterward</Text>
+          </View>
 
-          <BigButton
-            label="View Symptom Trends"
-            onPress={() => navigation.navigate('Trends')}
-            variant="secondary"
-            fullWidth
-          />
+          <View style={styles.actionItem}>
+            <BigButton
+              label="🎤 Voice Log Symptoms"
+              onPress={() => navigation.navigate('VoiceLog')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>For days when typing is difficult</Text>
+          </View>
 
-          <BigButton
-            label="Update Limitations"
-            onPress={() => navigation.navigate('Limitations')}
-            variant="secondary"
-            fullWidth
-          />
+          <View style={styles.actionItem}>
+            <BigButton
+              label="View Symptom Trends"
+              onPress={() => navigation.navigate('Trends')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>See patterns over time</Text>
+          </View>
 
-          <BigButton
-            label="View Reports"
-            onPress={() => navigation.navigate('Reports')}
-            variant="secondary"
-            fullWidth
-          />
+          <View style={styles.actionItem}>
+            <BigButton
+              label="Update Limitations"
+              onPress={() => navigation.navigate('Limitations')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>Track what you can and can't do</Text>
+          </View>
+
+          <View style={styles.actionItem}>
+            <BigButton
+              label="View Reports"
+              onPress={() => navigation.navigate('Reports')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>Summaries you can share or export</Text>
+          </View>
         </View>
 
         {/* Data Summary */}
@@ -310,6 +343,34 @@ const styles = StyleSheet.create({
   settingsIcon: {
     fontSize: typography.sizes.xl,
   },
+  explanationBlock: {
+    backgroundColor: colors.gray50,
+    padding: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+    borderRadius: 8,
+    gap: spacing.md,
+  },
+  explanationPrimary: {
+    fontSize: typography.sizes.md,
+    lineHeight: typography.sizes.md * 1.5,
+    color: colors.gray700,
+  },
+  explanationInstructions: {
+    gap: spacing.xs,
+  },
+  instructionLine: {
+    fontSize: typography.sizes.md,
+    lineHeight: typography.sizes.md * 1.4,
+    color: colors.gray700,
+  },
+  explanationReassurance: {
+    fontSize: typography.sizes.sm,
+    lineHeight: typography.sizes.sm * 1.4,
+    color: colors.gray600,
+    fontStyle: 'italic' as any,
+  },
   todaySection: {
     padding: spacing.lg,
     gap: spacing.md,
@@ -320,6 +381,11 @@ const styles = StyleSheet.create({
     color: colors.gray900,
     flex: 1,
     marginRight: spacing.sm,
+  },
+  sectionHelper: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
+    marginTop: -spacing.xs,
   },
   statusCard: {
     backgroundColor: colors.successLight,
@@ -352,6 +418,14 @@ const styles = StyleSheet.create({
   actionsSection: {
     padding: spacing.lg,
     gap: spacing.md,
+  },
+  actionItem: {
+    gap: spacing.xs,
+  },
+  actionHelper: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
+    marginLeft: spacing.xs,
   },
   dayQualitySection: {
     padding: spacing.lg,

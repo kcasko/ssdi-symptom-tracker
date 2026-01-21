@@ -13,6 +13,7 @@ export { ReportEditorScreen } from './ReportEditorScreen';
 export { SettingsScreen } from './SettingsScreen';
 export { TrendsScreen } from './TrendsScreen';
 export { VoiceLogScreen } from './VoiceLogScreen';
+export { AboutScreen } from './AboutScreen';
 
 // Placeholder exports for screens not yet implemented
 export { LimitationsScreen } from './LimitationsScreen';
