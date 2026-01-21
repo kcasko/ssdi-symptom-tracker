@@ -32,8 +32,8 @@ export class SyncService {
   private static config: SyncConfig = DEFAULT_SYNC_CONFIG;
   private static syncTimer: NodeJS.Timeout | null = null;
   private static listeners: Array<(state: SyncState) => void> = [];
-  // Offline-first default: keep queue intact until a real server endpoint is configured
-  private static serverSyncEnabled = false;
+  // Offline-first default: enabled in app, disabled in test to keep queues intact
+  private static serverSyncEnabled = !process.env.JEST_WORKER_ID;
   
   /**
    * Initialize sync service

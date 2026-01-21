@@ -8,6 +8,7 @@
  * Backup configuration
  */
 export interface BackupConfig {
+  enabled?: boolean;
   // Cloud provider
   provider: 'icloud' | 's3' | 'gdrive' | 'local';
   
@@ -149,6 +150,7 @@ export interface BackupVerification {
  * Default backup configuration
  */
 export const DEFAULT_BACKUP_CONFIG: BackupConfig = {
+  enabled: true,
   provider: 'icloud',
   autoBackup: true,
   backupFrequency: 'daily',
