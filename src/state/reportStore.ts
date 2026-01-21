@@ -5,7 +5,6 @@
 
 import { create } from 'zustand';
 import { ReportDraft, createReportDraft, ReportType } from '../domain/models/ReportDraft';
-import { LogStorage } from '../storage/storage';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
 import { generatePlainTextReport, generateStrictPDFHtml } from '../services/EvidencePDFExportService';
