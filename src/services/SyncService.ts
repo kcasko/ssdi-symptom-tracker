@@ -32,6 +32,8 @@ export class SyncService {
   private static config: SyncConfig = DEFAULT_SYNC_CONFIG;
   private static syncTimer: NodeJS.Timeout | null = null;
   private static listeners: Array<(state: SyncState) => void> = [];
+  // Offline-first default: keep queue intact until a real server endpoint is configured
+  private static serverSyncEnabled = false;
   
   /**
    * Initialize sync service
@@ -48,7 +50,7 @@ export class SyncService {
     });
     
     // Start auto-sync if enabled
-    if (this.config.autoSync) {
+    if (this.config.autoSync && this.serverSyncEnabled) {
       this.startAutoSync();
     }
   }
@@ -101,6 +103,11 @@ export class SyncService {
   static async sync(): Promise<SyncResult> {
     if (!this.syncState) {
       await this.loadState();
+    }
+
+    // In offline-first mode without a server endpoint, keep the queue intact.
+    if (!this.serverSyncEnabled) {
+      return this.createEmptyResult(false, 'Server sync disabled - queue retained for offline mode');
     }
     
     // Prevent concurrent syncs

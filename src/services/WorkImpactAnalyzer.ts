@@ -148,9 +148,10 @@ export class WorkImpactAnalyzer {
     
     // Calculate severity score
     const severityScore = this.calculateDutySeverity(interferingFactors);
+    const hasCriticalLimitation = interferingFactors.some(f => f.type === 'limitation');
     
     // Determine if can perform
-    const canPerform = this.determineCanPerform(severityScore, duty.isEssential);
+    const canPerform = this.determineCanPerform(severityScore, duty.isEssential, hasCriticalLimitation);
     
     // Generate explanation
     const impactExplanation = this.generateDutyExplanation(
@@ -235,8 +236,8 @@ export class WorkImpactAnalyzer {
         interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
         occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
-        averageSeverity: 7,
-        maxSeverity: 8,
+        averageSeverity: 8,
+        maxSeverity: 9,
         logIds: [limitation.id],
       });
     });
@@ -343,8 +344,8 @@ export class WorkImpactAnalyzer {
         interferenceDescription: `Documented ${limitation.category} limitation`,
         occurrenceCount: 1,
         occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
-        averageSeverity: 7,
-        maxSeverity: 8,
+        averageSeverity: 8,
+        maxSeverity: 9,
         logIds: [limitation.id],
       });
     });
@@ -400,8 +401,8 @@ export class WorkImpactAnalyzer {
         interferenceDescription: `${limitation.category} limitation - cannot meet ${requiredWeight} lb requirement`,
         occurrenceCount: 1,
         occurrencePercentage: dailyLogs.length > 0 ? (1 / dailyLogs.length) * 100 : 0,
-        averageSeverity: 7,
-        maxSeverity: 8,
+        averageSeverity: 9,
+        maxSeverity: 10,
         logIds: [limitation.id],
       });
     });
@@ -590,8 +591,10 @@ export class WorkImpactAnalyzer {
    */
   private static determineCanPerform(
     severityScore: number,
-    isEssential: boolean
+    isEssential: boolean,
+    hasCriticalLimitation: boolean
   ): DutyImpact['canPerform'] {
+    if (hasCriticalLimitation && isEssential) return 'no';
     if (severityScore >= 8) return 'no';
     if (severityScore >= 6) return isEssential ? 'no' : 'with_difficulty';
     if (severityScore >= 4) return 'with_difficulty';

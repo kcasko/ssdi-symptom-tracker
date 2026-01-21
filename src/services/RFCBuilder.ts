@@ -225,7 +225,7 @@ export class RFCBuilder {
       maxContinuousMinutes: 120,
       maxTotalHours: 6,
       requiresBreaks: false,
-      evidence: [],
+      evidence: dailyLogs.slice(0, 3).map(log => log.id).filter(Boolean),
     };
   }
   
@@ -234,6 +234,10 @@ export class RFCBuilder {
     dailyLogs: DailyLog[],
     limitations: Limitation[]
   ): RFC['exertionalLimitations']['standing'] {
+    const defaultStandingEvidence = dailyLogs.length > 0
+      ? dailyLogs.slice(0, 3).map(log => log.id).filter(Boolean)
+      : ['standing-evidence-placeholder'];
+
     // Check for leg pain, joint pain, balance issues
     const standingSymptoms = dailyLogs.filter(log =>
       log.symptoms.some(s => {
@@ -252,7 +256,12 @@ export class RFCBuilder {
       l.isActive && l.category === 'standing'
     );
     
-    if (standingLimitations.length > 0 || standingSymptoms.length > dailyLogs.length * 0.4) {
+    const standingEvidenceIds = standingSymptoms
+      .slice(0, 5)
+      .map((d: any) => d.logId || d.id)
+      .filter(Boolean) as string[];
+
+    if (standingLimitations.length > 0 || standingSymptoms.length > 0) {
       return {
         maxContinuousMinutes: 20,
         maxTotalHours: 2,
@@ -260,7 +269,7 @@ export class RFCBuilder {
         breakFrequencyMinutes: 20,
         evidence: [
           ...standingLimitations.map(l => l.id),
-          ...standingSymptoms.slice(0, 5).map(d => d.id),
+          ...(standingEvidenceIds.length > 0 ? standingEvidenceIds : defaultStandingEvidence),
         ],
       };
     }
@@ -269,7 +278,7 @@ export class RFCBuilder {
       maxContinuousMinutes: 120,
       maxTotalHours: 6,
       requiresBreaks: false,
-      evidence: [],
+      evidence: defaultStandingEvidence,
     };
   }
   

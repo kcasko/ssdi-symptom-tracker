@@ -206,8 +206,10 @@ export class CredibilityScorer {
     const sortedLogs = [...dailyLogs].sort((a, b) => a.logDate.localeCompare(b.logDate));
     const firstDate = new Date(sortedLogs[0].logDate);
     const lastDate = new Date(sortedLogs[sortedLogs.length - 1].logDate);
-    
-    const monthsCovered = (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44);
+
+    const daysSpan = Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const coverageDays = Math.max(daysSpan, dailyLogs.length);
+    const monthsCovered = coverageDays / 30.44;
     const totalMonthsCovered = Math.max(1, Math.round(monthsCovered * 10) / 10);
     
     const minimumMonthsNeeded = 12;

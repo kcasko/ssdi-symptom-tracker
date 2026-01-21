@@ -6,14 +6,25 @@ import { CloudBackupService } from '../CloudBackupService';
 import { BackupConfig } from '../../domain/models/BackupModels';
 
 // Mock all Expo modules that cause import issues
+const fileStore: Record<string, string> = {};
+
 jest.mock('expo-file-system', () => ({
   documentDirectory: 'mock://documents/',
-  writeAsStringAsync: jest.fn(() => Promise.resolve()),
-  readAsStringAsync: jest.fn(() => Promise.resolve('mock file content')),
-  readDirectoryAsync: jest.fn(() => Promise.resolve([])),
-  deleteAsync: jest.fn(() => Promise.resolve()),
+  writeAsStringAsync: jest.fn((path: string, content: string) => {
+    fileStore[path] = content;
+    return Promise.resolve();
+  }),
+  readAsStringAsync: jest.fn((path: string) => Promise.resolve(fileStore[path] ?? '')),
+  readDirectoryAsync: jest.fn(() => Promise.resolve(Object.keys(fileStore))),
+  deleteAsync: jest.fn((path: string) => {
+    delete fileStore[path];
+    return Promise.resolve();
+  }),
   makeDirectoryAsync: jest.fn(() => Promise.resolve()),
-  getInfoAsync: jest.fn(() => Promise.resolve({ exists: true, size: 1024 })),
+  getInfoAsync: jest.fn((path: string) => Promise.resolve({ exists: Boolean(fileStore[path]), size: fileStore[path]?.length ?? 0 })),
+  EncodingType: {
+    UTF8: 'utf8',
+  },
 }));
 
 jest.mock('expo-crypto', () => ({
@@ -34,6 +45,14 @@ jest.mock('expo-local-authentication', () => ({
   isEnrolledAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
+jest.mock('../../storage/encryption', () => ({
+  EncryptionManager: {
+    encryptString: jest.fn(async (plaintext: string) => ({ success: true, data: `enc:${plaintext}` })),
+    decryptString: jest.fn(async (ciphertext: string) => ({ success: true, data: ciphertext.replace(/^enc:/, '') })),
+    config: { enabled: true },
+  },
+}));
+
 jest.mock('react-native', () => ({
   Platform: {
     OS: 'ios',
@@ -42,8 +61,13 @@ jest.mock('react-native', () => ({
 }));
 
 jest.mock('pako', () => ({
-  deflate: jest.fn((data) => new Uint8Array([1, 2, 3])),
-  inflate: jest.fn((data) => new Uint8Array([4, 5, 6])),
+  deflate: jest.fn((data) => Buffer.from(String(data))),
+  inflate: jest.fn((data, opts) => {
+    if (opts && opts.to === 'string') {
+      return Buffer.from(data).toString();
+    }
+    return new Uint8Array(Buffer.from(data));
+  }),
   constants: {
     Z_BEST_COMPRESSION: 9
   }
