@@ -10,6 +10,7 @@ jest.mock('expo-file-system', () => ({
   documentDirectory: 'mock://documents/',
   writeAsStringAsync: jest.fn(() => Promise.resolve()),
   readAsStringAsync: jest.fn(() => Promise.resolve('mock file content')),
+  readDirectoryAsync: jest.fn(() => Promise.resolve([])),
   deleteAsync: jest.fn(() => Promise.resolve()),
   makeDirectoryAsync: jest.fn(() => Promise.resolve()),
   getInfoAsync: jest.fn(() => Promise.resolve({ exists: true, size: 1024 })),
@@ -40,6 +41,14 @@ jest.mock('react-native', () => ({
   }
 }));
 
+jest.mock('pako', () => ({
+  deflate: jest.fn((data) => new Uint8Array([1, 2, 3])),
+  inflate: jest.fn((data) => new Uint8Array([4, 5, 6])),
+  constants: {
+    Z_BEST_COMPRESSION: 9
+  }
+}));
+
 describe('CloudBackupService', () => {
   const mockConfig: BackupConfig = {
     provider: 'local',
@@ -59,12 +68,8 @@ describe('CloudBackupService', () => {
     jest.clearAllMocks();
     await CloudBackupService.updateConfig(mockConfig);
 
-    // Mock FileSystem methods
-    (FileSystem.writeAsStringAsync as jest.Mock).mockResolvedValue(undefined);
-    (FileSystem.readAsStringAsync as jest.Mock).mockResolvedValue('{}');
-    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({ exists: false });
-    (FileSystem.makeDirectoryAsync as jest.Mock).mockResolvedValue(undefined);
-    (FileSystem.readDirectoryAsync as jest.Mock).mockResolvedValue([]);
+    // Mocks are already defined at the module level above
+    // jest.clearAllMocks() will reset their call history but keep the implementations
   });
 
   describe('createBackup', () => {

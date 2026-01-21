@@ -100,13 +100,21 @@ export const MedsAppointmentsScreen: React.FC = () => {
   };
   
   const handleAddAppointment = () => {
-    setEditingAppt(null);
-    setShowApptModal(true);
+    // TODO: Implement appointment add/edit modal
+    Alert.alert(
+      'Coming Soon',
+      'Appointment editing feature is under development. For now, you can delete appointments and track them in your notes.',
+      [{ text: 'OK' }]
+    );
   };
-  
+
   const handleEditAppointment = (appt: Appointment) => {
-    setEditingAppt(appt);
-    setShowApptModal(true);
+    // TODO: Implement appointment add/edit modal
+    Alert.alert(
+      'Coming Soon',
+      'Appointment editing feature is under development. For now, you can delete appointments and track them in your notes.',
+      [{ text: 'OK' }]
+    );
   };
   
   const handleDeleteAppointment = (apptId: string) => {

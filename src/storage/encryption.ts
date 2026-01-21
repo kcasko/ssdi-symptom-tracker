@@ -1,6 +1,19 @@
 /**
  * Encryption Utilities
  * Optional encryption layer for sensitive data
+ *
+ * ⚠️ WARNING: The current encryption implementation uses a simplified algorithm
+ * and should NOT be considered cryptographically strong. While key generation
+ * now uses cryptographically secure random bytes, the actual encryption/decryption
+ * is a custom character transformation, not true AES-GCM.
+ *
+ * For production use with strong encryption requirements, consider:
+ * - Using react-native-aes-crypto for real AES encryption
+ * - Or relying entirely on expo-secure-store for all sensitive data
+ * - Or implementing proper AES-GCM using native crypto libraries
+ *
+ * The current implementation provides obfuscation and basic protection
+ * but should not be relied upon for highly sensitive health data.
  */
 
 import * as crypto from 'expo-crypto';
@@ -243,14 +256,15 @@ export class EncryptionManager {
   }
 
   /**
-   * Generate and store encryption key
+   * Generate and store encryption key using cryptographically secure random bytes
    */
   static async generateEncryptionKey(): Promise<EncryptionResult> {
     try {
-      // Generate a random key (in production, use proper crypto libraries)
-      const key = Array.from({ length: 32 }, () => 
-        Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
-      ).join('');
+      // Generate cryptographically secure random bytes (32 bytes = 256 bits for AES-256)
+      const keyBytes = crypto.getRandomBytes(32);
+      const key = Array.from(keyBytes)
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
 
       const result = await this.storeSecure(this.ENCRYPTION_KEY, key, true);
       return result;
@@ -285,8 +299,10 @@ export class EncryptionManager {
   }
 
   /**
-   * AES-GCM string encryption using expo-crypto
-   * Provides authenticated encryption with associated data (AEAD)
+   * String encryption with simplified algorithm
+   * ⚠️ WARNING: This is NOT true AES-GCM encryption despite the name.
+   * Uses character transformation for basic obfuscation.
+   * See file header for security warnings and alternatives.
    */
   static async encryptString(plaintext: string): Promise<EncryptionResult> {
     try {
@@ -340,8 +356,10 @@ export class EncryptionManager {
   }
 
   /**
-   * AES-GCM string decryption using expo-crypto
-   * Validates authenticated encryption and decrypts data
+   * String decryption with simplified algorithm
+   * ⚠️ WARNING: This is NOT true AES-GCM decryption despite the name.
+   * Reverses the character transformation used in encryptString.
+   * See file header for security warnings and alternatives.
    */
   static async decryptString(ciphertext: string): Promise<EncryptionResult> {
     try {

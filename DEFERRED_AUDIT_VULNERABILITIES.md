@@ -1,12 +1,13 @@
-# Deferred npm Audit Vulnerabilities (as of 2026-01-01)
+# Deferred npm Audit Vulnerabilities (Last Updated: 2026-01-21)
 
-This document tracks known npm audit vulnerabilities that are present due to Expo and its transitive dependencies. These issues are not currently fixable without breaking changes or upgrading Expo, which is not permitted for this project at this time.
+This document tracks known npm audit vulnerabilities that are present due to Expo and its transitive dependencies. These issues are not currently fixable without breaking changes or upgrading Expo, which would be a breaking change.
 
 ## Summary Table
 
 | Vulnerability | Package/Dependency         | Risk Level | Reachable at Runtime? | Recommendation         |
 |---------------|---------------------------|------------|----------------------|-----------------------|
 | Template Injection | send <0.19.0                | Moderate   | No                   | Defer, dev/build only |
+| File Overwrite & Symlink | tar <=7.5.3           | High       | No                   | Defer, dev/build only |
 | Prototype Pollution | xml2js <0.5.0               | Moderate   | No                   | Defer, dev/build only |
 | XML Parsing Issues  | xmldom                      | Critical   | No                   | Defer, dev/build only |
 | Others             | (transitive, dev/build)     | Low-Mod    | No                   | Defer, dev/build only |
