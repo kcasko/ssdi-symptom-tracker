@@ -3,6 +3,8 @@
  * Captures activity attempts and their impacts - raw evidence layer
  */
 
+import { RetrospectiveContext } from './RetrospectiveContext';
+
 export interface ActivityLog {
   id: string;
   profileId: string;
@@ -46,6 +48,9 @@ export interface ActivityLog {
   
   // Free-form notes
   notes?: string;
+  
+  // Retrospective context for backdated entries
+  retrospectiveContext?: RetrospectiveContext;
   
   // Photo evidence
   photos?: string[]; // Photo attachment IDs

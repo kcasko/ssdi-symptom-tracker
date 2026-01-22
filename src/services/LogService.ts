@@ -14,6 +14,7 @@ import {
   getWorstImpact,
   getTotalRecoveryTime 
 } from '../domain/models/ActivityLog';
+import { RetrospectiveContext } from '../domain/models/RetrospectiveContext';
 import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
 import { generateId } from '../utils/ids';
@@ -28,6 +29,7 @@ export interface DailyLogInput {
   }>;
   notes?: string;
   photos?: string[]; // Photo attachment IDs
+  retrospectiveContext?: RetrospectiveContext;
 }
 
 export interface ActivityLogInput {
@@ -45,6 +47,7 @@ export interface ActivityLogInput {
     durationMinutes: number;
   }>;
   notes?: string;
+  retrospectiveContext?: RetrospectiveContext;
 }
 
 export class LogService {
@@ -98,6 +101,10 @@ export class LogService {
       log.photos = input.photos;
     }
 
+    if (input.retrospectiveContext) {
+      log.retrospectiveContext = input.retrospectiveContext;
+    }
+
     // Recalculate overall severity
     log.overallSeverity = calculateAverageSeverity(log.symptoms);
 
@@ -131,6 +138,10 @@ export class LogService {
     // Update photos if provided
     if (updates.photos !== undefined) {
       updatedLog.photos = updates.photos;
+    }
+
+    if (updates.retrospectiveContext !== undefined) {
+      updatedLog.retrospectiveContext = updates.retrospectiveContext;
     }
 
     return updatedLog;
@@ -211,6 +222,10 @@ export class LogService {
       log.notes = input.notes;
     }
 
+    if (input.retrospectiveContext) {
+      log.retrospectiveContext = input.retrospectiveContext;
+    }
+
     return log;
   }
 
@@ -273,6 +288,10 @@ export class LogService {
     // Update notes
     if (updates.notes !== undefined) {
       updatedLog.notes = updates.notes;
+    }
+
+    if (updates.retrospectiveContext !== undefined) {
+      updatedLog.retrospectiveContext = updates.retrospectiveContext;
     }
 
     return updatedLog;

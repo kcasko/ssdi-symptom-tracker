@@ -3,6 +3,8 @@
  * Captures daily symptom entries - raw evidence layer
  */
 
+import { RetrospectiveContext } from './RetrospectiveContext';
+
 export interface DailyLog {
   id: string;
   profileId: string;
@@ -38,6 +40,9 @@ export interface DailyLog {
   
   // Free-form notes
   notes?: string;
+  
+  // Retrospective context for backdated entries
+  retrospectiveContext?: RetrospectiveContext;
   
   // Photo evidence
   photos?: string[]; // Photo attachment IDs

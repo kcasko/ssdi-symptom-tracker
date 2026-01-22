@@ -154,6 +154,30 @@ export function getMinutesBetween(start: Date | string, end: Date | string): num
 }
 
 /**
+ * Calculate whole-day delay between an event date and when it was recorded
+ */
+export function calculateDaysDelayed(eventDate: Date | string, createdAt?: Date | string): number {
+  if (!createdAt) return 0;
+  
+  const event = typeof eventDate === 'string' ? parseISO(eventDate) : eventDate;
+  const created = typeof createdAt === 'string' ? parseISO(createdAt) : createdAt;
+  
+  if (!isValid(event) || !isValid(created)) return 0;
+  
+  const days = differenceInDays(created, event);
+  return days < 0 ? 0 : days;
+}
+
+/**
+ * Get a human-readable label for how long after the event the log was created
+ */
+export function getDelayLabel(daysDelayed: number): string {
+  if (daysDelayed <= 0) return 'Logged same-day';
+  if (daysDelayed === 1) return 'Logged 1 day after event';
+  return `Logged ${daysDelayed} days after event`;
+}
+
+/**
  * Parse an ISO date string
  */
 export function parseDate(dateStr: string): Date | null {

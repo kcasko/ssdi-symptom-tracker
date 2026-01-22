@@ -12,7 +12,7 @@ import { Appointment } from '../domain/models/Appointment';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
-import { isSameDayAs } from '../utils/dates';
+import { calculateDaysDelayed, isSameDayAs } from '../utils/dates';
 import { applyEvidenceTimestamp } from '../services/EvidenceLogService';
 
 interface LogState {
@@ -155,6 +155,16 @@ export const useLogStore = create<LogState>((set, get) => ({
         createdAt: now,
         updatedAt: now,
       };
+
+      const daysDelayed = calculateDaysDelayed(newLog.logDate, newLog.createdAt);
+      if (daysDelayed > 7 || logData.retrospectiveContext) {
+        newLog.retrospectiveContext = {
+          daysDelayed,
+          flaggedAt: logData.retrospectiveContext?.flaggedAt || now,
+          reason: logData.retrospectiveContext?.reason || (daysDelayed > 7 ? 'Backdated entry (logged more than 7 days after event date)' : undefined),
+          note: logData.retrospectiveContext?.note,
+        };
+      }
       
       // Apply evidence timestamp if Evidence Mode is enabled
       newLog = applyEvidenceTimestamp(newLog);
@@ -230,6 +240,16 @@ export const useLogStore = create<LogState>((set, get) => ({
         createdAt: now,
         updatedAt: now,
       };
+
+      const daysDelayed = calculateDaysDelayed(newLog.activityDate, newLog.createdAt);
+      if (daysDelayed > 7 || logData.retrospectiveContext) {
+        newLog.retrospectiveContext = {
+          daysDelayed,
+          flaggedAt: logData.retrospectiveContext?.flaggedAt || now,
+          reason: logData.retrospectiveContext?.reason || (daysDelayed > 7 ? 'Backdated entry (logged more than 7 days after event date)' : undefined),
+          note: logData.retrospectiveContext?.note,
+        };
+      }
       
       // Apply evidence timestamp if Evidence Mode is enabled
       newLog = applyEvidenceTimestamp(newLog);

@@ -8,6 +8,9 @@ import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
+import { useEvidenceModeStore } from '../state/evidenceModeStore';
+import { getRevisionCount } from './EvidenceLogService';
+import { calculateDaysDelayed } from '../utils/dates';
 
 /**
  * PDF export configuration
@@ -273,8 +276,46 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const evidenceStore = useEvidenceModeStore.getState();
   const uniqueDates = (dates: string[]) => Array.from(new Set(dates)).sort();
   const listDates = (dates: string[]) => uniqueDates(dates).join(', ') || 'Not specified';
+
+  const getLogMeta = (log: DailyLog | ActivityLog, eventDate: string) => {
+    const created = log.createdAt ? new Date(log.createdAt).toISOString() : '';
+    const updated = (log as any).updatedAt ? new Date((log as any).updatedAt).toISOString() : created;
+    const evidenceTimestamp = (log as any).evidenceTimestamp
+      ? new Date((log as any).evidenceTimestamp).toISOString()
+      : '';
+    const daysDelayed = calculateDaysDelayed(eventDate, log.createdAt || created);
+    const finalized = evidenceStore.isLogFinalized(log.id) || Boolean((log as any).finalized);
+    const revisionCount = getRevisionCount(log.id);
+    const retrospectiveContext = (log as any).retrospectiveContext || {};
+    const reason = retrospectiveContext.reason ? escapeHTML(retrospectiveContext.reason) : '';
+    const note = retrospectiveContext.note ? escapeHTML(retrospectiveContext.note) : '';
+    const flaggedAt = retrospectiveContext.flaggedAt
+      ? new Date(retrospectiveContext.flaggedAt).toISOString()
+      : '';
+    const delayLabel =
+      daysDelayed > 0
+        ? `Logged ${daysDelayed} ${daysDelayed === 1 ? 'day' : 'days'} after event`
+        : 'Logged same-day';
+    const retrospectiveSummary =
+      reason || note
+        ? `Reason: ${reason || 'None'}; Note: ${note || 'None'}`
+        : 'None provided';
+
+    return {
+      created,
+      updated,
+      evidenceTimestamp,
+      daysDelayed,
+      delayLabel,
+      finalized,
+      revisionCount,
+      retrospectiveSummary,
+      retrospectiveFlaggedAt: flaggedAt,
+    };
+  };
 
   const renderDailyLogs = () => {
     if (payload.rawDailyLogs.length === 0) return '<p>No daily symptom entries in this range.</p>';
@@ -282,7 +323,11 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     return `<ul>${sorted
       .map((log) => {
         const symptoms = log.symptoms.map((s) => `${s.symptomId} (sev ${s.severity}${s.duration ? `, ${s.duration}m` : ''})`).join('; ');
-        return `<li>${formatDate(log.logDate)} — Severity ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}; Last modified: ${formatDate(log.updatedAt || log.createdAt)}</li>`;
+        const meta = getLogMeta(log, log.logDate);
+        const retrospectiveText = meta.retrospectiveFlaggedAt
+          ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
+          : meta.retrospectiveSummary;
+        return `<li>Event date (user-selected): ${escapeHTML(log.logDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Severity: ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}</li>`;
       })
       .join('')}</ul>`;
   };
@@ -294,7 +339,11 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
       .map((log) => {
         const impact = log.immediateImpact?.overallImpact ?? 0;
         const recovery = log.recoveryDuration || 0;
-        return `<li>${formatDate(log.activityDate)} — ${escapeHTML(log.activityName)}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'yes' : 'no'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}; Last modified: ${formatDate(log.updatedAt || log.createdAt)}</li>`;
+        const meta = getLogMeta(log, log.activityDate);
+        const retrospectiveText = meta.retrospectiveFlaggedAt
+          ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
+          : meta.retrospectiveSummary;
+        return `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`;
       })
       .join('')}</ul>`;
   };

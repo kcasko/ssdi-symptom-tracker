@@ -9,6 +9,9 @@ import { Medication } from '../domain/models/Medication';
 import { Limitation } from '../domain/models/Limitation';
 import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
+import { useEvidenceModeStore } from '../state/evidenceModeStore';
+import { getRevisionCount } from './EvidenceLogService';
+import { calculateDaysDelayed } from '../utils/dates';
 import { Share, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -157,18 +160,64 @@ export class ExportService {
   }
 
   /**
+   * Format ISO timestamp safely
+   */
+  private static toIsoString(value?: string): string {
+    if (!value) return '';
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? '' : date.toISOString();
+  }
+
+  /**
+   * Gather consistent temporal metadata for logs
+   */
+  private static getLogMetadata(log: DailyLog | ActivityLog, eventDate: string) {
+    const evidenceStore = useEvidenceModeStore.getState();
+    const createdIso = this.toIsoString(log.createdAt);
+    const updatedIso = this.toIsoString((log as any).updatedAt || log.createdAt);
+    const evidenceIso = this.toIsoString((log as any).evidenceTimestamp);
+    const daysDelayed = calculateDaysDelayed(eventDate, log.createdAt);
+    const finalized = evidenceStore.isLogFinalized(log.id) || Boolean((log as any).finalized);
+    const revisionCount = getRevisionCount(log.id);
+    const retrospectiveContext = (log as any).retrospectiveContext || {};
+
+    return {
+      createdIso,
+      updatedIso,
+      evidenceIso,
+      daysDelayed,
+      finalized,
+      revisionCount,
+      retrospectiveReason: retrospectiveContext.reason || '',
+      retrospectiveNote: retrospectiveContext.note || '',
+      retrospectiveFlaggedAt: retrospectiveContext.flaggedAt
+        ? this.toIsoString(retrospectiveContext.flaggedAt)
+        : '',
+    };
+  }
+
+  /**
    * Convert daily logs to CSV
    */
   private static dailyLogsToCSV(logs: DailyLog[]): string {
     const headers = [
-      'Date',
-      'Overall Severity',
+      'Event_Date',
+      'Created_DateTime',
+      'Last_Modified_DateTime',
+      'Evidence_Timestamp',
+      'Days_Delayed',
+      'Finalized',
+      'Revision_Count',
+      'Retrospective_Reason',
+      'Retrospective_Note',
+      'Retrospective_FlaggedAt',
+      'Overall_Severity',
       'Symptoms',
-      'Symptom Details',
+      'Symptom_Details',
       'Triggers',
       'Weather',
-      'Stress Level',
-      'Sleep Quality',
+      'Stress_Level',
+      'Sleep_Quality',
       'Notes',
     ];
 
@@ -189,12 +238,23 @@ export class ExportService {
           })
           .join('; ');
 
+        const meta = this.getLogMetadata(log, log.logDate);
+
         return [
           log.logDate,
+          meta.createdIso,
+          meta.updatedIso,
+          meta.evidenceIso,
+          meta.daysDelayed,
+          meta.finalized ? 'Yes' : 'No',
+          meta.revisionCount,
+          this.escapeCSV(meta.retrospectiveReason),
+          this.escapeCSV(meta.retrospectiveNote),
+          meta.retrospectiveFlaggedAt,
           log.overallSeverity,
-          symptoms,
-          symptomDetails,
-          log.triggers?.join('; ') || '',
+          this.escapeCSV(symptoms),
+          this.escapeCSV(symptomDetails),
+          this.escapeCSV(log.triggers?.join('; ') || ''),
           log.environmentalFactors?.weather || '',
           log.environmentalFactors?.stressLevel || '',
           log.sleepQuality?.quality || '',
@@ -210,12 +270,21 @@ export class ExportService {
    */
   private static activityLogsToCSV(logs: ActivityLog[]): string {
     const headers = [
-      'Date',
-      'Activity',
-      'Duration (min)',
-      'Stopped Early',
-      'Immediate Impact',
-      'Delayed Impact',
+      'Event_Date',
+      'Created_DateTime',
+      'Last_Modified_DateTime',
+      'Evidence_Timestamp',
+      'Days_Delayed',
+      'Finalized',
+      'Revision_Count',
+      'Retrospective_Reason',
+      'Retrospective_Note',
+      'Retrospective_FlaggedAt',
+      'Activity_Name',
+      'Duration_Minutes',
+      'Stopped_Early',
+      'Immediate_Impact',
+      'Delayed_Impact',
       'Notes',
     ];
 
@@ -223,14 +292,26 @@ export class ExportService {
       .sort((a, b) => a.activityDate.localeCompare(b.activityDate))
       .map(log => {
         const activityDef = getActivityById(log.activityId);
+        const meta = this.getLogMetadata(log, log.activityDate);
+        const immediateImpactScore = log.immediateImpact?.overallImpact ?? 0;
+        const delayedImpactScore = log.delayedImpact ? `${log.delayedImpact.overallImpact}/10` : '';
 
         return [
           log.activityDate,
+          meta.createdIso,
+          meta.updatedIso,
+          meta.evidenceIso,
+          meta.daysDelayed,
+          meta.finalized ? 'Yes' : 'No',
+          meta.revisionCount,
+          this.escapeCSV(meta.retrospectiveReason),
+          this.escapeCSV(meta.retrospectiveNote),
+          meta.retrospectiveFlaggedAt,
           activityDef?.name || log.activityName,
           log.duration,
           log.stoppedEarly ? 'Yes' : 'No',
-          `${log.immediateImpact.overallImpact}/10`,
-          log.delayedImpact ? `${log.delayedImpact.overallImpact}/10` : '',
+          `${immediateImpactScore}/10`,
+          delayedImpactScore,
           this.escapeCSV(log.notes || ''),
         ];
       });
