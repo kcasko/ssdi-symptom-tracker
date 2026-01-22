@@ -759,6 +759,12 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
   onShare,
 }) => {
   if (!summary) return null;
+  const trendLabel =
+    summary.dayQualitySummary.trend === 'improving'
+      ? 'Severity decreasing vs prior period'
+      : summary.dayQualitySummary.trend === 'worsening'
+        ? 'Severity increasing vs prior period'
+        : 'Severity stable vs prior period';
   
   return (
     <Modal visible={visible} animationType="slide" transparent={false}>
@@ -780,9 +786,9 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
           <View style={styles.summarySection}>
             <Text style={styles.summarySectionTitle}>Functional Status</Text>
             <Text style={styles.summaryText}>
-              Good Days: {summary.dayQualitySummary.goodDays} | Bad Days: {summary.dayQualitySummary.badDays} ({summary.dayQualitySummary.percentage}%)
+              Lower-impact days: {summary.dayQualitySummary.goodDays} | Higher-impact days: {summary.dayQualitySummary.badDays} ({summary.dayQualitySummary.percentage}%)
             </Text>
-            <Text style={styles.summaryText}>Trend: {summary.dayQualitySummary.trend}</Text>
+            <Text style={styles.summaryText}>Change indicator: {trendLabel}</Text>
           </View>
           
           {/* Recent Symptoms */}

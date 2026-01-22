@@ -250,7 +250,7 @@ export function generateVariabilityStatement(
     case 'some_variability':
       return 'symptoms show some day-to-day variation but maintain overall pattern';
     case 'high_variability':
-      return 'symptoms demonstrate significant variation between good and bad days';
+      return 'symptoms demonstrate significant variation between lower- and higher-impact days';
     case 'unpredictable':
       return 'symptoms follow unpredictable patterns without clear triggers';
   }

@@ -360,7 +360,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gap explanation (optional)</Text>
             <Text style={styles.helperText}>
-              No daily logs between {gapRange.start} and {gapRange.end} ({gapDaysSinceLast} days). Add context if helpful.
+              No daily logs between {gapRange.start} and {gapRange.end} ({gapDaysSinceLast} days). Add context if needed.
             </Text>
             <NotesField
               value={gapExplanation}

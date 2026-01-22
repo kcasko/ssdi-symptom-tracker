@@ -446,7 +446,7 @@ export class CredibilityScorer {
     // Completeness recommendations
     if (indicators.dataCompleteness.score < 70) {
       if (indicators.dataCompleteness.logsWithNotes / indicators.dataCompleteness.totalLogs < 0.5) {
-        recommendations.push('Add detailed notes to more log entries. Specific examples strengthen your case.');
+        recommendations.push('Add detailed notes to more log entries. Specific examples increase clarity in the record.');
       }
       if (indicators.dataCompleteness.logsWithMultipleSymptoms / indicators.dataCompleteness.totalLogs < 0.5) {
         recommendations.push('Track multiple symptoms when present. Co-occurring symptoms demonstrate impact.');

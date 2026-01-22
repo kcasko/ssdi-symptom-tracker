@@ -96,20 +96,15 @@ export const AboutScreen: React.FC<AboutProps> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Section 5: About Good Days and Bad Days */}
+        {/* Section 5: About Impact Bands */}
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionIcon}>📅</Text>
-            <Text style={styles.sectionTitle}>About Good Days and Bad Days</Text>
+            <Text style={styles.sectionTitle}>About Impact Bands</Text>
           </View>
           <Text style={styles.paragraph}>
-            'Good days' and 'bad days' are estimates based on symptom severity and activity impact you record. They are not labels or judgments.
+            Impact bands are calculated from the severity and activity impact you record. The labels describe intensity only and do not add interpretation.
           </Text>
-          <View style={styles.tipBox}>
-            <Text style={styles.tipText}>
-              A bad day is not a failure. It's information.
-            </Text>
-          </View>
         </View>
 
         {/* Section 6: Logging Quiet Days */}

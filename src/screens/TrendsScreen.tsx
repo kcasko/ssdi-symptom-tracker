@@ -218,7 +218,7 @@ export function TrendsScreen() {
   const chartData = useMemo(() => {
     if (selectedTrend === 'day-quality') {
       return {
-        labels: ['Good', 'Neutral', 'Bad', 'Very Bad'],
+        labels: ['Low impact', 'Moderate', 'High', 'Very High'],
         datasets: [{
           data: [
             dayRatios.goodDays,
@@ -251,14 +251,14 @@ export function TrendsScreen() {
   function renderDayRatioInsights() {
     return (
       <View style={styles.dayRatioContainer}>
-        <Text style={styles.sectionTitle}>Day Quality Analysis</Text>
+        <Text style={styles.sectionTitle}>Day Impact Distribution</Text>
         
         <View style={styles.ratioStatsGrid}>
           <View style={styles.ratioStatCard}>
             <Text style={[styles.ratioValue, { color: COLORS.successMain }]}>
               {dayRatios.goodDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Functional Days (severity &lt;5)</Text>
+            <Text style={styles.ratioLabel}>Lower-impact days (severity &lt;5)</Text>
             <Text style={styles.ratioCount}>({dayRatios.goodDays} days)</Text>
           </View>
 
@@ -266,13 +266,13 @@ export function TrendsScreen() {
             <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}>
               {dayRatios.badDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Limited Function Days (severity ≥6)</Text>
+            <Text style={styles.ratioLabel}>Higher-impact days (severity >=6)</Text>
             <Text style={styles.ratioCount}>({dayRatios.badDays + dayRatios.veryBadDays} days)</Text>
           </View>
         </View>
 
         <View style={styles.functionalCapacityCard}>
-          <Text style={styles.functionalCapacityTitle}>Functional Capacity</Text>
+          <Text style={styles.functionalCapacityTitle}>Impact mix</Text>
           <View style={styles.functionalCapacityBar}>
             <View 
               style={[
@@ -442,7 +442,7 @@ export function TrendsScreen() {
         <View style={styles.flareNotesCard}>
           <Text style={styles.flareNotesTitle}>Flare Impact Summary</Text>
           <Text style={styles.flareNotesText}>
-            • Flares defined as 3+ consecutive days with pain/severity ≥6/10
+            • Flares defined as 3+ consecutive days with pain/severity >=6/10
           </Text>
           {flareSummary.flaresPerMonth >= 2 && (
             <Text style={styles.flareNotesText}>
@@ -630,9 +630,16 @@ export function TrendsScreen() {
   const renderInsights = () => {
     if (trendData.length === 0) return null;
 
+    const displayTrend =
+      insights.trendDirection === 'improving'
+        ? 'Severity decreasing'
+        : insights.trendDirection === 'worsening'
+          ? 'Severity increasing'
+          : 'Severity stable';
+
     return (
       <View style={styles.insightsContainer}>
-        <Text style={styles.sectionTitle}>Insights</Text>
+        <Text style={styles.sectionTitle}>Summary Metrics</Text>
         <View style={styles.insightGrid}>
           <View style={styles.insightCard}>
             <Text style={styles.insightValue}>{insights.averageSeverity.toFixed(1)}</Text>
@@ -651,13 +658,9 @@ export function TrendsScreen() {
         {/* Additional insights */}
         <View style={styles.additionalInsights}>
           <Text style={styles.insightText}>
-            <Text style={styles.insightLabel}>Trend: </Text>
-            <Text style={[
-              styles.trendText,
-              insights.trendDirection === 'improving' && styles.improvingText,
-              insights.trendDirection === 'worsening' && styles.worseningText
-            ]}>
-              {insights.trendDirection.charAt(0).toUpperCase() + insights.trendDirection.slice(1)}
+            <Text style={styles.insightLabel}>Change direction: </Text>
+            <Text style={[styles.trendText]}>
+              {displayTrend}
             </Text>
           </Text>
           
@@ -670,7 +673,7 @@ export function TrendsScreen() {
 
           {insights.worstDay && (
             <Text style={styles.insightText}>
-              <Text style={styles.insightLabel}>Worst Day: </Text>
+              <Text style={styles.insightLabel}>Highest recorded severity day: </Text>
               {insights.worstDay.date} (severity: {insights.worstDay.severity.toFixed(1)})
             </Text>
           )}
@@ -700,7 +703,7 @@ export function TrendsScreen() {
             <Text style={[styles.medicationSummaryValue, { color: COLORS.success.main }]}>
               {medicationAnalysis.effectiveMedications}
             </Text>
-            <Text style={styles.medicationSummaryLabel}>Improved</Text>
+            <Text style={styles.medicationSummaryLabel}>Reduced impact</Text>
           </View>
           
           <View style={styles.medicationSummaryCard}>

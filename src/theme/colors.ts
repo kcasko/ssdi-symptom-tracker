@@ -6,7 +6,7 @@
  * - Deep slate and charcoal tones (not clinical blue)
  * - Low contrast but readable
  * - No alarm colors or bright accents
- * - Colors you'd trust on a bad day
+ * - Colors designed for clear, neutral presentation
  */
 
 export const colors = {

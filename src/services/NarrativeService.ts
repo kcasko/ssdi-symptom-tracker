@@ -193,9 +193,9 @@ export class NarrativeService {
       lines.push(`Recovery required: ${totalRecovery} minutes`);
       
       activityLog.recoveryActions.forEach(action => {
-        const helpfulText = action.helpful ? ' (helpful)' : ' (not helpful)';
+        const effectivenessText = action.helpful ? ' (marked effective)' : ' (marked not effective)';
         const durationText = action.duration ? ` - ${action.duration} minutes` : '';
-        lines.push(`- ${action.actionName}${durationText}${helpfulText}`);
+        lines.push(`- ${action.actionName}${durationText}${effectivenessText}`);
         
         if (action.notes) {
           lines.push(`  Notes: ${action.notes}`);
@@ -333,10 +333,10 @@ export class NarrativeService {
     
     lines.push(`During this reporting period, functional capacity analysis reveals:`);
     lines.push('');
-    lines.push(`Good days (minimal limitation): ${ratios.goodDayPercentage.toFixed(1)}%`);
-    lines.push(`Neutral days (moderate limitation): ${((ratios.totalDays - ratios.goodDays - ratios.badDays - ratios.veryBadDays) / ratios.totalDays * 100).toFixed(1)}%`);
-    lines.push(`Bad days (significant limitation): ${ratios.badDayPercentage.toFixed(1)}%`);
-    lines.push(`Very bad days (severe limitation): ${((ratios.veryBadDays / ratios.totalDays) * 100).toFixed(1)}%`);
+    lines.push(`Lower-impact days (severity <5): ${ratios.goodDayPercentage.toFixed(1)}%`);
+    lines.push(`Mid-range days (severity 5-6): ${((ratios.totalDays - ratios.goodDays - ratios.badDays - ratios.veryBadDays) / ratios.totalDays * 100).toFixed(1)}%`);
+    lines.push(`High-impact days (severity 7-8): ${ratios.badDayPercentage.toFixed(1)}%`);
+    lines.push(`Very high-impact days (severity 9-10): ${((ratios.veryBadDays / ratios.totalDays) * 100).toFixed(1)}%`);
     lines.push('');
     
     lines.push(`Average functional capacity: ${(10 - ratios.averageSeverity).toFixed(1)}/10`);
@@ -345,10 +345,10 @@ export class NarrativeService {
     lines.push('');
     
     if (ratios.worstStreak > 0) {
-      lines.push(`Longest period of consecutive bad days: ${ratios.worstStreak} days`);
+      lines.push(`Longest stretch of higher-impact days: ${ratios.worstStreak} days`);
     }
     if (ratios.bestStreak > 0) {
-      lines.push(`Longest period of consecutive good days: ${ratios.bestStreak} days`);
+      lines.push(`Longest stretch of lower-impact days: ${ratios.bestStreak} days`);
     }
     lines.push('');
     

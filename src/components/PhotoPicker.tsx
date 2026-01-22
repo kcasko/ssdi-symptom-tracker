@@ -257,7 +257,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
       <View style={styles.tipContainer}>
         <MaterialIcons name="lightbulb-outline" size={20} color={COLORS.warningMain} />
         <Text style={styles.tipText}>
-          Visual evidence significantly strengthens your disability case
+          Attach clear photos to document what was observed
         </Text>
       </View>
     </View>

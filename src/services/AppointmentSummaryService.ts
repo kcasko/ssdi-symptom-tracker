@@ -337,7 +337,7 @@ export class AppointmentSummaryService {
     const dayRatio = SymptomEngine.calculateDayRatio(dailyLogs);
     if (dayRatio.badDayPercentage >= 50) {
       points.push(
-        `Having bad days ${dayRatio.badDayPercentage}% of the time (${dayRatio.badDays} out of ${dayRatio.totalDays} days) - discuss impact on daily functioning`
+        `Higher-impact days recorded ${dayRatio.badDayPercentage}% of the time (${dayRatio.badDays} out of ${dayRatio.totalDays} days) - discuss impact on daily functioning`
       );
     }
     
@@ -402,7 +402,7 @@ export class AppointmentSummaryService {
   private static generateSuggestedQuestions(appointment: Appointment): string[] {
     const questions: string[] = [
       'Are there any additional treatment options I should consider?',
-      'How can I better manage my symptoms on bad days?',
+      'How can I manage symptoms on higher-impact days?',
       'Do my symptoms indicate any progression or changes in my condition?',
     ];
     
@@ -460,14 +460,14 @@ export class AppointmentSummaryService {
         goodDays: 0,
         badDays: 0,
         percentage: 0,
-        trend: 'No data available',
+        trend: 'stable',
       };
     }
     
     const dayRatio = SymptomEngine.calculateDayRatio(logs);
     
     // Determine trend
-    let trend = 'Stable';
+    let trend: 'improving' | 'worsening' | 'stable' = 'stable';
     if (logs.length >= 14) {
       const midpoint = Math.floor(logs.length / 2);
       const firstHalf = logs.slice(0, midpoint);
@@ -477,9 +477,9 @@ export class AppointmentSummaryService {
       const secondHalfRatio = SymptomEngine.calculateDayRatio(secondHalf);
       
       if (secondHalfRatio.badDayPercentage > firstHalfRatio.badDayPercentage + 15) {
-        trend = 'Worsening - more bad days in recent period';
+        trend = 'worsening';
       } else if (secondHalfRatio.badDayPercentage < firstHalfRatio.badDayPercentage - 15) {
-        trend = 'Improving - fewer bad days in recent period';
+        trend = 'improving';
       }
     }
     
@@ -519,9 +519,15 @@ export class AppointmentSummaryService {
     lines.push('─────────────────────────────────────────────');
     lines.push('FUNCTIONAL STATUS');
     lines.push('─────────────────────────────────────────────');
-    lines.push(`Good Days: ${summary.dayQualitySummary.goodDays}`);
-    lines.push(`Bad Days: ${summary.dayQualitySummary.badDays} (${summary.dayQualitySummary.percentage}%)`);
-    lines.push(`Trend: ${summary.dayQualitySummary.trend}`);
+    const dayTrend =
+      summary.dayQualitySummary.trend === 'improving'
+        ? 'Severity decreasing vs prior period'
+        : summary.dayQualitySummary.trend === 'worsening'
+          ? 'Severity increasing vs prior period'
+          : 'Severity stable vs prior period';
+    lines.push(`Lower-impact days: ${summary.dayQualitySummary.goodDays}`);
+    lines.push(`Higher-impact days: ${summary.dayQualitySummary.badDays} (${summary.dayQualitySummary.percentage}%)`);
+    lines.push(`Change indicator: ${dayTrend}`);
     lines.push('');
     
     // Recent symptoms
@@ -529,9 +535,16 @@ export class AppointmentSummaryService {
       lines.push('─────────────────────────────────────────────');
       lines.push('RECENT SYMPTOMS');
       lines.push('─────────────────────────────────────────────');
+      const formatTrend = (t: string) =>
+        t === 'improving'
+          ? 'severity decreasing'
+          : t === 'worsening'
+            ? 'severity increasing'
+            : 'severity stable';
+
       summary.recentSymptoms.slice(0, 7).forEach(symptom => {
         lines.push(
-          `• ${symptom.symptomName}: ${symptom.frequency}% of days, avg severity ${symptom.averageSeverity}/10 (${symptom.trend})`
+          `• ${symptom.symptomName}: ${symptom.frequency}% of days, avg severity ${symptom.averageSeverity}/10 (${formatTrend(symptom.trend)})`
         );
       });
       lines.push('');

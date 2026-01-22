@@ -347,7 +347,7 @@ export class PatternDetector {
   }
 
   /**
-   * Detect week patterns (good days vs bad days)
+   * Detect week patterns (lower-impact vs higher-impact days)
    */
   static analyzeWeeklyPatterns(logs: DailyLog[]): {
     goodDays: number;

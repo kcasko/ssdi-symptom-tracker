@@ -175,7 +175,7 @@ export class SymptomEngine {
   }
 
   /**
-   * Calculate good vs bad day ratio
+   * Calculate lower- vs higher-impact day ratio
    */
   static calculateDayRatio(logs: DailyLog[]): {
     goodDays: number;

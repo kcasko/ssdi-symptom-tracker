@@ -208,10 +208,10 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       {
         type: 'day_quality',
         title: 'Day Quality and Functional Capacity Analysis',
-        description: 'Good/bad day ratios showing consistent functional limitations',
+        description: 'Impact band ratios showing consistent functional limitations',
         required: true,
         order: 5,
-        contentHints: ['Good day percentage', 'Bad day percentage', 'Functional capacity trends', 'SSDI implications'],
+        contentHints: ['Lower-impact day percentage', 'Higher-impact day percentage', 'Functional capacity trends', 'SSDI implications'],
       },
       {
         type: 'functional_limitations',
@@ -350,7 +350,7 @@ export const SECTION_PHRASES = {
     variability: [
       'Limitations are consistent',
       'Variability noted in functional capacity',
-      'Good days and bad days reported',
+      'Impact bands reported',
       'Unpredictable functional variations',
     ],
   },

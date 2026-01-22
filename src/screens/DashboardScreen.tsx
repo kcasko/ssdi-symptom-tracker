@@ -152,7 +152,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               <SummaryCard
                 title="Limited Function Days"
                 value={stats.last7Days.badDays}
-                subtitle="Severity ≥6"
+                subtitle="Severity >=6"
                 variant={stats.last7Days.badDays >= 4 ? 'error' : stats.last7Days.badDays >= 2 ? 'warning' : 'success'}
               />
             </View>
@@ -173,7 +173,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               <SummaryCard
                 title="Limited Function Days"
                 value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
-                subtitle="Severity ≥6"
+                subtitle="Severity >=6"
                 variant={
                   last7DayRatios.badDayPercentage >= 60 ? 'error' :
                   last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'

@@ -1,6 +1,6 @@
 /**
  * Day Quality Analyzer
- * Classifies days as good, bad, or neutral based on symptom data
+ * Classifies days as lower-, mid-, or higher-impact based on symptom data
  * Critical for SSDI documentation showing functional capacity
  */
 
@@ -27,8 +27,8 @@ export interface DayRatios {
   badDayPercentage: number;
   functionalDaysPercentage: number; // Good + Neutral days
   averageSeverity: number;
-  worstStreak: number; // Longest consecutive bad days
-  bestStreak: number; // Longest consecutive good days
+  worstStreak: number; // Longest consecutive higher-impact days
+  bestStreak: number; // Longest consecutive lower-impact days
 }
 
 export interface TimeRangeRatios {
@@ -52,7 +52,7 @@ export interface DayClassificationCriteria {
   // High-impact symptoms that automatically make a day "bad"
   highImpactSymptoms: string[];
   
-  // Minimum functional capacity for "good" day
+  // Minimum functional capacity for lower-impact day
   minFunctionalCapacity: number;
 }
 
@@ -90,7 +90,7 @@ export class DayQualityAnalyzer {
     const symptomCount = dailyLog.symptoms.length;
     const overallSeverity = dailyLog.overallSeverity;
     
-    // No symptoms = good day (but check for other factors)
+    // No symptoms = lower-impact day (but check for other factors)
     if (symptomCount === 0) {
       return {
         date: dailyLog.logDate,
@@ -256,7 +256,7 @@ export class DayQualityAnalyzer {
   }
 
   /**
-   * Calculate longest streak of bad/very-bad days
+   * Calculate longest streak of higher-impact days
    */
   private calculateWorstStreak(classifications: DayClassification[]): number {
     let currentStreak = 0;
@@ -275,7 +275,7 @@ export class DayQualityAnalyzer {
   }
 
   /**
-   * Calculate longest streak of good days
+   * Calculate longest streak of lower-impact days
    */
   private calculateBestStreak(classifications: DayClassification[]): number {
     let currentStreak = 0;
@@ -300,13 +300,13 @@ export class DayQualityAnalyzer {
     const insights: string[] = [];
     const recent = ratios.last30Days;
 
-    // Bad day percentage insights
+    // High-impact day percentage
     if (recent.badDayPercentage >= 50) {
-      insights.push(`Over ${recent.badDayPercentage.toFixed(0)}% of days in the last month were significantly impaired by symptoms.`);
+      insights.push(`Over ${recent.badDayPercentage.toFixed(0)}% of days in the last month were recorded with significant symptom impact.`);
     }
 
     if (recent.functionalDaysPercentage < 60) {
-      insights.push(`Only ${recent.functionalDaysPercentage.toFixed(0)}% of days had adequate functional capacity for normal activities.`);
+      insights.push(`Only ${recent.functionalDaysPercentage.toFixed(0)}% of days were logged below severity 5.`);
     }
 
     // Streak analysis
@@ -315,7 +315,7 @@ export class DayQualityAnalyzer {
     }
 
     if (recent.bestStreak <= 3 && recent.totalDays >= 14) {
-      insights.push(`Longest period of good days was only ${recent.bestStreak} consecutive days.`);
+      insights.push(`Longest stretch of lower-impact days was ${recent.bestStreak} consecutive days.`);
     }
 
     // Severity patterns
