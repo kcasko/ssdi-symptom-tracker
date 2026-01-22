@@ -171,18 +171,18 @@ export function TrendsScreen() {
         
         <View style={styles.ratioStatsGrid}>
           <View style={styles.ratioStatCard}>
-            <Text style={[styles.ratioValue, { color: COLORS.successMain }]}> 
+            <Text style={[styles.ratioValue, { color: COLORS.successMain }]}>
               {dayRatios.goodDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Good Days</Text>
+            <Text style={styles.ratioLabel}>Functional Days (severity &lt;5)</Text>
             <Text style={styles.ratioCount}>({dayRatios.goodDays} days)</Text>
           </View>
-          
+
           <View style={styles.ratioStatCard}>
-            <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}> 
+            <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}>
               {dayRatios.badDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Bad Days</Text>
+            <Text style={styles.ratioLabel}>Limited Function Days (severity ≥6)</Text>
             <Text style={styles.ratioCount}>({dayRatios.badDays + dayRatios.veryBadDays} days)</Text>
           </View>
         </View>
@@ -211,41 +211,17 @@ export function TrendsScreen() {
 
         {dayRatios.worstStreak > 0 && (
           <View style={styles.streakCard}>
-            <Text style={styles.streakTitle}>Symptom Patterns</Text>
+            <Text style={styles.streakTitle}>Consecutive Day Patterns</Text>
             <Text style={styles.streakText}>
-              Longest difficult period: <Text style={styles.streakValue}>{dayRatios.worstStreak} consecutive days</Text>
+              Maximum consecutive high-severity days: <Text style={styles.streakValue}>{dayRatios.worstStreak} days</Text>
             </Text>
             {dayRatios.bestStreak > 0 && (
               <Text style={styles.streakText}>
-                Longest good period: <Text style={styles.streakValue}>{dayRatios.bestStreak} consecutive days</Text>
+                Maximum consecutive low-severity days: <Text style={styles.streakValue}>{dayRatios.bestStreak} days</Text>
               </Text>
             )}
           </View>
         )}
-
-        <View style={styles.ssdiInsightsCard}>
-          <Text style={styles.ssdiInsightsTitle}>SSDI Documentation Notes</Text>
-          {dayRatios.badDayPercentage >= 25 && (
-            <Text style={styles.ssdiInsightText}>
-              • Over {dayRatios.badDayPercentage.toFixed(0)}% of days significantly impaired by symptoms
-            </Text>
-          )}
-          {dayRatios.functionalDaysPercentage < 75 && (
-            <Text style={styles.ssdiInsightText}>
-              • Functional capacity limited on {(100 - dayRatios.functionalDaysPercentage).toFixed(0)}% of days
-            </Text>
-          )}
-          {dayRatios.worstStreak >= 7 && (
-            <Text style={styles.ssdiInsightText}>
-              • Experienced prolonged periods of impairment ({dayRatios.worstStreak} consecutive days)
-            </Text>
-          )}
-          {dayRatios.averageSeverity >= 5 && (
-            <Text style={styles.ssdiInsightText}>
-              • Average symptom severity of {dayRatios.averageSeverity.toFixed(1)}/10 indicates substantial limitation
-            </Text>
-          )}
-        </View>
       </View>
     );
   }
@@ -412,7 +388,7 @@ export function TrendsScreen() {
                     </View>
                     
                     <View style={styles.weatherStat}>
-                      <Text style={styles.weatherStatLabel}>Bad Days</Text>
+                      <Text style={styles.weatherStatLabel}>High-Severity Days</Text>
                       <Text style={styles.weatherStatValue}>
                         {correlation.significantSymptomPercentage}%
                       </Text>
@@ -466,9 +442,9 @@ export function TrendsScreen() {
               {environmentalAnalysis.stress.correlation > 0.3 && (
                 <View style={styles.stressInsightCard}>
                   <Text style={styles.stressInsightText}>
-                    {environmentalAnalysis.stress.correlation > 0.6 
-                      ? '⚠️ Strong positive correlation: Higher stress significantly worsens symptoms'
-                      : '• Moderate correlation: Stress appears to influence symptom severity'}
+                    {environmentalAnalysis.stress.correlation > 0.6
+                      ? 'Correlation coefficient >0.6: Higher stress correlates with increased severity'
+                      : 'Correlation coefficient 0.3-0.6: Stress level correlates with severity'}
                   </Text>
                 </View>
               )}
@@ -478,19 +454,19 @@ export function TrendsScreen() {
         
         {(environmentalAnalysis.weather.length > 0 || environmentalAnalysis.stress.hasData) && (
           <View style={styles.environmentalNotesCard}>
-            <Text style={styles.environmentalNotesTitle}>Documentation Notes</Text>
+            <Text style={styles.environmentalNotesTitle}>Observed Correlations</Text>
             {environmentalAnalysis.weather.some(w => w.impact === 'worsens') && (
               <Text style={styles.environmentalNotesText}>
-                • Environmental factors (weather) show measurable impact on symptom severity
+                • Weather conditions logged: {environmentalAnalysis.weather.length} types
               </Text>
             )}
             {environmentalAnalysis.stress.hasData && environmentalAnalysis.stress.correlation > 0.3 && (
               <Text style={styles.environmentalNotesText}>
-                • Stress levels correlate with symptom severity, indicating environmental sensitivity
+                • Stress data: {environmentalAnalysis.totalLogsWithStress} days logged
               </Text>
             )}
             <Text style={styles.environmentalNotesText}>
-              • These patterns support documentation of condition variability and environmental triggers
+              • Correlation data available for review
             </Text>
           </View>
         )}
@@ -792,7 +768,7 @@ export function TrendsScreen() {
 
       <View style={styles.chartContainer}>
         <Text style={styles.sectionTitle}>
-          {selectedTrend === 'day-quality' && 'Good vs Bad Day Distribution'}
+          {selectedTrend === 'day-quality' && 'Functional vs Limited Function Day Distribution'}
           {selectedTrend === 'symptoms' && 'Daily Symptom Count'}
           {selectedTrend === 'severity' && 'Average Severity Over Time'}
           {selectedTrend === 'patterns' && 'Most Common Symptoms'}

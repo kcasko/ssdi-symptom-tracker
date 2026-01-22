@@ -91,7 +91,7 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
           </TouchableOpacity>
 
           <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>🔒 Privacy First</Text>
+            <Text style={styles.infoTitle}>Privacy Notice</Text>
             <Text style={styles.infoText}>
               • All data stored locally on your device{'\n'}
               • No cloud sync or accounts{'\n'}

@@ -220,42 +220,42 @@ export const LimitationsScreen: React.FC = () => {
                         onPress={() => loadLimitationForEdit(limitation)}
                         style={styles.iconButton}
                       >
-                        <Text style={styles.iconButtonText}>✏️</Text>
+                        <Text style={styles.iconButtonText}>Edit</Text>
                       </TouchableOpacity>
                       <TouchableOpacity 
                         onPress={() => handleDelete(limitation.id)}
                         style={styles.iconButton}
                       >
-                        <Text style={styles.iconButtonText}>🗑️</Text>
+                        <Text style={styles.iconButtonText}>Delete</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                   
                   {limitation.timeThreshold && (
                     <Text style={styles.limitationText}>
-                      ⏱️ Time Limit: {limitation.timeThreshold.durationMinutes} minutes
+                      Time Limit: {limitation.timeThreshold.durationMinutes} minutes
                     </Text>
                   )}
                   
                   {limitation.weightThreshold && (
                     <Text style={styles.limitationText}>
-                      ⚖️ Weight Limit: {limitation.weightThreshold.pounds} lbs
+                      Weight Limit: {limitation.weightThreshold.pounds} lbs
                     </Text>
                   )}
                   
                   <Text style={styles.limitationText}>
-                    📅 Frequency: {limitation.frequency.replace(/_/g, ' ')}
+                    Frequency: {limitation.frequency.replace(/_/g, ' ')}
                   </Text>
                   
                   {limitation.consequences && limitation.consequences.length > 0 && (
                     <Text style={styles.limitationText}>
-                      ⚠️ Consequences: {limitation.consequences.join(', ')}
+                      Consequences: {limitation.consequences.join(', ')}
                     </Text>
                   )}
                   
                   {limitation.accommodations && limitation.accommodations.length > 0 && (
                     <Text style={styles.limitationText}>
-                      🛠️ Accommodations: {limitation.accommodations.join(', ')}
+                      Accommodations: {limitation.accommodations.join(', ')}
                     </Text>
                   )}
                 </View>
@@ -442,7 +442,7 @@ export const LimitationsScreen: React.FC = () => {
             />
             
             <View style={styles.infoCard}>
-              <Text style={styles.infoTitle}>📋 About Limitations</Text>
+              <Text style={styles.infoTitle}>About Limitations</Text>
               <Text style={styles.infoText}>
                 Document your functional capacity limits:{'\n\n'}
                 • How long you can perform activities{'\n'}

@@ -246,46 +246,6 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Credibility Score */}
-        {credibilityIndicators && (
-          <View style={styles.credibilitySection}>
-            <Text style={styles.sectionTitle}>Documentation Strength</Text>
-            <View style={styles.credibilityCard}>
-              <View style={styles.credibilityHeader}>
-                <Text style={styles.credibilityLabel}>Consistency indicators (qualitative)</Text>
-              </View>
-              
-              <View style={styles.credibilityIndicators}>
-                <View style={styles.indicatorRow}>
-                  <Text style={styles.indicatorLabel}>Logging Consistency:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.loggingConsistency.rating}</Text>
-                </View>
-                <View style={styles.indicatorRow}>
-                  <Text style={styles.indicatorLabel}>Duration Coverage:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.durationCoverage.rating}</Text>
-                </View>
-                <View style={styles.indicatorRow}>
-                  <Text style={styles.indicatorLabel}>Data Completeness:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.dataCompleteness.rating}</Text>
-                </View>
-                <View style={styles.indicatorRow}>
-                  <Text style={styles.indicatorLabel}>Pattern Stability:</Text>
-                  <Text style={styles.indicatorValue}>{credibilityIndicators.indicators.patternStability.rating}</Text>
-                </View>
-              </View>
-
-              {credibilityIndicators.recommendations.length > 0 && (
-                <View style={styles.recommendationsSection}>
-                  <Text style={styles.recommendationsTitle}>Recommendations:</Text>
-                  {credibilityIndicators.recommendations.map((rec, idx) => (
-                    <Text key={idx} style={styles.recommendationText}>- {rec}</Text>
-                  ))}
-                </View>
-              )}
-            </View>
-          </View>
-        )}
-
         {/* Data Backup & Restore */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Data Backup & Restore</Text>

@@ -85,7 +85,6 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
         {/* Header */}
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.greeting}>Welcome back</Text>
             <Text style={styles.profileName}>{activeProfile.name}</Text>
             <View style={{ marginTop: spacing.sm }}>
               <EvidenceModeControls profileId={activeProfile.id} compact={true} />
@@ -99,43 +98,36 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Persistent Explanation Block */}
+        {/* Documentation Requirements */}
         <View style={styles.explanationBlock}>
           <View style={styles.explanationHeader}>
-            <Text style={styles.explanationIcon}>💡</Text>
-            <Text style={styles.explanationTitle}>How This Works</Text>
+            <Text style={styles.explanationTitle}>Documentation Requirements</Text>
           </View>
 
           <Text style={styles.explanationPrimary}>
-            This app helps you keep a simple, honest record of how you're feeling and how daily life affects you. You don't need perfect wording or medical terms. Just log what you experience. Over time, patterns and summaries appear automatically.
+            Daily logging increases evidentiary reliability. Gaps in logging reduce documentation weight. Records are timestamped and cannot be retroactively modified once finalized.
           </Text>
 
           <View style={styles.explanationInstructions}>
-            <Text style={styles.instructionLine}>• Log symptoms once per day.</Text>
-            <Text style={styles.instructionLine}>• Log activity impact when it happens.</Text>
-            <Text style={styles.instructionLine}>• Review trends when you're ready.</Text>
-          </View>
-
-          <View style={styles.explanationFooter}>
-            <Text style={styles.explanationReassurance}>
-              If you haven't logged yet, that's okay. Start when you're ready.
-            </Text>
+            <Text style={styles.instructionLine}>• Daily symptom severity logs required</Text>
+            <Text style={styles.instructionLine}>• Activity limitation logs as applicable</Text>
+            <Text style={styles.instructionLine}>• Consistent logging establishes pattern documentation</Text>
           </View>
         </View>
 
         {/* Today's Status */}
         <View style={styles.todaySection}>
-          <Text style={styles.sectionTitle}>Today</Text>
+          <Text style={styles.sectionTitle}>Today's Status</Text>
           {loggedToday ? (
             <View style={styles.statusCard}>
-              <Text style={styles.statusText}>✓ Logged</Text>
+              <Text style={styles.statusText}>Entry recorded</Text>
               <TouchableOpacity onPress={() => navigation.navigate('DailyLog')}>
-                <Text style={styles.editLink}>Edit</Text>
+                <Text style={styles.editLink}>Amend</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <BigButton
-              label={profileDailyLogs.length === 0 ? "Start Your First Log" : "Log Today's Symptoms"}
+              label={profileDailyLogs.length === 0 ? "Create Initial Log" : "Log Daily Symptoms"}
               onPress={() => navigation.navigate('DailyLog')}
               variant="primary"
               fullWidth
@@ -158,9 +150,9 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             </View>
             <View style={styles.cardWrapper}>
               <SummaryCard
-                title="Bad Days"
+                title="Limited Function Days"
                 value={stats.last7Days.badDays}
-                subtitle="High severity"
+                subtitle="Severity ≥6"
                 variant={stats.last7Days.badDays >= 4 ? 'error' : stats.last7Days.badDays >= 2 ? 'warning' : 'success'}
               />
             </View>
@@ -168,9 +160,9 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           <View style={styles.statsGrid}>
             <View style={styles.cardWrapper}>
               <SummaryCard
-                title="Good Days"
+                title="Functional Days"
                 value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
-                subtitle="Functional capacity"
+                subtitle="Severity <5"
                 variant={
                   last7DayRatios.goodDayPercentage >= 60 ? 'success' :
                   last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
@@ -179,9 +171,9 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             </View>
             <View style={styles.cardWrapper}>
               <SummaryCard
-                title="Bad Days"
+                title="Limited Function Days"
                 value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
-                subtitle="Limited function"
+                subtitle="Severity ≥6"
                 variant={
                   last7DayRatios.badDayPercentage >= 60 ? 'error' :
                   last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
@@ -212,39 +204,39 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
         {/* Day Quality Summary - Last 30 Days */}
         <View style={styles.dayQualitySection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Last 30 Days - Functional Capacity</Text>
+            <Text style={styles.sectionTitle}>Last 30 Days - Logging Consistency</Text>
             <TouchableOpacity onPress={() => navigation.navigate('Trends')}>
               <Text style={styles.viewDetailsLink}>View Details →</Text>
             </TouchableOpacity>
           </View>
-          
+
           <View style={styles.capacityBar}>
             <View style={styles.capacityBarTrack}>
-              <View 
+              <View
                 style={[
                   styles.capacityBarFill,
                   {
                     width: `${last30DayRatios.goodDayPercentage}%`,
-                    backgroundColor: 
+                    backgroundColor:
                       last30DayRatios.goodDayPercentage >= 60 ? colors.successMain :
                       last30DayRatios.goodDayPercentage >= 30 ? colors.warningMain : colors.errorMain
                   }
-                ]} 
+                ]}
               />
             </View>
             <Text style={styles.capacityBarLabel}>
-              {last30DayRatios.goodDayPercentage.toFixed(0)}% Good Days
+              {last30DayRatios.goodDayPercentage.toFixed(0)}% Functional Days (severity <5)
             </Text>
           </View>
 
           <View style={styles.statsGrid}>
             <View style={styles.streakCard}>
               <Text style={styles.streakValue}>{last30DayRatios.worstStreak}</Text>
-              <Text style={styles.streakLabel}>Worst Streak</Text>
+              <Text style={styles.streakLabel}>Consecutive High-Severity Days</Text>
             </View>
             <View style={styles.streakCard}>
               <Text style={styles.streakValue}>{last30DayRatios.bestStreak}</Text>
-              <Text style={styles.streakLabel}>Best Streak</Text>
+              <Text style={styles.streakLabel}>Consecutive Low-Severity Days</Text>
             </View>
           </View>
         </View>
@@ -265,12 +257,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="🎤 Voice Log Symptoms"
+              label="Voice Entry (Accessibility Mode)"
               onPress={() => navigation.navigate('VoiceLog')}
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>For days when typing is difficult</Text>
+            <Text style={styles.actionHelper}>Alternative input method</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -295,12 +287,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="💊 Medications & Appointments"
+              label="Medications and Appointments"
               onPress={() => navigation.navigate('MedsAppointments')}
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Track treatments and prepare for doctor visits</Text>
+            <Text style={styles.actionHelper">Treatment records and provider visit preparation</Text>
           </View>
 
           <View style={styles.actionItem}>

@@ -90,7 +90,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
         <Text style={styles.date}>{new Date(date).toLocaleDateString()}</Text>
         {existingLog?.evidenceTimestamp && (
           <Text style={styles.evidenceTimestamp}>
-            Evidence recorded: {new Date(existingLog.evidenceTimestamp).toLocaleString()}
+            System timestamp (immutable): {new Date(existingLog.evidenceTimestamp).toISOString()}
           </Text>
         )}
       </View>
@@ -131,7 +131,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
 
             <View style={styles.section}>
               <BigButton
-                label={stoppedEarly ? '✓ Stopped Early' : 'Completed Full Duration'}
+                label={stoppedEarly ? 'Stopped Early' : 'Completed Full Duration'}
                 onPress={() => setStoppedEarly(!stoppedEarly)}
                 variant={stoppedEarly ? 'danger' : 'secondary'}
                 fullWidth

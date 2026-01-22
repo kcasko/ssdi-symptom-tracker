@@ -24,37 +24,37 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Welcome to Daymark</Text>
-        <Text style={styles.subtitle}>A simple, honest tool for tracking your daily health patterns</Text>
+        <Text style={styles.title}>Daymark – Daily Symptom Documentation</Text>
+        <Text style={styles.subtitle}>Structured record system for medical and disability evidence</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What This App Does</Text>
           <Text style={styles.bodyText}>
-            Daymark helps you keep a consistent record of how you're feeling and how daily activities affect you. It's designed to turn everyday experiences into clear, organized information over time.
+            Daymark creates timestamped records of symptom severity, activity limitations, and functional capacity. Records are organized chronologically and can be exported for medical or legal review.
           </Text>
           <Text style={styles.bodyText}>
-            You don't need medical language, perfect memory, or long explanations. Short, honest entries are enough.
+            All entries require explicit user input. No defaults are applied. Records cannot be retroactively modified once finalized.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What This App Doesn't Do</Text>
           <Text style={styles.bodyText}>
-            Daymark does not diagnose conditions, replace medical care, or judge how well you're doing. There are no right or wrong answers. The app simply reflects what you log.
+            Daymark does not diagnose conditions, provide medical advice, or interpret logged data. It is a documentation tool only.
           </Text>
         </View>
 
         <View style={styles.features}>
-          <Text style={styles.featureText}>✓ Track symptoms and daily patterns</Text>
-          <Text style={styles.featureText}>✓ Log activity impact and limitations</Text>
-          <Text style={styles.featureText}>✓ Generate clear reports for doctors</Text>
-          <Text style={styles.featureText}>✓ 100% private - your data stays on your device</Text>
-          <Text style={styles.featureText}>✓ Multi-profile support for families</Text>
+          <Text style={styles.featureText}>• Timestamped symptom severity records</Text>
+          <Text style={styles.featureText}>• Activity limitation documentation</Text>
+          <Text style={styles.featureText}>• Structured export format for medical providers</Text>
+          <Text style={styles.featureText}>• Local storage only (no cloud transmission)</Text>
+          <Text style={styles.featureText}>• Multi-profile support</Text>
         </View>
 
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            A calm, neutral tool for tracking how you're feeling over time. No wellness advice, no medical claims, just honest records.
+            Documentation tool only. No diagnostic capability. No medical interpretation. User assumes full responsibility for data accuracy.
           </Text>
         </View>
 

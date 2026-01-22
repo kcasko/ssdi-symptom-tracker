@@ -200,7 +200,7 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
         <View style={styles.header}>
           <Text style={styles.title}>Voice Logging</Text>
           <Text style={styles.subtitle}>
-            Speak naturally to log your symptoms hands-free
+            Alternative input method for symptom documentation
           </Text>
         </View>
 

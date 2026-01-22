@@ -206,7 +206,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         <Text style={styles.date}>{new Date(date).toLocaleDateString()}</Text>
         {existingLog?.evidenceTimestamp && (
           <Text style={styles.evidenceTimestamp}>
-            Evidence recorded: {new Date(existingLog.evidenceTimestamp).toLocaleString()}
+            System timestamp (immutable): {new Date(existingLog.evidenceTimestamp).toISOString()}
           </Text>
         )}
       </View>
@@ -258,8 +258,10 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
         {/* Photo Evidence Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Photo Evidence</Text>
-          
+          <Text style={styles.sectionTitle}>
+            {existingLog?.finalized ? 'Finalized Evidence Attachments' : 'Supporting Photos (draft)'}
+          </Text>
+
           {logPhotos.length > 0 && (
             <PhotoGallery
               photos={logPhotos}
@@ -278,14 +280,14 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       <View style={styles.footer}>
         <BigButton
-          label="🎤 Voice Log Symptoms"
+          label="Voice Entry (Accessibility Mode)"
           onPress={() => navigation.navigate('VoiceLog')}
           variant="secondary"
           fullWidth
           style={{ marginBottom: spacing.sm }}
         />
         <BigButton
-          label={existingLog ? 'Update Log' : 'Save Log'}
+          label={existingLog?.finalized ? 'Create Revision (original preserved)' : existingLog ? 'Amend Log (replaces previous entry)' : 'Save Log'}
           onPress={handleSave}
           variant="primary"
           fullWidth
