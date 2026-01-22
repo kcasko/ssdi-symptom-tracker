@@ -89,7 +89,7 @@ export class VoiceLoggingService {
       return {
         symptoms: symptoms.map(match => ({
           symptomId: match.symptomId,
-          severity: match.severity || 5, // Default to moderate
+          severity: match.severity ?? -1,
           notes: match.notes,
           location: match.location,
         })),

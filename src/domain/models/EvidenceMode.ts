@@ -36,7 +36,9 @@ export interface RevisionRecord {
   
   // Revision metadata
   revisionTimestamp: string;
-  reason: string; // User-provided reason for revision
+  reasonCategory: RevisionReasonCategory;
+  reasonNote?: string;
+  summary?: string; // Short description of what changed
   
   // What changed
   fieldPath: string; // e.g., "symptoms[0].severity", "notes"
@@ -46,6 +48,13 @@ export interface RevisionRecord {
   // Original log data (immutable snapshot)
   originalSnapshot?: string; // JSON stringified original log
 }
+
+export type RevisionReasonCategory =
+  | 'typo_correction'
+  | 'added_detail_omitted_earlier'
+  | 'correction_after_reviewing_records'
+  | 'clarification_requested'
+  | 'other';
 
 /**
  * Submission pack
@@ -122,8 +131,10 @@ export function createRevisionRecord(
   fieldPath: string,
   originalValue: any,
   updatedValue: any,
-  reason: string,
-  originalSnapshot?: any
+  reasonCategory: RevisionReasonCategory,
+  reasonNote?: string,
+  originalSnapshot?: any,
+  summary?: string
 ): RevisionRecord {
   return {
     id,
@@ -131,7 +142,9 @@ export function createRevisionRecord(
     logType,
     profileId,
     revisionTimestamp: new Date().toISOString(),
-    reason,
+    reasonCategory,
+    reasonNote,
+    summary,
     fieldPath,
     originalValue,
     updatedValue,

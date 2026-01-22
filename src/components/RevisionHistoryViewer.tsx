@@ -13,7 +13,7 @@ import {
   Modal,
 } from 'react-native';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
-import { RevisionRecord } from '../domain/models/EvidenceMode';
+import { RevisionRecord, RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
 interface RevisionHistoryViewerProps {
   logId: string;
@@ -84,6 +84,13 @@ interface RevisionCardProps {
 
 function RevisionCard({ revision, index }: RevisionCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const reasonLabels: Record<RevisionReasonCategory, string> = {
+    typo_correction: 'Typo correction',
+    added_detail_omitted_earlier: 'Added detail omitted earlier',
+    correction_after_reviewing_records: 'Correction after reviewing records',
+    clarification_requested: 'Clarification at request of third party',
+    other: 'Other',
+  };
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -114,6 +121,11 @@ function RevisionCard({ revision, index }: RevisionCardProps) {
             {formatTimestamp(revision.revisionTimestamp)}
           </Text>
         </View>
+        <View style={styles.reasonPill}>
+          <Text style={styles.reasonText}>
+            {reasonLabels[revision.reasonCategory] || 'Other'}
+          </Text>
+        </View>
         <Text style={styles.expandIcon}>{expanded ? '−' : '+'}</Text>
       </TouchableOpacity>
 
@@ -126,8 +138,18 @@ function RevisionCard({ revision, index }: RevisionCardProps) {
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Reason:</Text>
-            <Text style={styles.detailValue}>{revision.reason}</Text>
+            <Text style={styles.detailValue}>
+              {reasonLabels[revision.reasonCategory] || 'Other'}
+              {revision.reasonNote ? ` — ${revision.reasonNote}` : ''}
+            </Text>
           </View>
+
+          {revision.summary && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Summary:</Text>
+              <Text style={styles.detailValue}>{revision.summary}</Text>
+            </View>
+          )}
 
           <View style={styles.valueComparison}>
             <View style={styles.valueBlock}>
@@ -226,6 +248,18 @@ const styles = StyleSheet.create({
   revisionTimestamp: {
     fontSize: 14,
     color: '#666',
+  },
+  reasonPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    backgroundColor: '#eef2f7',
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  reasonText: {
+    fontSize: 12,
+    color: '#2c3e50',
+    fontWeight: '600',
   },
   expandIcon: {
     fontSize: 24,

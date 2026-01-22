@@ -10,6 +10,7 @@ import {
   LogFinalization, 
   RevisionRecord, 
   SubmissionPack,
+  RevisionReasonCategory,
   createRevisionRecord,
   createSubmissionPack
 } from '../domain/models/EvidenceMode';
@@ -57,8 +58,10 @@ interface EvidenceModeState {
     fieldPath: string,
     originalValue: any,
     updatedValue: any,
-    reason: string,
-    originalSnapshot?: any
+    reasonCategory: RevisionReasonCategory,
+    reasonNote?: string,
+    originalSnapshot?: any,
+    summary?: string
   ) => Promise<void>;
   getLogRevisions: (logId: string) => RevisionRecord[];
   getAllRevisions: () => RevisionRecord[];
@@ -218,11 +221,14 @@ export const useEvidenceModeStore = create<EvidenceModeState>((set, get) => ({
     fieldPath: string,
     originalValue: any,
     updatedValue: any,
-    reason: string,
-    originalSnapshot?: any
+    reasonCategory: RevisionReasonCategory,
+    reasonNote?: string,
+    originalSnapshot?: any,
+    summary?: string
   ) => {
     const { revisions } = get();
     const revisionId = `revision_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const note = reasonCategory === 'other' ? (reasonNote || '') : reasonNote;
 
     const revision = createRevisionRecord(
       revisionId,
@@ -232,8 +238,10 @@ export const useEvidenceModeStore = create<EvidenceModeState>((set, get) => ({
       fieldPath,
       originalValue,
       updatedValue,
-      reason,
-      originalSnapshot
+      reasonCategory,
+      note,
+      originalSnapshot,
+      summary
     );
 
     const updated = [...revisions, revision];

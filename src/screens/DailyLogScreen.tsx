@@ -155,7 +155,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       setSelectedSymptomIds([...selectedSymptomIds, symptomId]);
       setSymptomEntries({
         ...symptomEntries,
-        [symptomId]: { symptomId, severity: 5 },
+        [symptomId]: { symptomId, severity: -1 },
       });
       setActiveSymptomId(symptomId);
     }
@@ -183,6 +183,14 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       return;
     }
 
+    const missingSeverity = selectedSymptomIds.find(
+      (id) => (symptomEntries[id]?.severity ?? -1) < 0
+    );
+    if (missingSeverity) {
+      Alert.alert('Severity Required', 'Select a severity for each symptom before saving.');
+      return;
+    }
+
     if (!parseDate(date)) {
       Alert.alert('Invalid Date', 'Please enter the event date in YYYY-MM-DD format.');
       return;
@@ -201,7 +209,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     try {
       const symptoms = selectedSymptomIds.map((id) => ({
         symptomId: id,
-        severity: symptomEntries[id]?.severity || 5,
+        severity: symptomEntries[id]?.severity ?? 0,
         notes: symptomEntries[id]?.notes,
       }));
 
@@ -234,7 +242,9 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
             activeProfile.id,
             existingLog,
             updated,
-            'Updated symptom entries and notes'
+            'added_detail_omitted_earlier',
+            'Updated symptom entries and notes',
+            'Symptom severities and notes revised'
           );
           // updateDailyLog will be called by the revision system
         } else {
@@ -406,17 +416,17 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Rate: {activeSymptom.name}</Text>
             <PainScale
-              value={symptomEntries[activeSymptomId!]?.severity || 5}
+              value={symptomEntries[activeSymptomId!]?.severity ?? -1}
               onChange={(severity) => handleSeverityChange(activeSymptomId!, severity)}
             />
             <NotesField
               value={symptomEntries[activeSymptomId!]?.notes || ''}
               onChange={(notes) => handleNotesChange(activeSymptomId!, notes)}
-              label="Symptom Context"
-              placeholder="What triggered it? How long? What helped?"
-            />
-          </View>
-        )}
+          label="Symptom Context"
+          placeholder="What triggered it? How long? What helped?"
+        />
+      </View>
+    )}
 
         <View style={styles.section}>
           <NotesField

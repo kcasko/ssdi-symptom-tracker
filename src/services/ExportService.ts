@@ -236,6 +236,77 @@ export class ExportService {
     });
   }
 
+  private static calculateSeverityMetrics(values: number[]) {
+    const valid = (values || []).filter((v) => typeof v === 'number' && !Number.isNaN(v));
+    if (valid.length === 0) {
+      return null;
+    }
+
+    const sorted = [...valid].sort((a, b) => a - b);
+    const count = sorted.length;
+    const sum = sorted.reduce((acc, v) => acc + v, 0);
+    const mean = sum / count;
+    const median =
+      count % 2 === 0
+        ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
+        : sorted[Math.floor(count / 2)];
+    const min = sorted[0];
+    const max = sorted[count - 1];
+    const range = max - min;
+    const variance =
+      count === 0 ? 0 : sorted.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / count;
+    const stdDev = Math.sqrt(variance);
+
+    const bandCounts = {
+      '0-3': sorted.filter((v) => v >= 0 && v <= 3).length,
+      '4-6': sorted.filter((v) => v >= 4 && v <= 6).length,
+      '7-8': sorted.filter((v) => v >= 7 && v <= 8).length,
+      '9-10': sorted.filter((v) => v >= 9 && v <= 10).length,
+    };
+
+    const digitFrequency: Record<string, number> = {};
+    for (let i = 0; i <= 10; i++) {
+      digitFrequency[String(i)] = sorted.filter((v) => Math.round(v) === i).length;
+    }
+
+    return {
+      count,
+      mean: Number(mean.toFixed(2)),
+      median: Number(median.toFixed(2)),
+      range,
+      stdDev: Number(stdDev.toFixed(2)),
+      min,
+      max,
+      bandCounts,
+      digitFrequency,
+    };
+  }
+
+  private static appendSeveritySummaryRows(rows: string[][], headers: string[], metrics: ReturnType<typeof this.calculateSeverityMetrics>, label: string) {
+    if (!metrics) return;
+    const blankRow = () => new Array(headers.length).fill('');
+    const pushRow = (metricLabel: string, value: string) => {
+      const row = blankRow();
+      row[0] = 'SUMMARY';
+      row[1] = `${label} - ${metricLabel}`;
+      row[2] = value;
+      rows.push(row);
+    };
+
+    pushRow('Mean', metrics.mean.toString());
+    pushRow('Median', metrics.median.toString());
+    pushRow('Range', metrics.range.toString());
+    pushRow('Std Dev', metrics.stdDev.toString());
+    pushRow('Min', metrics.min.toString());
+    pushRow('Max', metrics.max.toString());
+    Object.entries(metrics.bandCounts).forEach(([band, count]) => {
+      pushRow(`Band ${band} count`, String(count));
+    });
+    Object.entries(metrics.digitFrequency).forEach(([digit, count]) => {
+      pushRow(`Digit ${digit} count`, String(count));
+    });
+  }
+
   /**
    * Convert daily logs to CSV
    */
@@ -351,6 +422,9 @@ export class ExportService {
 
     pushGapRowsBefore('9999-12-31');
 
+    const severityMetrics = this.calculateSeverityMetrics(sortedLogs.map((l) => l.overallSeverity));
+    this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Overall Severity');
+
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
@@ -423,7 +497,8 @@ export class ExportService {
       pushGapRowsBefore(log.activityDate);
       const activityDef = getActivityById(log.activityId);
       const meta = this.getLogMetadata(log, log.activityDate);
-      const immediateImpactScore = log.immediateImpact?.overallImpact ?? 0;
+      const immediateImpactScore = log.immediateImpact?.overallImpact;
+      const immediateImpactDisplay = immediateImpactScore === undefined ? '' : `${immediateImpactScore}/10`;
       const delayedImpactScore = log.delayedImpact ? `${log.delayedImpact.overallImpact}/10` : '';
 
       rows.push([
@@ -444,13 +519,20 @@ export class ExportService {
         activityDef?.name || log.activityName,
         log.duration,
         log.stoppedEarly ? 'Yes' : 'No',
-        `${immediateImpactScore}/10`,
+        immediateImpactDisplay,
         delayedImpactScore,
         this.escapeCSV(log.notes || ''),
       ]);
     });
 
     pushGapRowsBefore('9999-12-31');
+
+    const severityMetrics = this.calculateSeverityMetrics(
+      sortedLogs
+        .map((l) => l.immediateImpact?.overallImpact)
+        .filter((v): v is number => typeof v === 'number')
+    );
+    this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Impact Severity');
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }

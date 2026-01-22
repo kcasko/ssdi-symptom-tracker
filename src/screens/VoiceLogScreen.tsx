@@ -81,6 +81,12 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
       return;
     }
 
+    const missingSeverity = editedSymptoms.find((s) => (s.severity ?? -1) < 0);
+    if (missingSeverity) {
+      Alert.alert('Severity Required', 'Set a severity for each symptom before saving.');
+      return;
+    }
+
     try {
       const today = new Date().toISOString().split('T')[0];
       
@@ -132,8 +138,9 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
   };
 
   const calculateOverallSeverity = (symptoms: SymptomEntry[]): number => {
-    if (symptoms.length === 0) return 0;
-    return Math.round(symptoms.reduce((sum, s) => sum + s.severity, 0) / symptoms.length);
+    const valid = symptoms.filter((s) => (s.severity ?? -1) >= 0);
+    if (valid.length === 0) return 0;
+    return Math.round(valid.reduce((sum, s) => sum + (s.severity || 0), 0) / valid.length);
   };
 
   const clearResults = () => {
@@ -144,13 +151,14 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
   const renderSymptomPreview = (symptom: SymptomEntry, index: number) => {
     const symptomDef = getSymptomById(symptom.symptomId);
     if (!symptomDef) return null;
+    const severityLabel = symptom.severity >= 0 ? `${symptom.severity}/10` : 'Set severity';
 
     return (
       <View key={`${symptom.symptomId}-${index}`} style={styles.symptomCard}>
         <View style={styles.symptomHeader}>
           <Text style={styles.symptomName}>{symptomDef.name}</Text>
           <View style={[styles.severityBadge, { backgroundColor: getSeverityColor(symptom.severity) }]}>
-            <Text style={styles.severityText}>{symptom.severity}/10</Text>
+            <Text style={styles.severityText}>{severityLabel}</Text>
           </View>
         </View>
         
@@ -166,6 +174,7 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
   };
 
   const getSeverityColor = (severity: number): string => {
+    if (severity < 0) return colors.gray[300];
     if (severity <= 2) return colors.success.main;
     if (severity <= 4) return colors.warning.main;
     if (severity <= 6) return colors.primary[400];
@@ -173,7 +182,7 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
     return colors.error.dark;
   };
 
-  const renderVoiceInstructions = () => (
+const renderVoiceInstructions = () => (
     <View style={styles.instructionsContainer}>
       <Text style={styles.instructionsTitle}>Voice Logging Tips</Text>
       <Text style={styles.instructionText}>
@@ -193,6 +202,8 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
       </Text>
     </View>
   );
+
+  const hasMissingSeverity = editedSymptoms.some((s) => (s.severity ?? -1) < 0);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -332,9 +343,9 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
 
                       <View style={styles.severitySliderContainer}>
                         <PainScale
-                          value={symptom.severity}
+                          value={symptom.severity ?? -1}
                           onChange={(value) => handleEditSymptomSeverity(index, value)}
-                          label={`Severity: ${symptom.severity}/10`}
+                          label={symptom.severity >= 0 ? `Severity: ${symptom.severity}/10` : 'Select severity (0-10)'}
                         />
                       </View>
 
@@ -397,10 +408,10 @@ export const VoiceLogScreen: React.FC<VoiceLogProps> = ({ navigation }) => {
               <TouchableOpacity
                 style={[
                   styles.modalSaveButton,
-                  editedSymptoms.length === 0 && styles.modalSaveButtonDisabled
+                  (editedSymptoms.length === 0 || hasMissingSeverity) && styles.modalSaveButtonDisabled
                 ]}
                 onPress={saveDailyLog}
-                disabled={editedSymptoms.length === 0}
+                disabled={editedSymptoms.length === 0 || hasMissingSeverity}
               >
                 <Text style={styles.modalSaveText}>Save Log</Text>
               </TouchableOpacity>

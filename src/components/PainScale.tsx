@@ -66,13 +66,15 @@ export const PainScale: React.FC<PainScaleProps> = ({
         ))}
       </View>
 
-      {value >= 0 && (
+      {value >= 0 ? (
         <View style={styles.feedbackContainer}>
           <View style={[styles.colorIndicator, { backgroundColor: getSeverityColor(value) }]} />
           <Text style={styles.feedbackText}>
             {value}/10 - {getSeverityLabel(value)}
           </Text>
         </View>
+      ) : (
+        <Text style={styles.unselectedText}>Select a severity</Text>
       )}
     </View>
   );
@@ -129,5 +131,9 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold as any,
     color: colors.gray700,
+  },
+  unselectedText: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray600,
   },
 });

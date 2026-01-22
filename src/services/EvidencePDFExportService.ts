@@ -143,16 +143,6 @@ export interface StrictPDFPayload {
   medications: Medication[];
   appointments: Appointment[];
   gapExplanations?: GapExplanation[];
-  summaries: {
-    frequency?: string;
-    activity?: string;
-    limitations?: string;
-  };
-  analyses: {
-    rfc?: string[];
-    workImpact?: string[];
-    consistency?: string[];
-  };
   narratives: Array<{
     heading: string;
     paragraphs: string[];
@@ -310,6 +300,50 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     });
   };
 
+  const calculateSeverityMetrics = (values: number[]) => {
+    const valid = (values || []).filter((v) => typeof v === 'number' && !Number.isNaN(v));
+    if (valid.length === 0) return null;
+
+    const sorted = [...valid].sort((a, b) => a - b);
+    const count = sorted.length;
+    const sum = sorted.reduce((acc, v) => acc + v, 0);
+    const mean = sum / count;
+    const median =
+      count % 2 === 0
+        ? (sorted[count / 2 - 1] + sorted[count / 2]) / 2
+        : sorted[Math.floor(count / 2)];
+    const min = sorted[0];
+    const max = sorted[count - 1];
+    const range = max - min;
+    const variance =
+      count === 0 ? 0 : sorted.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / count;
+    const stdDev = Math.sqrt(variance);
+
+    const bandCounts = {
+      '0-3': sorted.filter((v) => v >= 0 && v <= 3).length,
+      '4-6': sorted.filter((v) => v >= 4 && v <= 6).length,
+      '7-8': sorted.filter((v) => v >= 7 && v <= 8).length,
+      '9-10': sorted.filter((v) => v >= 9 && v <= 10).length,
+    };
+
+    const digitFrequency: Record<string, number> = {};
+    for (let i = 0; i <= 10; i++) {
+      digitFrequency[String(i)] = sorted.filter((v) => Math.round(v) === i).length;
+    }
+
+    return {
+      mean: Number(mean.toFixed(2)),
+      median: Number(median.toFixed(2)),
+      range,
+      stdDev: Number(stdDev.toFixed(2)),
+      min,
+      max,
+      bandCounts,
+      digitFrequency,
+      count,
+    };
+  };
+
   const getLogMeta = (log: DailyLog | ActivityLog, eventDate: string) => {
     const created = log.createdAt ? new Date(log.createdAt).toISOString() : '';
     const updated = (log as any).updatedAt ? new Date((log as any).updatedAt).toISOString() : created;
@@ -408,15 +442,16 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
         gapIndex++;
       }
 
-      const impact = log.immediateImpact?.overallImpact ?? 0;
+      const impact = log.immediateImpact?.overallImpact;
       const recovery = log.recoveryDuration || 0;
       const meta = getLogMeta(log, log.activityDate);
       const retrospectiveText = meta.retrospectiveFlaggedAt
         ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
         : meta.retrospectiveSummary;
+      const impactText = impact === undefined ? 'Impact not recorded' : `Impact ${impact}/10`;
 
       items.push(
-        `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
+        `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; ${escapeHTML(impactText)}; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
       );
     });
 
@@ -431,7 +466,7 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
   const renderMeds = () => {
     if (!payload.medications || payload.medications.length === 0) return '<p>No medications recorded in this range.</p>';
     return `<ul>${payload.medications
-      .map((med) => `<li>${escapeHTML(med.name || med.id || 'Medication')} — ${escapeHTML(med.dosage || '')} ${escapeHTML(med.frequency || '')}; Last modified: ${formatDate((med as any).updatedAt || (med as any).createdAt || exportDate)}</li>`)
+      .map((med) => `<li>${escapeHTML(med.name || med.id || 'Medication')} - ${escapeHTML(med.dosage || '')} ${escapeHTML(med.frequency || '')}; Last modified: ${formatDate((med as any).updatedAt || (med as any).createdAt || exportDate)}</li>`)
       .join('')}</ul>`;
   };
 
@@ -439,23 +474,55 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     if (!payload.appointments || payload.appointments.length === 0) return '<p>No appointments recorded in this range.</p>';
     const sorted = [...payload.appointments].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
     return `<ul>${sorted
-      .map((appt) => `<li>${formatDate(appt.date)} — ${escapeHTML(appt.providerName || 'Provider')} (${escapeHTML(appt.purpose || 'Purpose not specified')}); Status: ${escapeHTML((appt as any).status || 'unknown')}; Last modified: ${formatDate((appt as any).updatedAt || (appt as any).createdAt || exportDate)}</li>`)
+      .map((appt) => `<li>${formatDate(appt.date)} - ${escapeHTML(appt.providerName || 'Provider')} (${escapeHTML(appt.purpose || 'Purpose not specified')}); Status: ${escapeHTML((appt as any).status || 'unknown')}; Last modified: ${formatDate((appt as any).updatedAt || (appt as any).createdAt || exportDate)}</li>`)
       .join('')}</ul>`;
   };
 
-  const renderNarratives = () =>
-    payload.narratives
+  const renderNarratives = () => {
+    if (!payload.narratives || payload.narratives.length === 0) {
+      return '<p>No narrative drafts included.</p>';
+    }
+
+    return payload.narratives
       .map((narr) => {
-        const footnote = `<p class="footnote">Draft narrative prepared from recorded entries; editable by user. Derived from entries dated ${escapeHTML(listDates(narr.sourceDates))}.</p>`;
-        const paragraphs = narr.paragraphs.map((p) => `<p>${escapeHTML(p)}</p>`).join('');
-        return `<h3>${escapeHTML(narr.heading)}</h3>${paragraphs}${footnote}`;
+        const rows = narr.paragraphs
+          .map((p, idx) => `<tr><td>${idx + 1}</td><td>${escapeHTML(p)}</td></tr>`)
+          .join('');
+        const sourceRow = `<tr><td colspan="2">Source dates: ${escapeHTML(listDates(narr.sourceDates))}</td></tr>`;
+
+        return `<h3>${escapeHTML(narr.heading)}</h3><table border="1" cellpadding="4" cellspacing="0"><thead><tr><th>Item</th><th>Content</th></tr></thead><tbody>${sourceRow}${rows || '<tr><td colspan="2">No text provided.</td></tr>'}</tbody></table>`;
       })
       .join('');
-
-  const renderStringArraySection = (label: string, items?: string[]) => {
-    if (!items || items.length === 0) return `<p>${label}: Not provided.</p>`;
-    return `<h3>${escapeHTML(label)}</h3><ul>${items.map((i) => `<li>${escapeHTML(i)}</li>`).join('')}</ul>`;
   };
+
+  const renderMetricsTable = (title: string, metrics: ReturnType<typeof calculateSeverityMetrics>) => {
+    if (!metrics) return `<h3>${escapeHTML(title)}</h3><p>No data available.</p>`;
+    const rows: string[] = [];
+    const push = (label: string, value: string | number) => {
+      rows.push(`<tr><td>${escapeHTML(label)}</td><td>${escapeHTML(String(value))}</td></tr>`);
+    };
+
+    push('Count', metrics.count);
+    push('Mean', metrics.mean);
+    push('Median', metrics.median);
+    push('Range', metrics.range);
+    push('Std Dev', metrics.stdDev);
+    push('Min', metrics.min);
+    push('Max', metrics.max);
+    Object.entries(metrics.bandCounts).forEach(([band, count]) => push(`Band ${band} count`, count));
+    Object.entries(metrics.digitFrequency).forEach(([digit, count]) => push(`Digit ${digit} count`, count));
+
+    return `<h3>${escapeHTML(title)}</h3><table border="1" cellpadding="4" cellspacing="0"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+  };
+
+  const dailySeverityValues = payload.rawDailyLogs
+    .map((l) => l.overallSeverity)
+    .filter((v) => typeof v === 'number' && !Number.isNaN(v));
+  const activityImpactValues = payload.rawActivityLogs
+    .map((l) => l.immediateImpact?.overallImpact)
+    .filter((v): v is number => typeof v === 'number' && !Number.isNaN(v));
+  const dailySeverityMetrics = calculateSeverityMetrics(dailySeverityValues);
+  const activitySeverityMetrics = calculateSeverityMetrics(activityImpactValues);
 
   const html = `
   <!DOCTYPE html>
@@ -483,16 +550,9 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
     ${renderAppointments()}
 
     <div class="section-divider"></div>
-    <h2>Summaries</h2>
-    <p>${escapeHTML(payload.summaries.frequency || 'Frequency and pattern summaries: Not provided.')}</p>
-    <p>${escapeHTML(payload.summaries.activity || 'Activity tolerance summaries: Not provided.')}</p>
-    <p>${escapeHTML(payload.summaries.limitations || 'Functional limitations summaries: Not provided.')}</p>
-
-    <div class="section-divider"></div>
-    <h2>Analysis</h2>
-    ${renderStringArraySection('RFC-style sections', payload.analyses.rfc)}
-    ${renderStringArraySection('Work-impact analysis', payload.analyses.workImpact)}
-    ${renderStringArraySection('Consistency indicators', payload.analyses.consistency)}
+    <h2>Variability Metrics</h2>
+    ${renderMetricsTable('Daily severity variability', dailySeverityMetrics)}
+    ${renderMetricsTable('Activity impact variability', activitySeverityMetrics)}
 
     <div class="section-divider"></div>
     <h2>Narrative Drafts</h2>

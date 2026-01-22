@@ -6,6 +6,7 @@
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
+import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
 /**
  * Check if a log can be modified
@@ -50,7 +51,9 @@ export async function updateLogWithRevision(
   profileId: string,
   originalLog: DailyLog | ActivityLog,
   updates: Partial<DailyLog | ActivityLog>,
-  reason: string
+  reasonCategory: RevisionReasonCategory,
+  reasonNote: string,
+  summary?: string
 ): Promise<{ success: boolean; needsRevision: boolean; error?: string }> {
   const evidenceStore = useEvidenceModeStore.getState();
   
@@ -68,8 +71,10 @@ export async function updateLogWithRevision(
           fieldPath,
           originalValue,
           newValue,
-          reason,
-          originalLog
+          reasonCategory,
+          reasonNote,
+          originalLog,
+          summary
         );
       }
       

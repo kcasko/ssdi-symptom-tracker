@@ -47,7 +47,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [duration, setDuration] = useState(30);
-  const [impactSeverity, setImpactSeverity] = useState(5);
+  const [impactSeverity, setImpactSeverity] = useState(-1);
   const [stoppedEarly, setStoppedEarly] = useState(false);
   const [notes, setNotes] = useState('');
   const [retrospectiveReason, setRetrospectiveReason] = useState('');
@@ -99,6 +99,11 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
       return;
     }
 
+    if (impactSeverity < 0) {
+      Alert.alert('Impact Severity Required', 'Select an impact severity before saving.');
+      return;
+    }
+
     // Check if log can be modified (Evidence Mode finalization check)
     if (existingLog && !canModifyLog(existingLog.id).canModify) {
       Alert.alert(
@@ -127,7 +132,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
         date,
         duration,
         stoppedEarly,
-        impacts: impactSeverity > 0 ? [{ symptomId: 'general', severity: impactSeverity }] : [],
+        impacts: impactSeverity >= 0 ? [{ symptomId: 'general', severity: impactSeverity }] : [],
         notes,
         retrospectiveContext,
       });

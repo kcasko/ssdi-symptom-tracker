@@ -349,13 +349,6 @@ export const useReportStore = create<ReportState>((set, get) => ({
           (g: any) => g.startDate >= draft.dateRange.start && g.endDate <= draft.dateRange.end
         );
 
-        const gatherText = (types: string[]) =>
-          draft.sections
-            .filter((s) => s.included && types.includes(s.sectionType))
-            .map((s) => s.blocks.map((b) => b.content).join(' '))
-            .join(' ')
-            .trim();
-
         const narrativeSections = draft.sections.filter(
           (s) => s.included && (s.sectionType === 'narrative' || s.sectionType === 'custom')
         );
@@ -383,22 +376,6 @@ export const useReportStore = create<ReportState>((set, get) => ({
           medications: filteredMeds,
           appointments: filteredAppointments,
           gapExplanations: filteredGapExplanations,
-          summaries: {
-            frequency: gatherText(['summary', 'patterns']),
-            activity: gatherText(['activity_impact']),
-            limitations: gatherText(['functional_limitations']),
-          },
-          analyses: {
-            rfc: draft.sections
-              .filter((s) => s.included && s.sectionType === 'functional_limitations')
-              .map((s) => s.blocks.map((b) => b.content).join(' ')),
-            workImpact: draft.sections
-              .filter((s) => s.included && s.sectionType === 'activity_impact')
-              .map((s) => s.blocks.map((b) => b.content).join(' ')),
-            consistency: draft.sections
-              .filter((s) => s.included && s.sectionType === 'patterns')
-              .map((s) => s.blocks.map((b) => b.content).join(' ')),
-          },
           narratives,
         });
 
