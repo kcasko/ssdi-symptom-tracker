@@ -190,6 +190,18 @@ export class LogStorage {
     return result.success;
   }
 
+  static async getGapExplanations(profileId: string): Promise<any[]> {
+    const key = `${STORAGE_KEYS.GAP_EXPLANATIONS}_${profileId}`;
+    const result = await Storage.get(key, []);
+    return result.data || [];
+  }
+
+  static async saveGapExplanations(profileId: string, explanations: any[]): Promise<boolean> {
+    const key = `${STORAGE_KEYS.GAP_EXPLANATIONS}_${profileId}`;
+    const result = await Storage.set(key, explanations);
+    return result.success;
+  }
+
   static async getLimitations(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.LIMITATIONS}_${profileId}`;
     const result = await Storage.get(key, []);

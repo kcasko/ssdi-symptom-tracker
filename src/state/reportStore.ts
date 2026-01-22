@@ -325,12 +325,13 @@ export const useReportStore = create<ReportState>((set, get) => ({
       // Use appropriate export service based on format
       if (format === 'pdf') {
         // Load supporting data for strict, doctor-first PDF
-        const [profiles, dailyLogs, activityLogs, medications, appointments] = await Promise.all([
+        const [profiles, dailyLogs, activityLogs, medications, appointments, gapExplanations] = await Promise.all([
           ProfileStorage.getAllProfiles(),
           LogStorage.getDailyLogs(currentProfileId),
           LogStorage.getActivityLogs(currentProfileId),
           LogStorage.getMedications(currentProfileId),
           LogStorage.getAppointments(currentProfileId),
+          LogStorage.getGapExplanations(currentProfileId),
         ]);
 
         const profile = profiles.find((p: any) => p.id === currentProfileId);
@@ -343,6 +344,9 @@ export const useReportStore = create<ReportState>((set, get) => ({
         const filteredMeds = medications; // meds are not date-bound in data model; include all for context
         const filteredAppointments = appointments.filter((appt: any) =>
           appt.date ? appt.date >= draft.dateRange.start && appt.date <= draft.dateRange.end : true
+        );
+        const filteredGapExplanations = gapExplanations.filter(
+          (g: any) => g.startDate >= draft.dateRange.start && g.endDate <= draft.dateRange.end
         );
 
         const gatherText = (types: string[]) =>
@@ -378,6 +382,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
           rawActivityLogs: filteredActivityLogs,
           medications: filteredMeds,
           appointments: filteredAppointments,
+          gapExplanations: filteredGapExplanations,
           summaries: {
             frequency: gatherText(['summary', 'patterns']),
             activity: gatherText(['activity_impact']),

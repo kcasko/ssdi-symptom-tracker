@@ -40,6 +40,7 @@ interface AppState {
   medications: any[];
   appointments: any[];
   photos: any[];
+  gapExplanations: any[];
   
   // Log actions
   addDailyLog: (log: any) => Promise<void>;
@@ -48,6 +49,7 @@ interface AppState {
   addLimitation: (limitation: any) => Promise<void>;
   updateLimitation: (limitation: any) => Promise<void>;
   deleteLimitation: (limitationId: string) => Promise<void>;
+  addGapExplanation: (explanation: any) => Promise<void>;
   
   // Photo actions
   addPhoto: (photo: any) => Promise<void>;
@@ -268,12 +270,14 @@ export function useAppState(): AppState {
     medications: logStore.medications,
     appointments: logStore.appointments,
     photos: logStore.photos,
+    gapExplanations: logStore.gapExplanations,
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,
     addActivityLog: logStore.addActivityLog,
     addLimitation: logStore.addLimitation,
     updateLimitation: logStore.updateLimitation,
     deleteLimitation: logStore.deleteLimitation,
+    addGapExplanation: logStore.addGapExplanation,
     addPhoto: logStore.addPhoto,
     deletePhoto: logStore.deletePhoto,
     getPhotosByEntity: logStore.getPhotosByEntity,

@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
   PHOTOS: '@ssdi/photos',
   REPORT_DRAFTS: '@ssdi/reportDrafts',
   SETTINGS: '@ssdi/settings',
+  GAP_EXPLANATIONS: '@ssdi/gapExplanations',
   SCHEMA_VERSION: '@ssdi/schemaVersion',
   APP_LOCK_ENABLED: '@ssdi/appLockEnabled',
   FIRST_LAUNCH: '@ssdi/firstLaunch',

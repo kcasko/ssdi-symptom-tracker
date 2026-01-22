@@ -39,6 +39,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
     photos,
     profiles,
     settings,
+    gapExplanations,
   } = useAppState();
 
   const now = new Date();
@@ -61,6 +62,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         limitations.filter(l => l.profileId === activeProfile.id)
       )
     : null;
+  const profileGapExplanations = gapExplanations.filter((g) => g.profileId === activeProfile?.id);
 
   const handleExportData = async (type: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations' | 'all') => {
     if (!activeProfile) return;
@@ -79,14 +81,16 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
         await ExportService.exportToCSV(
           'daily-logs',
           dailyLogs.filter(l => l.profileId === activeProfile.id),
-          filename
+          filename,
+          { gapExplanations: profileGapExplanations, dateRange: { start: startDate, end: endDate } }
         );
       } else if (type === 'activity-logs') {
         const filename = ExportService.generateFilename('activity_logs', 'csv');
         await ExportService.exportToCSV(
           'activity-logs',
           activityLogs.filter(l => l.profileId === activeProfile.id),
-          filename
+          filename,
+          { gapExplanations: profileGapExplanations, dateRange: { start: startDate, end: endDate } }
         );
       } else if (type === 'medications') {
         const filename = ExportService.generateFilename('medications', 'csv');

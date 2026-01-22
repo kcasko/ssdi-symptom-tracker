@@ -11,7 +11,7 @@ import { colors as COLORS } from '../theme/colors';
 interface SimpleLineChartProps {
   data: {
     labels: string[];
-    datasets: { data: number[] }[];
+    datasets: { data: Array<number | null> }[];
   };
   width: number;
   height: number;
@@ -28,8 +28,9 @@ export function SimpleLineChart({
 }: SimpleLineChartProps) {
   const { labels, datasets } = data;
   const values = datasets[0]?.data || [];
+  const numericValues = values.filter((v) => v !== null && !Number.isNaN(v)) as number[];
 
-  if (labels.length === 0 || values.length === 0) {
+  if (labels.length === 0 || values.length === 0 || numericValues.length === 0) {
     return null;
   }
 
@@ -42,26 +43,26 @@ export function SimpleLineChart({
   const chartWidth = width - paddingLeft - paddingRight;
   const chartHeight = height - paddingTop - paddingBottom;
 
-  const maxValue = Math.max(...values, 1);
-  const minValue = Math.min(...values, 0);
+  const maxValue = Math.max(...numericValues, 1);
+  const minValue = Math.min(...numericValues, 0);
   const valueRange = maxValue - minValue || 1;
 
   // Calculate points
   const points = values.map((value, index) => {
+    if (value === null || Number.isNaN(value)) return null;
     const x = paddingLeft + (index / (values.length - 1 || 1)) * chartWidth;
     const y = paddingTop + chartHeight - ((value - minValue) / valueRange) * chartHeight;
     return { x, y, value };
   });
 
   // Create smooth path (bezier curve)
-  const createSmoothPath = () => {
-    if (points.length < 2) return '';
+  const createSegmentPath = (segment: Array<{ x: number; y: number }>) => {
+    if (segment.length < 2) return '';
+    let path = `M ${segment[0].x} ${segment[0].y}`;
 
-    let path = `M ${points[0].x} ${points[0].y}`;
-
-    for (let i = 0; i < points.length - 1; i++) {
-      const current = points[i];
-      const next = points[i + 1];
+    for (let i = 0; i < segment.length - 1; i++) {
+      const current = segment[i];
+      const next = segment[i + 1];
       const midX = (current.x + next.x) / 2;
 
       path += ` C ${midX} ${current.y}, ${midX} ${next.y}, ${next.x} ${next.y}`;
@@ -69,6 +70,23 @@ export function SimpleLineChart({
 
     return path;
   };
+
+  // Break into segments where gaps exist
+  const segments: Array<Array<{ x: number; y: number; value: number }>> = [];
+  let currentSegment: Array<{ x: number; y: number; value: number }> = [];
+  points.forEach((point) => {
+    if (!point) {
+      if (currentSegment.length > 0) {
+        segments.push(currentSegment);
+        currentSegment = [];
+      }
+      return;
+    }
+    currentSegment.push(point);
+  });
+  if (currentSegment.length > 0) {
+    segments.push(currentSegment);
+  }
 
   // Y-axis ticks
   const yTickCount = 5;
@@ -141,26 +159,30 @@ export function SimpleLineChart({
           );
         })}
 
-        {/* Line path */}
-        <Path
-          d={createSmoothPath()}
-          stroke={lineColor}
-          strokeWidth={2.5}
-          fill="none"
-        />
-
-        {/* Data points */}
-        {showDots && points.map((point, index) => (
-          <Circle
-            key={`dot-${index}`}
-            cx={point.x}
-            cy={point.y}
-            r={4}
-            fill={COLORS.white}
+        {/* Line paths for each segment (gaps break continuity) */}
+        {segments.map((segment, idx) => (
+          <Path
+            key={`path-${idx}`}
+            d={createSegmentPath(segment)}
             stroke={lineColor}
-            strokeWidth={2}
+            strokeWidth={2.5}
+            fill="none"
           />
         ))}
+
+        {/* Data points */}
+        {showDots &&
+          segments.flat().map((point, index) => (
+            <Circle
+              key={`dot-${index}`}
+              cx={point.x}
+              cy={point.y}
+              r={4}
+              fill={COLORS.white}
+              stroke={lineColor}
+              strokeWidth={2}
+            />
+          ))}
 
         {/* X-axis labels (rotated, showing subset) */}
         {labels.map((label, index) => {

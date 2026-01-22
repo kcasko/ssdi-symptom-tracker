@@ -11,7 +11,8 @@ import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { getRevisionCount } from './EvidenceLogService';
-import { calculateDaysDelayed } from '../utils/dates';
+import { calculateDaysDelayed, countInclusiveDays, findDateGaps } from '../utils/dates';
+import { GapExplanation } from '../domain/models/GapExplanation';
 import { Share, Alert } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -23,6 +24,11 @@ export interface ExportOptions {
   dateRange?: { start: string; end: string };
 }
 
+export interface ExportContextOptions {
+  gapExplanations?: GapExplanation[];
+  dateRange?: { start: string; end: string };
+}
+
 export class ExportService {
   /**
    * Export data to CSV format
@@ -30,17 +36,18 @@ export class ExportService {
   static async exportToCSV(
     dataType: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations',
     data: any[],
-    filename: string
+    filename: string,
+    context?: ExportContextOptions
   ): Promise<void> {
     try {
       let csvContent = '';
 
       switch (dataType) {
         case 'daily-logs':
-          csvContent = this.dailyLogsToCSV(data as DailyLog[]);
+          csvContent = this.dailyLogsToCSV(data as DailyLog[], context);
           break;
         case 'activity-logs':
-          csvContent = this.activityLogsToCSV(data as ActivityLog[]);
+          csvContent = this.activityLogsToCSV(data as ActivityLog[], context);
           break;
         case 'medications':
           csvContent = this.medicationsToCSV(data as Medication[]);
@@ -196,10 +203,43 @@ export class ExportService {
     };
   }
 
+  private static buildGapSegments(
+    dates: string[],
+    gapExplanations?: GapExplanation[],
+    dateRange?: { start: string; end: string }
+  ) {
+    let segments = findDateGaps(dates, 4, dateRange?.start, dateRange?.end);
+
+    if (segments.length === 0 && dateRange?.start && dateRange?.end && dates.length === 0) {
+      const lengthDays = countInclusiveDays(dateRange.start, dateRange.end);
+      if (lengthDays >= 4) {
+        segments = [
+          {
+            startDate: dateRange.start,
+            endDate: dateRange.end,
+            lengthDays,
+          },
+        ];
+      }
+    }
+
+    return segments.map(segment => {
+      const explanation = gapExplanations?.find(
+        (g) => g.startDate === segment.startDate && g.endDate === segment.endDate
+      );
+
+      return {
+        ...segment,
+        explanationNote: explanation?.note || '',
+        hasExplanation: Boolean(explanation && explanation.note && explanation.note.trim().length > 0),
+      };
+    });
+  }
+
   /**
    * Convert daily logs to CSV
    */
-  private static dailyLogsToCSV(logs: DailyLog[]): string {
+  private static dailyLogsToCSV(logs: DailyLog[], context?: ExportContextOptions): string {
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -211,6 +251,10 @@ export class ExportService {
       'Retrospective_Reason',
       'Retrospective_Note',
       'Retrospective_FlaggedAt',
+      'Gap_Length_Days',
+      'Gap_Date_Range',
+      'Gap_Explanation_Provided',
+      'Gap_Explanation_Note',
       'Overall_Severity',
       'Symptoms',
       'Symptom_Details',
@@ -221,14 +265,53 @@ export class ExportService {
       'Notes',
     ];
 
-    const rows = logs
-      .sort((a, b) => a.logDate.localeCompare(b.logDate))
-      .map(log => {
-        const symptoms = log.symptoms
-          .map(s => {
-            const symptomDef = getSymptomById(s.symptomId);
-            return symptomDef?.name || s.symptomId;
-          })
+    const sortedLogs = [...logs].sort((a, b) => a.logDate.localeCompare(b.logDate));
+    const gapSegments = this.buildGapSegments(
+      sortedLogs.map(l => l.logDate),
+      context?.gapExplanations,
+      context?.dateRange
+    );
+    let gapIndex = 0;
+    const rows: string[][] = [];
+
+    const pushGapRowsBefore = (currentDate: string) => {
+      while (gapIndex < gapSegments.length && gapSegments[gapIndex].endDate < currentDate) {
+        const gap = gapSegments[gapIndex];
+        rows.push([
+          'GAP',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          gap.lengthDays.toString(),
+          `${gap.startDate} to ${gap.endDate}`,
+          gap.hasExplanation ? 'Yes' : 'No',
+          this.escapeCSV(gap.explanationNote || ''),
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        gapIndex++;
+      }
+    };
+
+    sortedLogs.forEach(log => {
+      pushGapRowsBefore(log.logDate);
+      const symptoms = log.symptoms
+        .map(s => {
+          const symptomDef = getSymptomById(s.symptomId);
+          return symptomDef?.name || s.symptomId;
+        })
           .join('; ');
 
         const symptomDetails = log.symptoms
@@ -240,27 +323,33 @@ export class ExportService {
 
         const meta = this.getLogMetadata(log, log.logDate);
 
-        return [
-          log.logDate,
-          meta.createdIso,
-          meta.updatedIso,
-          meta.evidenceIso,
-          meta.daysDelayed,
-          meta.finalized ? 'Yes' : 'No',
-          meta.revisionCount,
-          this.escapeCSV(meta.retrospectiveReason),
-          this.escapeCSV(meta.retrospectiveNote),
-          meta.retrospectiveFlaggedAt,
-          log.overallSeverity,
-          this.escapeCSV(symptoms),
-          this.escapeCSV(symptomDetails),
-          this.escapeCSV(log.triggers?.join('; ') || ''),
-          log.environmentalFactors?.weather || '',
-          log.environmentalFactors?.stressLevel || '',
-          log.sleepQuality?.quality || '',
-          this.escapeCSV(log.notes || ''),
-        ];
-      });
+      rows.push([
+        log.logDate,
+        meta.createdIso,
+        meta.updatedIso,
+        meta.evidenceIso,
+        meta.daysDelayed,
+        meta.finalized ? 'Yes' : 'No',
+        meta.revisionCount,
+        this.escapeCSV(meta.retrospectiveReason),
+        this.escapeCSV(meta.retrospectiveNote),
+        meta.retrospectiveFlaggedAt,
+        '',
+        '',
+        '',
+        '',
+        log.overallSeverity,
+        this.escapeCSV(symptoms),
+        this.escapeCSV(symptomDetails),
+        this.escapeCSV(log.triggers?.join('; ') || ''),
+        log.environmentalFactors?.weather || '',
+        log.environmentalFactors?.stressLevel || '',
+        log.sleepQuality?.quality || '',
+        this.escapeCSV(log.notes || ''),
+      ]);
+    });
+
+    pushGapRowsBefore('9999-12-31');
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
@@ -268,7 +357,7 @@ export class ExportService {
   /**
    * Convert activity logs to CSV
    */
-  private static activityLogsToCSV(logs: ActivityLog[]): string {
+  private static activityLogsToCSV(logs: ActivityLog[], context?: ExportContextOptions): string {
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -280,6 +369,10 @@ export class ExportService {
       'Retrospective_Reason',
       'Retrospective_Note',
       'Retrospective_FlaggedAt',
+      'Gap_Length_Days',
+      'Gap_Date_Range',
+      'Gap_Explanation_Provided',
+      'Gap_Explanation_Note',
       'Activity_Name',
       'Duration_Minutes',
       'Stopped_Early',
@@ -288,33 +381,76 @@ export class ExportService {
       'Notes',
     ];
 
-    const rows = logs
-      .sort((a, b) => a.activityDate.localeCompare(b.activityDate))
-      .map(log => {
-        const activityDef = getActivityById(log.activityId);
-        const meta = this.getLogMetadata(log, log.activityDate);
-        const immediateImpactScore = log.immediateImpact?.overallImpact ?? 0;
-        const delayedImpactScore = log.delayedImpact ? `${log.delayedImpact.overallImpact}/10` : '';
+    const sortedLogs = [...logs].sort((a, b) => a.activityDate.localeCompare(b.activityDate));
+    const gapSegments = this.buildGapSegments(
+      sortedLogs.map(l => l.activityDate),
+      context?.gapExplanations,
+      context?.dateRange
+    );
+    let gapIndex = 0;
+    const rows: string[][] = [];
 
-        return [
-          log.activityDate,
-          meta.createdIso,
-          meta.updatedIso,
-          meta.evidenceIso,
-          meta.daysDelayed,
-          meta.finalized ? 'Yes' : 'No',
-          meta.revisionCount,
-          this.escapeCSV(meta.retrospectiveReason),
-          this.escapeCSV(meta.retrospectiveNote),
-          meta.retrospectiveFlaggedAt,
-          activityDef?.name || log.activityName,
-          log.duration,
-          log.stoppedEarly ? 'Yes' : 'No',
-          `${immediateImpactScore}/10`,
-          delayedImpactScore,
-          this.escapeCSV(log.notes || ''),
-        ];
-      });
+    const pushGapRowsBefore = (currentDate: string) => {
+      while (gapIndex < gapSegments.length && gapSegments[gapIndex].endDate < currentDate) {
+        const gap = gapSegments[gapIndex];
+        rows.push([
+          'GAP',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          gap.lengthDays.toString(),
+          `${gap.startDate} to ${gap.endDate}`,
+          gap.hasExplanation ? 'Yes' : 'No',
+          this.escapeCSV(gap.explanationNote || ''),
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+        ]);
+        gapIndex++;
+      }
+    };
+
+    sortedLogs.forEach(log => {
+      pushGapRowsBefore(log.activityDate);
+      const activityDef = getActivityById(log.activityId);
+      const meta = this.getLogMetadata(log, log.activityDate);
+      const immediateImpactScore = log.immediateImpact?.overallImpact ?? 0;
+      const delayedImpactScore = log.delayedImpact ? `${log.delayedImpact.overallImpact}/10` : '';
+
+      rows.push([
+        log.activityDate,
+        meta.createdIso,
+        meta.updatedIso,
+        meta.evidenceIso,
+        meta.daysDelayed,
+        meta.finalized ? 'Yes' : 'No',
+        meta.revisionCount,
+        this.escapeCSV(meta.retrospectiveReason),
+        this.escapeCSV(meta.retrospectiveNote),
+        meta.retrospectiveFlaggedAt,
+        '',
+        '',
+        '',
+        '',
+        activityDef?.name || log.activityName,
+        log.duration,
+        log.stoppedEarly ? 'Yes' : 'No',
+        `${immediateImpactScore}/10`,
+        delayedImpactScore,
+        this.escapeCSV(log.notes || ''),
+      ]);
+    });
+
+    pushGapRowsBefore('9999-12-31');
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }

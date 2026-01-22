@@ -45,13 +45,14 @@ import {
   getEffectivenessText,
   type MedicationAnalysis,
 } from '../utils/medicationCorrelation';
+import { addDays, countInclusiveDays, findDateGaps } from '../utils/dates';
 
 const screenWidth = Dimensions.get('window').width;
 
 type TrendType = 'symptoms' | 'severity' | 'patterns' | 'day-quality';
 
 export function TrendsScreen() {
-  const { dailyLogs } = useAppState();
+  const { dailyLogs, gapExplanations, activeProfile } = useAppState();
   const medications = useLogStore(state => state.medications);
   const [selectedTrend, setSelectedTrend] = useState<TrendType>('day-quality');
   
@@ -87,6 +88,73 @@ export function TrendsScreen() {
     });
     return dayAnalyzer.calculateDayRatios(filteredLogs);
   }, [dailyLogs, dateRange, dayAnalyzer]);
+
+  const rangeLogs = useMemo(
+    () =>
+      dailyLogs.filter((log) => log.logDate >= dateRange.startDate && log.logDate <= dateRange.endDate),
+    [dailyLogs, dateRange]
+  );
+
+  const uniqueRangeDates = useMemo(
+    () => Array.from(new Set(rangeLogs.map((l) => l.logDate))).sort(),
+    [rangeLogs]
+  );
+
+  const profileGapExplanations = useMemo(
+    () => gapExplanations.filter((g) => g.profileId === activeProfile?.id),
+    [gapExplanations, activeProfile?.id]
+  );
+
+  const gapSegments = useMemo(() => {
+    if (uniqueRangeDates.length === 0) {
+      const lengthDays = countInclusiveDays(dateRange.startDate, dateRange.endDate);
+      return lengthDays > 0
+        ? [{ startDate: dateRange.startDate, endDate: dateRange.endDate, lengthDays }]
+        : [];
+    }
+    return findDateGaps(uniqueRangeDates, 1, dateRange.startDate, dateRange.endDate);
+  }, [uniqueRangeDates, dateRange]);
+
+  const gapDetails = useMemo(
+    () =>
+      gapSegments.map((gap) => {
+        const explanation = profileGapExplanations.find(
+          (g) => g.startDate === gap.startDate && g.endDate === gap.endDate
+        );
+        return {
+          ...gap,
+          explanation: explanation?.note || '',
+          hasExplanation: Boolean(explanation && explanation.note && explanation.note.trim().length > 0),
+        };
+      }),
+    [gapSegments, profileGapExplanations]
+  );
+
+  const daysLoggedCount = uniqueRangeDates.length;
+  const totalDaysInRange = countInclusiveDays(dateRange.startDate, dateRange.endDate);
+  const daysMissed = Math.max(0, totalDaysInRange - daysLoggedCount);
+  const longestGap = gapSegments.reduce((max, gap) => Math.max(max, gap.lengthDays), 0);
+  const percentageLogged = totalDaysInRange ? Math.round((daysLoggedCount / totalDaysInRange) * 100) : 0;
+
+  const expandedSeries = useMemo(() => {
+    const logsByDate = new Map(rangeLogs.map((log) => [log.logDate, log]));
+    const points: Array<{ date: string; label: string; value: number | null }> = [];
+    let cursor = new Date(dateRange.startDate);
+    const end = new Date(dateRange.endDate);
+
+    while (cursor <= end) {
+      const iso = cursor.toISOString().split('T')[0];
+      const log = logsByDate.get(iso);
+      points.push({
+        date: iso,
+        label: new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        value: log ? log.overallSeverity : null,
+      });
+      cursor = addDays(cursor, 1);
+    }
+
+    return points;
+  }, [rangeLogs, dateRange]);
 
   // Generate insights
   const insights: TrendInsights = useMemo(() => {
@@ -161,8 +229,24 @@ export function TrendsScreen() {
         }],
       };
     }
+    if (selectedTrend === 'severity') {
+      const hasData = expandedSeries.some((p) => p.value !== null);
+      if (!hasData) {
+        return {
+          labels: ['No Data'],
+          datasets: [{ data: [0] }],
+        };
+      }
+      const labelInterval = Math.max(1, Math.ceil(expandedSeries.length / 7));
+      return {
+        labels: expandedSeries.map((p, i) => (i % labelInterval === 0 ? p.label : '')),
+        datasets: [{
+          data: expandedSeries.map((p) => p.value),
+        }],
+      };
+    }
     return generateChartData(trendData, selectedTrend);
-  }, [trendData, selectedTrend, dayRatios]);
+  }, [trendData, selectedTrend, dayRatios, expandedSeries]);
 
   function renderDayRatioInsights() {
     return (
@@ -222,6 +306,49 @@ export function TrendsScreen() {
             )}
           </View>
         )}
+      </View>
+    );
+  }
+
+  function renderGapSummary() {
+    return (
+      <View style={styles.consistencyContainer}>
+        <Text style={styles.sectionTitle}>Logging Consistency</Text>
+        <View style={styles.consistencyGrid}>
+          <View style={styles.consistencyCard}>
+            <Text style={styles.consistencyValue}>{daysLoggedCount}</Text>
+            <Text style={styles.consistencyLabel}>Days logged</Text>
+          </View>
+          <View style={styles.consistencyCard}>
+            <Text style={styles.consistencyValue}>{daysMissed}</Text>
+            <Text style={styles.consistencyLabel}>Days missed</Text>
+          </View>
+          <View style={styles.consistencyCard}>
+            <Text style={styles.consistencyValue}>{longestGap}</Text>
+            <Text style={styles.consistencyLabel}>Longest gap (days)</Text>
+          </View>
+          <View style={styles.consistencyCard}>
+            <Text style={styles.consistencyValue}>{percentageLogged}%</Text>
+            <Text style={styles.consistencyLabel}>Percentage logged</Text>
+          </View>
+        </View>
+
+        <View style={styles.gapList}>
+          {gapDetails.length === 0 ? (
+            <Text style={styles.gapListText}>No gaps in this range.</Text>
+          ) : (
+            gapDetails.map((gap) => (
+              <View key={`${gap.startDate}-${gap.endDate}`} style={styles.gapItem}>
+                <Text style={styles.gapItemText}>
+                  Gap: {gap.startDate} -> {gap.endDate} ({gap.lengthDays} days)
+                </Text>
+                <Text style={styles.gapItemNote}>
+                  Explanation: {gap.hasExplanation ? gap.explanation : 'None recorded'}
+                </Text>
+              </View>
+            ))
+          )}
+        </View>
       </View>
     );
   }
@@ -731,6 +858,8 @@ export function TrendsScreen() {
         />
       </View>
 
+      {renderGapSummary()}
+
       <View style={styles.trendSelector}>
         <TouchableOpacity
           style={[styles.trendButton, selectedTrend === 'day-quality' && styles.trendButtonActive]}
@@ -810,6 +939,54 @@ const styles = StyleSheet.create({
   dateRangeContainer: {
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.lg,
+  },
+  consistencyContainer: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  consistencyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+  consistencyCard: {
+    flexBasis: '48%',
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: COLORS.gray200,
+  },
+  consistencyValue: {
+    ...TYPOGRAPHY.titleLarge,
+    color: COLORS.gray900,
+    fontWeight: 'bold',
+  },
+  consistencyLabel: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.gray700,
+  },
+  gapList: {
+    marginTop: SPACING.sm,
+    backgroundColor: COLORS.gray100,
+    padding: SPACING.md,
+    borderRadius: 8,
+  },
+  gapListText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.gray700,
+  },
+  gapItem: {
+    marginBottom: SPACING.sm,
+  },
+  gapItemText: {
+    ...TYPOGRAPHY.bodyMedium,
+    color: COLORS.gray900,
+    fontWeight: '600',
+  },
+  gapItemNote: {
+    ...TYPOGRAPHY.caption,
+    color: COLORS.gray700,
   },
   trendSelector: {
     flexDirection: 'row',

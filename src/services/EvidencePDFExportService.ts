@@ -10,7 +10,8 @@ import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { getRevisionCount } from './EvidenceLogService';
-import { calculateDaysDelayed } from '../utils/dates';
+import { calculateDaysDelayed, countInclusiveDays, findDateGaps } from '../utils/dates';
+import { GapExplanation } from '../domain/models/GapExplanation';
 
 /**
  * PDF export configuration
@@ -141,6 +142,7 @@ export interface StrictPDFPayload {
   rawActivityLogs: ActivityLog[];
   medications: Medication[];
   appointments: Appointment[];
+  gapExplanations?: GapExplanation[];
   summaries: {
     frequency?: string;
     activity?: string;
@@ -280,6 +282,34 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
   const uniqueDates = (dates: string[]) => Array.from(new Set(dates)).sort();
   const listDates = (dates: string[]) => uniqueDates(dates).join(', ') || 'Not specified';
 
+  const buildGapSegments = (dates: string[]) => {
+    let segments = findDateGaps(dates, 4, payload.dateRange?.start, payload.dateRange?.end);
+
+    if (segments.length === 0 && payload.dateRange && dates.length === 0) {
+      const lengthDays = countInclusiveDays(payload.dateRange.start, payload.dateRange.end);
+      if (lengthDays >= 4) {
+        segments = [
+          {
+            startDate: payload.dateRange.start,
+            endDate: payload.dateRange.end,
+            lengthDays,
+          },
+        ];
+      }
+    }
+
+    return segments.map(segment => {
+      const explanation = payload.gapExplanations?.find(
+        (g) => g.startDate === segment.startDate && g.endDate === segment.endDate
+      );
+      return {
+        ...segment,
+        hasExplanation: Boolean(explanation && explanation.note && explanation.note.trim().length > 0),
+        note: explanation?.note || '',
+      };
+    });
+  };
+
   const getLogMeta = (log: DailyLog | ActivityLog, eventDate: string) => {
     const created = log.createdAt ? new Date(log.createdAt).toISOString() : '';
     const updated = (log as any).updatedAt ? new Date((log as any).updatedAt).toISOString() : created;
@@ -320,32 +350,82 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
   const renderDailyLogs = () => {
     if (payload.rawDailyLogs.length === 0) return '<p>No daily symptom entries in this range.</p>';
     const sorted = [...payload.rawDailyLogs].sort((a, b) => a.logDate.localeCompare(b.logDate));
-    return `<ul>${sorted
-      .map((log) => {
-        const symptoms = log.symptoms.map((s) => `${s.symptomId} (sev ${s.severity}${s.duration ? `, ${s.duration}m` : ''})`).join('; ');
-        const meta = getLogMeta(log, log.logDate);
-        const retrospectiveText = meta.retrospectiveFlaggedAt
-          ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
-          : meta.retrospectiveSummary;
-        return `<li>Event date (user-selected): ${escapeHTML(log.logDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Severity: ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}</li>`;
-      })
-      .join('')}</ul>`;
+    const gaps = buildGapSegments(sorted.map((l) => l.logDate));
+    let gapIndex = 0;
+    const items: string[] = [];
+
+    const pushGap = (gap: { startDate: string; endDate: string; lengthDays: number; hasExplanation: boolean; note: string }) => {
+      items.push(
+        `<li>[GAP] ${gap.startDate} to ${gap.endDate} (${gap.lengthDays} days); Explanation: ${
+          gap.hasExplanation ? escapeHTML(gap.note || 'Provided') : 'None recorded'
+        }</li>`
+      );
+    };
+
+    sorted.forEach((log) => {
+      while (gapIndex < gaps.length && gaps[gapIndex].endDate < log.logDate) {
+        pushGap(gaps[gapIndex]);
+        gapIndex++;
+      }
+
+      const symptoms = log.symptoms.map((s) => `${s.symptomId} (sev ${s.severity}${s.duration ? `, ${s.duration}m` : ''})`).join('; ');
+      const meta = getLogMeta(log, log.logDate);
+      const retrospectiveText = meta.retrospectiveFlaggedAt
+        ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
+        : meta.retrospectiveSummary;
+
+      items.push(
+        `<li>Event date (user-selected): ${escapeHTML(log.logDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Severity: ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
+      );
+    });
+
+    while (gapIndex < gaps.length) {
+      pushGap(gaps[gapIndex]);
+      gapIndex++;
+    }
+
+    return `<ul>${items.join('')}</ul>`;
   };
 
   const renderActivityLogs = () => {
     if (payload.rawActivityLogs.length === 0) return '<p>No activity logs in this range.</p>';
     const sorted = [...payload.rawActivityLogs].sort((a, b) => a.activityDate.localeCompare(b.activityDate));
-    return `<ul>${sorted
-      .map((log) => {
-        const impact = log.immediateImpact?.overallImpact ?? 0;
-        const recovery = log.recoveryDuration || 0;
-        const meta = getLogMeta(log, log.activityDate);
-        const retrospectiveText = meta.retrospectiveFlaggedAt
-          ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
-          : meta.retrospectiveSummary;
-        return `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`;
-      })
-      .join('')}</ul>`;
+    const gaps = buildGapSegments(sorted.map((l) => l.activityDate));
+    let gapIndex = 0;
+    const items: string[] = [];
+
+    const pushGap = (gap: { startDate: string; endDate: string; lengthDays: number; hasExplanation: boolean; note: string }) => {
+      items.push(
+        `<li>[GAP] ${gap.startDate} to ${gap.endDate} (${gap.lengthDays} days); Explanation: ${
+          gap.hasExplanation ? escapeHTML(gap.note || 'Provided') : 'None recorded'
+        }</li>`
+      );
+    };
+
+    sorted.forEach((log) => {
+      while (gapIndex < gaps.length && gaps[gapIndex].endDate < log.activityDate) {
+        pushGap(gaps[gapIndex]);
+        gapIndex++;
+      }
+
+      const impact = log.immediateImpact?.overallImpact ?? 0;
+      const recovery = log.recoveryDuration || 0;
+      const meta = getLogMeta(log, log.activityDate);
+      const retrospectiveText = meta.retrospectiveFlaggedAt
+        ? `${meta.retrospectiveSummary}; Flagged at: ${meta.retrospectiveFlaggedAt}`
+        : meta.retrospectiveSummary;
+
+      items.push(
+        `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; Impact ${impact}/10; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
+      );
+    });
+
+    while (gapIndex < gaps.length) {
+      pushGap(gaps[gapIndex]);
+      gapIndex++;
+    }
+
+    return `<ul>${items.join('')}</ul>`;
   };
 
   const renderMeds = () => {

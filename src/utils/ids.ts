@@ -46,6 +46,7 @@ export const ids = {
   reportDraft: () => generatePrefixedId('report'),
   section: () => generatePrefixedId('section'),
   textBlock: () => generatePrefixedId('block'),
+  gap: () => generatePrefixedId('gap'),
 };
 
 /**

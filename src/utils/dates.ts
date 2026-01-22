@@ -178,6 +178,75 @@ export function getDelayLabel(daysDelayed: number): string {
 }
 
 /**
+ * Count inclusive days between two dates
+ */
+export function countInclusiveDays(start: Date | string, end: Date | string): number {
+  const d1 = typeof start === 'string' ? parseISO(start) : start;
+  const d2 = typeof end === 'string' ? parseISO(end) : end;
+  if (!isValid(d1) || !isValid(d2)) return 0;
+  const diff = differenceInDays(d2, d1);
+  return diff < 0 ? 0 : diff + 1;
+}
+
+export interface GapSegment {
+  startDate: string;
+  endDate: string;
+  lengthDays: number;
+}
+
+/**
+ * Find gaps between sorted dates (YYYY-MM-DD). Optional range anchors.
+ */
+export function findDateGaps(
+  dateStrings: string[],
+  minGapLength: number = 1,
+  rangeStart?: string,
+  rangeEnd?: string
+): GapSegment[] {
+  if (!dateStrings || dateStrings.length === 0) return [];
+
+  const uniqueDates = Array.from(new Set(dateStrings)).sort();
+  const gaps: GapSegment[] = [];
+
+  let previous = rangeStart ? rangeStart : uniqueDates[0];
+
+  uniqueDates.forEach((current) => {
+    const gapLength = Math.max(0, getDaysBetween(previous, current) - 1);
+    if (gapLength >= minGapLength) {
+      const start = addDays(typeof previous === 'string' ? parseISO(previous) : previous, 1)
+        .toISOString()
+        .split('T')[0];
+      const end = addDays(typeof current === 'string' ? parseISO(current) : current, -1)
+        .toISOString()
+        .split('T')[0];
+      gaps.push({
+        startDate: start,
+        endDate: end,
+        lengthDays: gapLength,
+      });
+    }
+    previous = current;
+  });
+
+  if (rangeEnd) {
+    const trailingGap = Math.max(0, getDaysBetween(previous, rangeEnd) - 1);
+    if (trailingGap >= minGapLength) {
+      const start = addDays(typeof previous === 'string' ? parseISO(previous) : previous, 1)
+        .toISOString()
+        .split('T')[0];
+      const end = rangeEnd;
+      gaps.push({
+        startDate: start,
+        endDate: end,
+        lengthDays: trailingGap,
+      });
+    }
+  }
+
+  return gaps;
+}
+
+/**
  * Parse an ISO date string
  */
 export function parseDate(dateStr: string): Date | null {

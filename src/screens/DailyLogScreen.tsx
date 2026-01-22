@@ -25,7 +25,9 @@ import { LogService, PhotoService } from '../services';
 import { canModifyLog, updateLogWithRevision } from '../services/EvidenceLogService';
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
-import { calculateDaysDelayed, getDelayLabel, parseDate } from '../utils/dates';
+import { GapExplanation } from '../domain/models/GapExplanation';
+import { calculateDaysDelayed, getDelayLabel, parseDate, getDaysBetween, addDays } from '../utils/dates';
+import { ids } from '../utils/ids';
 
 type DailyLogProps = NativeStackScreenProps<RootStackParamList, 'DailyLog'>;
 
@@ -43,13 +45,14 @@ const RETROSPECTIVE_REASONS = [
 ];
 
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
-  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity } = useAppState();
+  const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity, addGapExplanation } = useAppState();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<string[]>([]);
   const [symptomEntries, setSymptomEntries] = useState<Record<string, SymptomEntry>>({});
   const [activeSymptomId, setActiveSymptomId] = useState<string | null>(null);
   const [generalNotes, setGeneralNotes] = useState('');
   const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
+  const [gapExplanation, setGapExplanation] = useState('');
   const [retrospectiveReason, setRetrospectiveReason] = useState('');
   const [retrospectiveNote, setRetrospectiveNote] = useState('');
   const [showRevisionHistory, setShowRevisionHistory] = useState(false);
@@ -57,6 +60,25 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const existingLog = dailyLogs.find(
     (l) => l.profileId === activeProfile?.id && l.logDate === date
   );
+  const profileDailyLogs = dailyLogs.filter((l) => l.profileId === activeProfile?.id);
+  const previousLog = profileDailyLogs
+    .filter((l) => l.logDate < date)
+    .sort((a, b) => b.logDate.localeCompare(a.logDate))[0];
+  const gapDaysSinceLast = previousLog
+    ? Math.max(0, getDaysBetween(previousLog.logDate, date) - 1)
+    : 0;
+  const gapRange =
+    previousLog && gapDaysSinceLast > 0
+      ? {
+          start: addDays(parseDate(previousLog.logDate) || new Date(previousLog.logDate), 1)
+            .toISOString()
+            .split('T')[0],
+          end: addDays(parseDate(date) || new Date(date), -1)
+            .toISOString()
+            .split('T')[0],
+        }
+      : null;
+  const showGapExplanation = !existingLog && gapDaysSinceLast > 7 && Boolean(gapRange);
 
   const eventDateValid = Boolean(parseDate(date));
   const creationReference = existingLog?.createdAt || new Date().toISOString();
@@ -99,6 +121,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       setRetrospectiveReason(existingLog.retrospectiveContext?.reason || '');
       setRetrospectiveNote(existingLog.retrospectiveContext?.note || '');
+      setGapExplanation('');
 
       // Load photos for this log
       if (existingLog.id) {
@@ -112,9 +135,10 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     setSymptomEntries({});
     setGeneralNotes('');
     setActiveSymptomId(null);
-    setLogPhotos([]);
-    setRetrospectiveReason('');
-    setRetrospectiveNote('');
+      setLogPhotos([]);
+      setRetrospectiveReason('');
+      setRetrospectiveNote('');
+      setGapExplanation('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingLog?.id, date]); // Reset when the date changes
 
@@ -218,6 +242,20 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         }
       } else {
         // Pass data to store, which will create the log with proper IDs and timestamps
+        if (showGapExplanation && gapRange && gapExplanation.trim().length > 0) {
+          const nowIso = new Date().toISOString();
+          const gapRecord: GapExplanation = {
+            id: ids.gap(),
+            profileId: activeProfile.id,
+            startDate: gapRange.start,
+            endDate: gapRange.end,
+            lengthDays: gapDaysSinceLast,
+            note: gapExplanation.trim(),
+            createdAt: nowIso,
+          };
+          await addGapExplanation(gapRecord);
+        }
+
         await addDailyLog({
           profileId: activeProfile.id,
           logDate: date,
@@ -304,6 +342,21 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
               log={existingLog}
               logType="daily"
               profileId={activeProfile.id}
+            />
+          </View>
+        )}
+
+        {showGapExplanation && gapRange && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Gap explanation (optional)</Text>
+            <Text style={styles.helperText}>
+              No daily logs between {gapRange.start} and {gapRange.end} ({gapDaysSinceLast} days). Add context if helpful.
+            </Text>
+            <NotesField
+              value={gapExplanation}
+              onChange={setGapExplanation}
+              label="Gap context"
+              placeholder="Optional note about why logging paused"
             />
           </View>
         )}

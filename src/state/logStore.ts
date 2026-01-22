@@ -10,6 +10,7 @@ import { Limitation } from '../domain/models/Limitation';
 import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
+import { GapExplanation } from '../domain/models/GapExplanation';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { calculateDaysDelayed, isSameDayAs } from '../utils/dates';
@@ -23,6 +24,7 @@ interface LogState {
   medications: Medication[];
   appointments: Appointment[];
   photos: PhotoAttachment[];
+  gapExplanations: GapExplanation[];
   
   // Loading states
   loading: boolean;
@@ -69,6 +71,10 @@ interface LogState {
   deletePhoto: (photoId: string) => Promise<void>;
   getPhotosByEntity: (entityType: string, entityId: string) => PhotoAttachment[];
   
+  // Gaps
+  addGapExplanation: (explanation: GapExplanation) => Promise<void>;
+  getGapExplanationForRange: (startDate: string, endDate: string) => GapExplanation | undefined;
+  
   // Utility
   clearError: () => void;
   clearData: () => void;
@@ -82,6 +88,7 @@ export const useLogStore = create<LogState>((set, get) => ({
   medications: [],
   appointments: [],
   photos: [],
+  gapExplanations: [],
   loading: false,
   error: null,
   currentProfileId: null,
@@ -106,13 +113,14 @@ export const useLogStore = create<LogState>((set, get) => ({
     console.log('loadData called for profile:', profileId);
     
     try {
-      const [dailyLogs, activityLogs, limitations, medications, appointments, photos] = await Promise.all([
+      const [dailyLogs, activityLogs, limitations, medications, appointments, photos, gapExplanations] = await Promise.all([
         LogStorage.getDailyLogs(profileId),
         LogStorage.getActivityLogs(profileId),
         LogStorage.getLimitations(profileId),
         LogStorage.getMedications(profileId),
         LogStorage.getAppointments(profileId),
         LogStorage.getPhotos(profileId),
+        LogStorage.getGapExplanations(profileId),
       ]);
       
       console.log('Data loaded:', { dailyLogs: dailyLogs.length, activityLogs: activityLogs.length });
@@ -124,6 +132,7 @@ export const useLogStore = create<LogState>((set, get) => ({
         medications,
         appointments,
         photos,
+        gapExplanations,
         loading: false,
       });
     } catch (error) {
@@ -560,6 +569,28 @@ export const useLogStore = create<LogState>((set, get) => ({
     );
   },
 
+  // Gap explanations
+  addGapExplanation: async (explanation) => {
+    const { currentProfileId } = get();
+    if (!currentProfileId) return;
+
+    try {
+      const { gapExplanations } = get();
+      const updated = [...gapExplanations, explanation];
+      await LogStorage.saveGapExplanations(currentProfileId, updated);
+      set({ gapExplanations: updated, error: null });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to save gap explanation' });
+    }
+  },
+
+  getGapExplanationForRange: (startDate: string, endDate: string) => {
+    const { gapExplanations } = get();
+    return gapExplanations.find(
+      (g) => g.startDate === startDate && g.endDate === endDate
+    );
+  },
+
   // Utility
   clearError: () => set({ error: null }),
 
@@ -570,6 +601,7 @@ export const useLogStore = create<LogState>((set, get) => ({
     medications: [],
     appointments: [],
     photos: [],
+    gapExplanations: [],
     currentProfileId: null,
     error: null,
   }),
