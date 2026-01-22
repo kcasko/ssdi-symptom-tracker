@@ -46,9 +46,22 @@ async function convertIcons() {
     { output: 'assets/icons/adaptive-icon.png', size: 432, description: 'Android Adaptive Icon' },
   ];
 
+  // Splash screen sizes - centered logo on background
+  const splashConversions = [
+    { output: 'assets/branding/splash.png', width: 1242, height: 2688, description: 'Default Splash Screen' },
+    { output: 'assets/branding/splash-1536x2048.png', width: 1536, height: 2048, description: 'iPad Pro 12.9"' },
+    { output: 'assets/branding/splash-1668x2224.png', width: 1668, height: 2224, description: 'iPad Pro 12.9" Gen 3' },
+    { output: 'assets/branding/splash-1620x2160.png', width: 1620, height: 2160, description: 'iPad Pro 10.5"' },
+    { output: 'assets/branding/splash-750x1334.png', width: 750, height: 1334, description: 'iPhone 8' },
+    { output: 'assets/branding/splash-828x1792.png', width: 828, height: 1792, description: 'iPhone 11' },
+    { output: 'assets/branding/splash-1125x2436.png', width: 1125, height: 2436, description: 'iPhone X/XS/11 Pro' },
+    { output: 'assets/branding/splash-1242x2688.png', width: 1242, height: 2688, description: 'iPhone XS Max/11 Pro Max' },
+  ];
+
   let successCount = 0;
   let errorCount = 0;
 
+  // Generate icons
   for (const conversion of conversions) {
     try {
       await sharp(sourceFile)
@@ -64,6 +77,38 @@ async function convertIcons() {
       successCount++;
     } catch (error) {
       console.error(`✗ Failed: ${conversion.output}`);
+      console.error(`  Error: ${error.message}\n`);
+      errorCount++;
+    }
+  }
+
+  // Generate splash screens
+  console.log('\n🖼️  Generating splash screens...\n');
+  for (const splash of splashConversions) {
+    try {
+      // Calculate logo size (about 1/3 of screen width)
+      const logoSize = Math.floor(splash.width * 0.33);
+
+      await sharp(sourceFile)
+        .resize(logoSize, logoSize, {
+          fit: 'contain',
+          background: { r: 0, g: 0, b: 0, alpha: 0 }
+        })
+        .extend({
+          top: Math.floor((splash.height - logoSize) / 2),
+          bottom: Math.floor((splash.height - logoSize) / 2),
+          left: Math.floor((splash.width - logoSize) / 2),
+          right: Math.floor((splash.width - logoSize) / 2),
+          background: { r: 47, g: 61, b: 76, alpha: 1 } // #2f3d4c
+        })
+        .png({ quality: 100 })
+        .toFile(splash.output);
+
+      console.log(`✓ ${splash.output}`);
+      console.log(`  ${splash.width}x${splash.height} - ${splash.description}\n`);
+      successCount++;
+    } catch (error) {
+      console.error(`✗ Failed: ${splash.output}`);
       console.error(`  Error: ${error.message}\n`);
       errorCount++;
     }
