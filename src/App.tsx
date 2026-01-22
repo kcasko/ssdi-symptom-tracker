@@ -24,15 +24,15 @@ export default function App() {
       <SafeAreaProvider>
         <View style={styles.loadingContainer}>
           <Text style={[styles.appTitle, { color: colors.primary600 }]}>
-            SSDI Symptom Tracker
+            Daymark
           </Text>
-          <ActivityIndicator 
-            size="large" 
-            color={colors.primary600} 
+          <ActivityIndicator
+            size="large"
+            color={colors.primary600}
             style={styles.spinner}
           />
           <Text style={[styles.loadingText, { color: colors.text.secondary }]}>
-            Initializing your private symptom tracker...
+            Initializing your health tracker...
           </Text>
         </View>
         <StatusBar style="auto" />

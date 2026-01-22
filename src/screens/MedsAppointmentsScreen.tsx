@@ -41,10 +41,12 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const deleteMedication = useLogStore(state => state.deleteMedication);
   
   const appointments = useLogStore(state => state.appointments);
+  const addAppointment = useLogStore(state => state.addAppointment);
+  const updateAppointment = useLogStore(state => state.updateAppointment);
   const deleteAppointment = useLogStore(state => state.deleteAppointment);
-  
+
   const { dailyLogs, activityLogs, limitations } = useAppState();
-  
+
   const [activeTab, setActiveTab] = useState<Tab>('medications');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMed, setEditingMed] = useState<Medication | null>(null);
@@ -52,6 +54,8 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [selectedMedForSideEffects, setSelectedMedForSideEffects] = useState<Medication | null>(null);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
+  const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
   // ...existing code...
 
   const activeMeds = medications.filter(m => m.isActive);
@@ -100,21 +104,13 @@ export const MedsAppointmentsScreen: React.FC = () => {
   };
   
   const handleAddAppointment = () => {
-    // TODO: Implement appointment add/edit modal
-    Alert.alert(
-      'Coming Soon',
-      'Appointment editing feature is under development. For now, you can delete appointments and track them in your notes.',
-      [{ text: 'OK' }]
-    );
+    setEditingAppt(null);
+    setShowAppointmentModal(true);
   };
 
   const handleEditAppointment = (appt: Appointment) => {
-    // TODO: Implement appointment add/edit modal
-    Alert.alert(
-      'Coming Soon',
-      'Appointment editing feature is under development. For now, you can delete appointments and track them in your notes.',
-      [{ text: 'OK' }]
-    );
+    setEditingAppt(appt);
+    setShowAppointmentModal(true);
   };
   
   const handleDeleteAppointment = (apptId: string) => {
@@ -226,6 +222,20 @@ export const MedsAppointmentsScreen: React.FC = () => {
         summary={selectedSummary}
         onClose={() => setShowSummaryModal(false)}
         onShare={handleShareSummary}
+      />
+
+      <AppointmentModal
+        visible={showAppointmentModal}
+        appointment={editingAppt}
+        onClose={() => setShowAppointmentModal(false)}
+        onSave={async (apptData) => {
+          if (editingAppt) {
+            await updateAppointment({ ...editingAppt, ...apptData, updatedAt: new Date().toISOString() });
+          } else {
+            await addAppointment(apptData);
+          }
+          setShowAppointmentModal(false);
+        }}
       />
     </View>
   );
@@ -882,6 +892,234 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={styles.closeActionButton}>
             <Text style={styles.closeActionButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+interface AppointmentModalProps {
+  visible: boolean;
+  appointment: Appointment | null;
+  onClose: () => void;
+  onSave: (apptData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+}
+
+const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointment, onClose, onSave }) => {
+  const currentProfileId = useLogStore(state => state.currentProfileId);
+  const [appointmentDate, setAppointmentDate] = useState('');
+  const [appointmentTime, setAppointmentTime] = useState('');
+  const [providerName, setProviderName] = useState('');
+  const [providerType, setProviderType] = useState<ProviderType>('primary_care');
+  const [facilityName, setFacilityName] = useState('');
+  const [purpose, setPurpose] = useState<AppointmentPurpose>('follow_up');
+  const [purposeDetails, setPurposeDetails] = useState('');
+  const [status, setStatus] = useState<AppointmentStatus>('scheduled');
+  const [preAppointmentNotes, setPreAppointmentNotes] = useState('');
+
+  React.useEffect(() => {
+    if (appointment) {
+      setAppointmentDate(appointment.appointmentDate);
+      setAppointmentTime(appointment.appointmentTime || '');
+      setProviderName(appointment.providerName);
+      setProviderType(appointment.providerType);
+      setFacilityName(appointment.facilityName || '');
+      setPurpose(appointment.purpose);
+      setPurposeDetails(appointment.purposeDetails || '');
+      setStatus(appointment.status);
+      setPreAppointmentNotes(appointment.preAppointmentNotes || '');
+    } else {
+      // Reset for new appointment
+      const today = new Date().toISOString().split('T')[0];
+      setAppointmentDate(today);
+      setAppointmentTime('');
+      setProviderName('');
+      setProviderType('primary_care');
+      setFacilityName('');
+      setPurpose('follow_up');
+      setPurposeDetails('');
+      setStatus('scheduled');
+      setPreAppointmentNotes('');
+    }
+  }, [appointment, visible]);
+
+  const handleSave = async () => {
+    if (!appointmentDate.trim() || !providerName.trim() || !currentProfileId) {
+      Alert.alert('Error', 'Please fill in required fields (date and provider name)');
+      return;
+    }
+
+    const apptData: Omit<Appointment, 'id' | 'createdAt' | 'updatedAt'> = {
+      profileId: currentProfileId,
+      appointmentDate: appointmentDate.trim(),
+      appointmentTime: appointmentTime.trim() || undefined,
+      providerName: providerName.trim(),
+      providerType,
+      facilityName: facilityName.trim() || undefined,
+      purpose,
+      purposeDetails: purposeDetails.trim() || undefined,
+      status,
+      preAppointmentNotes: preAppointmentNotes.trim() || undefined,
+    };
+
+    await onSave(apptData);
+  };
+
+  const providerTypes: ProviderType[] = [
+    'primary_care', 'specialist', 'mental_health', 'physical_therapy',
+    'occupational_therapy', 'pain_management', 'rheumatology', 'neurology',
+    'orthopedics', 'psychiatry', 'psychology', 'other'
+  ];
+
+  const purposes: AppointmentPurpose[] = [
+    'initial_evaluation', 'follow_up', 'medication_review', 'test_results',
+    'treatment', 'therapy_session', 'ssdi_evaluation', 'paperwork', 'other'
+  ];
+
+  const statuses: AppointmentStatus[] = [
+    'scheduled', 'completed', 'cancelled', 'rescheduled', 'no_show'
+  ];
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>{appointment ? 'Edit' : 'Add'} Appointment</Text>
+          <TouchableOpacity onPress={onClose}>
+            <Text style={styles.modalClose}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.modalContent}>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Appointment Date *</Text>
+            <TextInput
+              style={styles.input}
+              value={appointmentDate}
+              onChangeText={setAppointmentDate}
+              placeholder="YYYY-MM-DD"
+              placeholderTextColor={colors.gray400}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Appointment Time</Text>
+            <TextInput
+              style={styles.input}
+              value={appointmentTime}
+              onChangeText={setAppointmentTime}
+              placeholder="HH:MM (e.g., 14:30)"
+              placeholderTextColor={colors.gray400}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Provider Name *</Text>
+            <TextInput
+              style={styles.input}
+              value={providerName}
+              onChangeText={setProviderName}
+              placeholder="e.g., Dr. Smith"
+              placeholderTextColor={colors.gray400}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Provider Type</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+              {providerTypes.map((type) => (
+                <TouchableOpacity
+                  key={type}
+                  style={[styles.pill, providerType === type && styles.pillActive]}
+                  onPress={() => setProviderType(type)}
+                >
+                  <Text style={[styles.pillText, providerType === type && styles.pillTextActive]}>
+                    {getProviderTypeLabel(type)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Facility/Clinic Name</Text>
+            <TextInput
+              style={styles.input}
+              value={facilityName}
+              onChangeText={setFacilityName}
+              placeholder="Optional"
+              placeholderTextColor={colors.gray400}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Purpose</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+              {purposes.map((p) => (
+                <TouchableOpacity
+                  key={p}
+                  style={[styles.pill, purpose === p && styles.pillActive]}
+                  onPress={() => setPurpose(p)}
+                >
+                  <Text style={[styles.pillText, purpose === p && styles.pillTextActive]}>
+                    {getPurposeLabel(p)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Purpose Details</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={purposeDetails}
+              onChangeText={setPurposeDetails}
+              placeholder="Additional details about the visit purpose"
+              placeholderTextColor={colors.gray400}
+              multiline
+              numberOfLines={3}
+            />
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Status</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+              {statuses.map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.pill, status === s && styles.pillActive]}
+                  onPress={() => setStatus(s)}
+                >
+                  <Text style={[styles.pillText, status === s && styles.pillTextActive]}>
+                    {s.charAt(0).toUpperCase() + s.slice(1).replace('_', ' ')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Pre-Appointment Notes</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={preAppointmentNotes}
+              onChangeText={setPreAppointmentNotes}
+              placeholder="Questions to ask, symptoms to mention, etc."
+              placeholderTextColor={colors.gray400}
+              multiline
+              numberOfLines={4}
+            />
+          </View>
+        </ScrollView>
+
+        <View style={styles.modalFooter}>
+          <TouchableOpacity onPress={onClose} style={styles.modalCancelButton}>
+            <Text style={styles.modalCancelButtonText}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleSave} style={styles.modalSaveButton}>
+            <Text style={styles.modalSaveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>

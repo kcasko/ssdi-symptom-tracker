@@ -295,6 +295,16 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
+              label="💊 Medications & Appointments"
+              onPress={() => navigation.navigate('MedsAppointments')}
+              variant="secondary"
+              fullWidth
+            />
+            <Text style={styles.actionHelper}>Track treatments and prepare for doctor visits</Text>
+          </View>
+
+          <View style={styles.actionItem}>
+            <BigButton
               label="View Reports"
               onPress={() => navigation.navigate('Reports')}
               variant="secondary"
