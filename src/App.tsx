@@ -16,7 +16,7 @@ LogBox.ignoreLogs([
 ]);
 export default function App() {
   // Initialize app state
-  const { isInitialized, hasError, errorMessage } = useAppState();
+  const { isInitialized, isFirstLaunch, hasError, errorMessage } = useAppState();
 
   // Loading screen while app initializes (ONLY during init, not after)
   if (!isInitialized) {
@@ -63,7 +63,7 @@ export default function App() {
   // Main app
   return (
     <SafeAreaProvider>
-      <AppNavigator />
+      <AppNavigator isFirstLaunch={isFirstLaunch} />
       <StatusBar style="auto" />
     </SafeAreaProvider>
   );

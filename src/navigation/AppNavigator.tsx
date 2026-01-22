@@ -43,11 +43,15 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export function AppNavigator() {
+interface AppNavigatorProps {
+  isFirstLaunch: boolean;
+}
+
+export function AppNavigator({ isFirstLaunch }: AppNavigatorProps) {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="ProfilePicker"
+        initialRouteName={isFirstLaunch ? "Onboarding" : "ProfilePicker"}
         screenOptions={{
           headerShown: false,
         }}
