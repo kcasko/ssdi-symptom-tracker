@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { useLogStore } from '../state/logStore';
+import { colors } from '../theme/colors';
 
 interface SubmissionPackBuilderProps {
   profileId: string;
@@ -308,14 +309,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   button: {
-    backgroundColor: '#1976d2',
+    backgroundColor: colors.primaryMain,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   buttonDisabled: {
-    backgroundColor: '#bdbdbd',
+    backgroundColor: colors.gray400,
   },
   buttonText: {
     color: '#fff',

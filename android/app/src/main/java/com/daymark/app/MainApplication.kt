@@ -1,4 +1,4 @@
-package com.ssdi.symptomtracker
+package com.daymark.app
 
 import android.app.Application
 import android.content.res.Configuration
