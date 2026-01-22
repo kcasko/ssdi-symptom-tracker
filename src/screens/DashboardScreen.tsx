@@ -101,19 +101,26 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
         {/* Persistent Explanation Block */}
         <View style={styles.explanationBlock}>
+          <View style={styles.explanationHeader}>
+            <Text style={styles.explanationIcon}>💡</Text>
+            <Text style={styles.explanationTitle}>How This Works</Text>
+          </View>
+
           <Text style={styles.explanationPrimary}>
             This app helps you keep a simple, honest record of how you're feeling and how daily life affects you. You don't need perfect wording or medical terms. Just log what you experience. Over time, patterns and summaries appear automatically.
           </Text>
 
           <View style={styles.explanationInstructions}>
-            <Text style={styles.instructionLine}>Log symptoms once per day.</Text>
-            <Text style={styles.instructionLine}>Log activity impact when it happens.</Text>
-            <Text style={styles.instructionLine}>Review trends when you're ready.</Text>
+            <Text style={styles.instructionLine}>• Log symptoms once per day.</Text>
+            <Text style={styles.instructionLine}>• Log activity impact when it happens.</Text>
+            <Text style={styles.instructionLine}>• Review trends when you're ready.</Text>
           </View>
 
-          <Text style={styles.explanationReassurance}>
-            If you haven't logged yet, that's okay. Start when you're ready.
-          </Text>
+          <View style={styles.explanationFooter}>
+            <Text style={styles.explanationReassurance}>
+              If you haven't logged yet, that's okay. Start when you're ready.
+            </Text>
+          </View>
         </View>
 
         {/* Today's Status */}
@@ -141,52 +148,64 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           <Text style={styles.sectionTitle}>Last 7 Days</Text>
           <Text style={styles.sectionHelper}>Low or zero values usually mean you haven't logged yet.</Text>
           <View style={styles.statsGrid}>
-            <SummaryCard
-              title="Symptoms"
-              value={stats.last7Days.symptomCount}
-              subtitle="Unique symptoms you've logged"
-              variant={stats.last7Days.symptomCount > 5 ? 'warning' : 'default'}
-            />
-            <SummaryCard
-              title="Bad Days"
-              value={stats.last7Days.badDays}
-              subtitle="High severity"
-              variant={stats.last7Days.badDays >= 4 ? 'error' : stats.last7Days.badDays >= 2 ? 'warning' : 'success'}
-            />
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Symptoms"
+                value={stats.last7Days.symptomCount}
+                subtitle="Unique symptoms you've logged"
+                variant={stats.last7Days.symptomCount > 5 ? 'warning' : 'default'}
+              />
+            </View>
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Bad Days"
+                value={stats.last7Days.badDays}
+                subtitle="High severity"
+                variant={stats.last7Days.badDays >= 4 ? 'error' : stats.last7Days.badDays >= 2 ? 'warning' : 'success'}
+              />
+            </View>
           </View>
           <View style={styles.statsGrid}>
-            <SummaryCard
-              title="Good Days"
-              value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
-              subtitle="Based on logged functional capacity"
-              variant={
-                last7DayRatios.goodDayPercentage >= 60 ? 'success' :
-                last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
-              }
-            />
-            <SummaryCard
-              title="Bad Days"
-              value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
-              subtitle="Days where symptoms significantly limited function"
-              variant={
-                last7DayRatios.badDayPercentage >= 60 ? 'error' :
-                last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
-              }
-            />
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Good Days"
+                value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
+                subtitle="Functional capacity"
+                variant={
+                  last7DayRatios.goodDayPercentage >= 60 ? 'success' :
+                  last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
+                }
+              />
+            </View>
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Bad Days"
+                value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
+                subtitle="Limited function"
+                variant={
+                  last7DayRatios.badDayPercentage >= 60 ? 'error' :
+                  last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
+                }
+              />
+            </View>
           </View>
           <View style={styles.statsGrid}>
-            <SummaryCard
-              title="Activities"
-              value={stats.last7Days.activitiesLogged}
-              subtitle="Logged"
-              variant="default"
-            />
-            <SummaryCard
-              title="Total Logs"
-              value={stats.allTime.totalLogs}
-              subtitle="All time"
-              variant="default"
-            />
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Activities"
+                value={stats.last7Days.activitiesLogged}
+                subtitle="Logged"
+                variant="default"
+              />
+            </View>
+            <View style={styles.cardWrapper}>
+              <SummaryCard
+                title="Total Logs"
+                value={stats.allTime.totalLogs}
+                subtitle="All time"
+                variant="default"
+              />
+            </View>
           </View>
         </View>
 
@@ -344,32 +363,61 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.xl,
   },
   explanationBlock: {
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.white,
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.md,
-    borderRadius: 8,
+    borderRadius: 12,
     gap: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  explanationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  explanationIcon: {
+    fontSize: typography.sizes.lg,
+  },
+  explanationTitle: {
+    fontSize: typography.sizes.lg,
+    fontWeight: typography.weights.semibold as any,
+    color: colors.primaryMain,
   },
   explanationPrimary: {
+    fontSize: typography.sizes.md,
+    lineHeight: typography.sizes.md * 1.6,
+    color: colors.gray800,
+  },
+  explanationInstructions: {
+    gap: spacing.sm,
+    paddingLeft: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  instructionLine: {
     fontSize: typography.sizes.md,
     lineHeight: typography.sizes.md * 1.5,
     color: colors.gray700,
   },
-  explanationInstructions: {
-    gap: spacing.xs,
-  },
-  instructionLine: {
-    fontSize: typography.sizes.md,
-    lineHeight: typography.sizes.md * 1.4,
-    color: colors.gray700,
+  explanationFooter: {
+    backgroundColor: colors.gray50,
+    padding: spacing.md,
+    borderRadius: 8,
+    marginTop: spacing.xs,
   },
   explanationReassurance: {
     fontSize: typography.sizes.sm,
-    lineHeight: typography.sizes.sm * 1.4,
+    lineHeight: typography.sizes.sm * 1.5,
     color: colors.gray600,
-    fontStyle: 'italic' as any,
+    textAlign: 'center' as any,
   },
   todaySection: {
     padding: spacing.lg,
@@ -414,6 +462,9 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     gap: spacing.md,
+  },
+  cardWrapper: {
+    flex: 1,
   },
   actionsSection: {
     padding: spacing.lg,

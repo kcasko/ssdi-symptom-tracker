@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SSDI Symptom Tracker",
-    "slug": "ssdi-symptom-tracker",
+    "name": "Daymark",
+    "slug": "daymark",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/icon.png",
@@ -9,21 +9,21 @@
     "splash": {
       "image": "./assets/branding/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#1a365d"
+      "backgroundColor": "#2f3d4c"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ssdi.symptomtracker"
+      "bundleIdentifier": "com.daymark.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
-        "backgroundColor": "#1a365d"
+        "backgroundColor": "#2f3d4c"
       },
-      "package": "com.ssdi.symptomtracker"
+      "package": "com.daymark.app"
     },
     "web": {
       "favicon": "./assets/icons/favicon.png"

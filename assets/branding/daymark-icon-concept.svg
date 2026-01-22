@@ -1,0 +1,35 @@
+<!--
+  Daymark Icon Concept - Reference Design
+  A single dot intersecting a horizontal line, representing marking a day in time
+
+  This is a reference concept. Final icon should be generated using the prompts
+  in docs/BRAND_ASSETS.md for proper sizing and export.
+
+  Colors:
+  Background: #2f3d4c (Deep slate)
+  Mark/Line: #f0f2f5 (Very light slate)
+-->
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="90" fill="#2f3d4c"/>
+
+  <!-- Horizontal line (timeline) -->
+  <line
+    x1="140"
+    y1="256"
+    x2="372"
+    y2="256"
+    stroke="#f0f2f5"
+    stroke-width="3"
+    stroke-linecap="round"
+    opacity="0.6"
+  />
+
+  <!-- Dot (today's mark) -->
+  <circle
+    cx="256"
+    cy="256"
+    r="24"
+    fill="#f0f2f5"
+  />
+</svg>

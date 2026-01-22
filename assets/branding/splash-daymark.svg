@@ -1,0 +1,66 @@
+<!--
+  Daymark Splash Screen
+  1242x2688 (iPhone Pro Max size)
+
+  Export this as splash.png at 1242x2688
+  Replace the existing splash.png with this new version
+-->
+<svg width="1242" height="2688" viewBox="0 0 1242 2688" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1242" height="2688" fill="#2f3d4c"/>
+
+  <!-- Centered icon and wordmark -->
+  <g transform="translate(621, 1344)">
+    <!-- Icon: dot on line (scaled up) -->
+    <g transform="translate(-80, -80)">
+      <!-- Horizontal timeline -->
+      <line
+        x1="20"
+        y1="80"
+        x2="140"
+        y2="80"
+        stroke="#f0f2f5"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-opacity="0.5"
+      />
+
+      <!-- Today's mark - centered dot -->
+      <circle
+        cx="80"
+        cy="80"
+        r="18"
+        fill="#f0f2f5"
+      />
+
+      <!-- Subtle highlight -->
+      <circle
+        cx="80"
+        cy="80"
+        r="18"
+        fill="url(#dotGradient)"
+      />
+    </g>
+
+    <!-- Wordmark below icon -->
+    <text
+      x="0"
+      y="100"
+      font-family="system-ui, -apple-system, sans-serif"
+      font-size="48"
+      font-weight="500"
+      fill="#fafbfc"
+      text-anchor="middle"
+      letter-spacing="2"
+    >
+      daymark
+    </text>
+  </g>
+
+  <defs>
+    <radialGradient id="dotGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

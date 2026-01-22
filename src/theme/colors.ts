@@ -1,125 +1,131 @@
 /**
- * SSDI Symptom Tracker - Color Palette
- * High contrast colors optimized for fatigued users
+ * Daymark - Color Palette
+ * Calm, neutral tones for marking time without judgment
+ *
+ * Design Philosophy:
+ * - Deep slate and charcoal tones (not clinical blue)
+ * - Low contrast but readable
+ * - No alarm colors or bright accents
+ * - Colors you'd trust on a bad day
  */
 
 export const colors = {
-  // Primary palette - calming blue tones
+  // Primary palette - deep slate tones
   primary: {
-    50: '#e6f0ff',
-    100: '#b3d4ff',
-    200: '#80b8ff',
-    300: '#4d9cff',
-    400: '#1a80ff',
-    500: '#0066e6',
-    600: '#0052b3',
-    700: '#003d80',
-    800: '#00294d',
-    900: '#1a365d',
+    50: '#f0f2f5',     // Very light slate
+    100: '#d9dfe6',    // Light slate
+    200: '#b3bfcc',    // Soft slate
+    300: '#8d9fb3',    // Medium slate
+    400: '#677f99',    // Muted slate
+    500: '#4a6176',    // Core slate
+    600: '#3d4f61',    // Deep slate
+    700: '#2f3d4c',    // Darker slate
+    800: '#222b37',    // Charcoal
+    900: '#1a2128',    // Near black slate
   },
 
-  // Semantic colors
+  // Semantic colors - toned down, calm
   success: {
-    light: '#d4edda',
-    main: '#28a745',
-    dark: '#1e7e34',
-    text: '#155724',
+    light: '#e8f4f1',  // Very soft green background
+    main: '#52a68a',   // Muted sage green
+    dark: '#3d7a66',   // Deeper sage
+    text: '#2c5949',   // Dark sage text
   },
 
   warning: {
-    light: '#fff3cd',
-    main: '#ffc107',
-    dark: '#d39e00',
-    text: '#856404',
+    light: '#fef8ec',  // Very soft amber background
+    main: '#d4a574',   // Muted amber
+    dark: '#b88a5c',   // Deeper amber
+    text: '#8b6944',   // Dark amber text
   },
 
   error: {
-    light: '#f8d7da',
-    main: '#dc3545',
-    dark: '#c82333',
-    text: '#721c24',
+    light: '#f7ebe9',  // Very soft rose background
+    main: '#c17369',   // Muted rose
+    dark: '#a25d54',   // Deeper rose
+    text: '#7a4740',   // Dark rose text
   },
 
-  // Neutral grays
+  // Neutral grays - warmer, softer
   gray: {
-    50: '#f8f9fa',
-    100: '#f1f3f5',
-    200: '#e9ecef',
-    300: '#dee2e6',
-    400: '#ced4da',
-    500: '#adb5bd',
-    600: '#6c757d',
-    700: '#495057',
-    800: '#343a40',
-    900: '#212529',
+    50: '#fafbfc',     // Off-white
+    100: '#f4f5f7',    // Very light gray
+    200: '#e9ebee',    // Light gray
+    300: '#dce0e4',    // Soft gray
+    400: '#c4cbd3',    // Medium gray
+    500: '#9aa4b0',    // Neutral gray
+    600: '#6b7684',    // Muted gray
+    700: '#4a5361',    // Deep gray
+    800: '#333b47',    // Darker gray
+    900: '#1e242e',    // Near black
   },
 
-  // Severity scale colors (0-10)
+  // Severity scale colors (0-10) - less alarming
   severity: {
-    none: '#4ade80',      // 0 - Green
-    minimal: '#86efac',   // 1-2 - Light green
-    mild: '#fef08a',      // 3-4 - Yellow
-    moderate: '#fdba74',  // 5-6 - Orange
-    severe: '#f87171',    // 7-8 - Light red
-    extreme: '#dc2626',   // 9-10 - Dark red
+    none: '#7ec299',      // 0 - Soft green
+    minimal: '#98cfac',   // 1-2 - Light sage
+    mild: '#e8d490',      // 3-4 - Soft yellow
+    moderate: '#daa978',  // 5-6 - Muted orange
+    severe: '#c9887d',    // 7-8 - Soft rose
+    extreme: '#b5726a',   // 9-10 - Muted red
   },
 
   // Background colors
   background: {
-    primary: '#ffffff',
-    secondary: '#f8f9fa',
-    tertiary: '#e9ecef',
-    dark: '#1a365d',
+    primary: '#ffffff',   // Pure white
+    secondary: '#fafbfc', // Off-white
+    tertiary: '#f4f5f7',  // Very light gray
+    dark: '#2f3d4c',      // Deep slate
   },
 
-  // Text colors
+  // Text colors - softer hierarchy
   text: {
-    primary: '#212529',
-    secondary: '#6c757d',
-    disabled: '#adb5bd',
-    inverse: '#ffffff',
-    link: '#0066e6',
+    primary: '#1e242e',   // Near black
+    secondary: '#6b7684', // Muted gray
+    disabled: '#9aa4b0',  // Neutral gray
+    inverse: '#ffffff',   // White on dark
+    link: '#4a6176',      // Core slate
   },
 
   // Border colors
   border: {
-    light: '#e9ecef',
-    medium: '#ced4da',
-    dark: '#6c757d',
-    focus: '#0066e6',
+    light: '#e9ebee',     // Light gray
+    medium: '#c4cbd3',    // Medium gray
+    dark: '#6b7684',      // Muted gray
+    focus: '#4a6176',     // Core slate
   },
 
-  // Status colors for logs
+  // Status colors for logs - calm versions
   status: {
-    logged: '#0066e6',
-    pending: '#ffc107',
-    exported: '#28a745',
-    draft: '#6c757d',
+    logged: '#4a6176',    // Core slate
+    pending: '#d4a574',   // Muted amber
+    exported: '#52a68a',  // Muted sage
+    draft: '#6b7684',     // Muted gray
   },
 
-  // Shorthand aliases for commonly used colors (for convenience)
-  gray50: '#f8f9fa',
-  gray100: '#f1f3f5',
-  gray200: '#e9ecef',
-  gray300: '#dee2e6',
-  gray400: '#ced4da',
-  gray500: '#adb5bd',
-  gray600: '#6c757d',
-  gray700: '#495057',
-  gray800: '#343a40',
-  gray900: '#212529',
-  
+  // Shorthand aliases for commonly used colors
+  gray50: '#fafbfc',
+  gray100: '#f4f5f7',
+  gray200: '#e9ebee',
+  gray300: '#dce0e4',
+  gray400: '#c4cbd3',
+  gray500: '#9aa4b0',
+  gray600: '#6b7684',
+  gray700: '#4a5361',
+  gray800: '#333b47',
+  gray900: '#1e242e',
+
   // Common color shorthands
   white: '#ffffff',
   black: '#000000',
-  primaryMain: '#0066e6',        // primary[500] - main primary color
-  primary600: '#0052b3',         // primary[600] - darker primary
-  primaryLight: '#e6f0ff',       // primary[50]
-  warningMain: '#ffc107',        // warning.main
-  warningLight: '#fff3cd',       // warning.light
-  errorMain: '#dc3545',          // error.main
-  successMain: '#28a745',        // success.main
-  successLight: '#d4edda',       // success.light
+  primaryMain: '#4a6176',        // Core slate
+  primary600: '#3d4f61',         // Deep slate
+  primaryLight: '#f0f2f5',       // Very light slate
+  warningMain: '#d4a574',        // Muted amber
+  warningLight: '#fef8ec',       // Very soft amber
+  errorMain: '#c17369',          // Muted rose
+  successMain: '#52a68a',        // Muted sage
+  successLight: '#e8f4f1',       // Very soft green
 } as const;
 
 /**

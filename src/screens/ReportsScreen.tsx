@@ -242,7 +242,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Reports</Text>
-        <Text style={styles.subtitle}>Generate SSDI documentation</Text>
+        <Text style={styles.subtitle}>Summaries of your logged data</Text>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -351,7 +351,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Evidence Submission Packs</Text>
             <Text style={styles.sectionDescription}>
-              Generate attorney-ready evidence packages for SSDI review
+              Generate comprehensive evidence packages for review
             </Text>
             <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
           </View>

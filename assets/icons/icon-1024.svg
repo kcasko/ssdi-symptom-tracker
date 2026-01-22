@@ -1,0 +1,49 @@
+<!--
+  Daymark App Icon - 1024x1024
+  Export this to PNG for iOS App Store and other platforms
+
+  To export:
+  1. Open in Figma/Sketch/Illustrator
+  2. Export as PNG at 1024x1024
+  3. Ensure no transparency in background
+  4. Save as icon-1024.png
+-->
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with rounded corners -->
+  <rect width="1024" height="1024" rx="180" fill="#2f3d4c"/>
+
+  <!-- Horizontal timeline - thin line -->
+  <line
+    x1="280"
+    y1="512"
+    x2="744"
+    y2="512"
+    stroke="#f0f2f5"
+    stroke-width="4"
+    stroke-linecap="round"
+    stroke-opacity="0.5"
+  />
+
+  <!-- Today's mark - centered dot -->
+  <circle
+    cx="512"
+    cy="512"
+    r="42"
+    fill="#f0f2f5"
+  />
+
+  <!-- Subtle inner shadow on dot (optional depth) -->
+  <circle
+    cx="512"
+    cy="512"
+    r="42"
+    fill="url(#dotGradient)"
+  />
+
+  <defs>
+    <radialGradient id="dotGradient" cx="0.3" cy="0.3">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

@@ -125,10 +125,9 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
             <Text style={styles.settingValue}>1.0.0</Text>
           </View>
           <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>SSDI Symptom Tracker</Text>
+            <Text style={styles.infoTitle}>Daymark</Text>
             <Text style={styles.infoText}>
-              Evidence collection and report drafting tool for SSDI documentation.
-              Not a wellness app - focused on functional impact and pattern documentation.
+              A calm, neutral tool for marking your days. Track symptoms and patterns without judgment.
             </Text>
           </View>
         </View>

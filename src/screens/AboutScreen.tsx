@@ -32,8 +32,11 @@ export const AboutScreen: React.FC<AboutProps> = ({ navigation }) => {
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Section 1: What This App Is For */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What This App Is For</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>✨</Text>
+            <Text style={styles.sectionTitle}>What This App Is For</Text>
+          </View>
           <Text style={styles.paragraph}>
             This app helps you keep a consistent record of how you're feeling and how daily activities affect you. It's designed to turn everyday experiences into clear, organized information over time.
           </Text>
@@ -43,8 +46,11 @@ export const AboutScreen: React.FC<AboutProps> = ({ navigation }) => {
         </View>
 
         {/* Section 2: What This App Is Not */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What This App Is Not</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>⚠️</Text>
+            <Text style={styles.sectionTitle}>What This App Is Not</Text>
+          </View>
           <Text style={styles.paragraph}>
             This app does not diagnose conditions, replace medical care, or judge how well you're doing. There are no right or wrong answers.
           </Text>
@@ -54,66 +60,92 @@ export const AboutScreen: React.FC<AboutProps> = ({ navigation }) => {
         </View>
 
         {/* Section 3: How to Use the App (Basic Flow) */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>How to Use the App (Basic Flow)</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>📋</Text>
+            <Text style={styles.sectionTitle}>How to Use the App</Text>
+          </View>
           <Text style={styles.paragraph}>
             Most people use the app in three simple ways:
           </Text>
           <View style={styles.instructionBlock}>
-            <Text style={styles.instructionLine}>Once per day, log your symptoms.</Text>
-            <Text style={styles.instructionLine}>When an activity affects you, log the impact.</Text>
-            <Text style={styles.instructionLine}>Review trends or reports when you want an overview.</Text>
+            <Text style={styles.instructionLine}>• Once per day, log your symptoms.</Text>
+            <Text style={styles.instructionLine}>• When an activity affects you, log the impact.</Text>
+            <Text style={styles.instructionLine}>• Review trends or reports when you want an overview.</Text>
           </View>
-          <Text style={styles.paragraph}>
-            You can skip days, log quiet days, or log only when something changes. Consistency helps, but perfection isn't required.
-          </Text>
+          <View style={styles.tipBox}>
+            <Text style={styles.tipText}>
+              You can skip days, log quiet days, or log only when something changes. Consistency helps, but perfection isn't required.
+            </Text>
+          </View>
         </View>
 
         {/* Section 4: Understanding the Overview Screen */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Understanding the Overview Screen</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>📊</Text>
+            <Text style={styles.sectionTitle}>Understanding the Overview</Text>
+          </View>
           <Text style={styles.paragraph}>
             The Overview shows summaries based on what you've logged. Numbers and percentages are calculated automatically and change as more data is added.
           </Text>
-          <Text style={styles.paragraph}>
-            If you see zeros or empty sections, it usually means you haven't logged yet or haven't logged in that category. This is normal.
-          </Text>
+          <View style={styles.tipBox}>
+            <Text style={styles.tipText}>
+              If you see zeros or empty sections, it usually means you haven't logged yet or haven't logged in that category. This is normal.
+            </Text>
+          </View>
         </View>
 
         {/* Section 5: About Good Days and Bad Days */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About Good Days and Bad Days</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>📅</Text>
+            <Text style={styles.sectionTitle}>About Good Days and Bad Days</Text>
+          </View>
           <Text style={styles.paragraph}>
             'Good days' and 'bad days' are estimates based on symptom severity and activity impact you record. They are not labels or judgments.
           </Text>
-          <Text style={styles.paragraph}>
-            A bad day is not a failure. It's information.
-          </Text>
+          <View style={styles.tipBox}>
+            <Text style={styles.tipText}>
+              A bad day is not a failure. It's information.
+            </Text>
+          </View>
         </View>
 
         {/* Section 6: Logging Quiet Days */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Logging Quiet Days</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>☀️</Text>
+            <Text style={styles.sectionTitle}>Logging Quiet Days</Text>
+          </View>
           <Text style={styles.paragraph}>
             Days with few or no symptoms are still important. Logging quiet days helps create an accurate picture over time and prevents gaps in your history.
           </Text>
         </View>
 
         {/* Section 7: Privacy and Data Use */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Privacy and Data Use</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>🔒</Text>
+            <Text style={styles.sectionTitle}>Privacy and Data Use</Text>
+          </View>
           <Text style={styles.paragraph}>
             Your data stays on your device unless you choose to export or share it. The app only summarizes what you enter. Nothing is assumed or added automatically.
           </Text>
         </View>
 
         {/* Section 8: Using Reports */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Using Reports</Text>
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionIcon}>📄</Text>
+            <Text style={styles.sectionTitle}>Using Reports</Text>
+          </View>
           <Text style={styles.paragraph}>
             Reports turn your logs into readable summaries. They are meant to help you explain patterns over time without having to remember details.
           </Text>
         </View>
+
+        <View style={styles.footer} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -128,6 +160,8 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     backgroundColor: colors.white,
     gap: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray200,
   },
   backButton: {
     fontSize: typography.sizes.md,
@@ -142,15 +176,32 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  section: {
+  sectionCard: {
+    backgroundColor: colors.white,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.lg,
     padding: spacing.lg,
+    borderRadius: 12,
     gap: spacing.md,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  sectionIcon: {
+    fontSize: typography.sizes.xl,
   },
   sectionTitle: {
     fontSize: typography.sizes.lg,
     fontWeight: typography.weights.bold as any,
     color: colors.gray900,
-    marginBottom: spacing.xs,
   },
   paragraph: {
     fontSize: typography.sizes.md,
@@ -160,10 +211,26 @@ const styles = StyleSheet.create({
   instructionBlock: {
     gap: spacing.sm,
     paddingLeft: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   instructionLine: {
     fontSize: typography.sizes.md,
-    lineHeight: typography.sizes.md * 1.5,
+    lineHeight: typography.sizes.md * 1.6,
     color: colors.gray700,
+  },
+  tipBox: {
+    backgroundColor: colors.primaryLight,
+    padding: spacing.md,
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primaryMain,
+  },
+  tipText: {
+    fontSize: typography.sizes.sm,
+    lineHeight: typography.sizes.sm * 1.6,
+    color: colors.gray700,
+  },
+  footer: {
+    height: spacing.xl,
   },
 });

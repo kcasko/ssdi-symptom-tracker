@@ -18,20 +18,19 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>SSDI Symptom Tracker</Text>
-        <Text style={styles.subtitle}>Evidence Collection for SSDI Documentation</Text>
-        
+        <Text style={styles.title}>Daymark</Text>
+        <Text style={styles.subtitle}>Mark your days without judgment</Text>
+
         <View style={styles.features}>
-          <Text style={styles.featureText}>✓ Track symptoms and functional impact</Text>
-          <Text style={styles.featureText}>✓ Generate SSDI-appropriate reports</Text>
+          <Text style={styles.featureText}>✓ Track symptoms and daily patterns</Text>
+          <Text style={styles.featureText}>✓ Generate clear, organized summaries</Text>
           <Text style={styles.featureText}>✓ 100% private - local storage only</Text>
           <Text style={styles.featureText}>✓ Multi-profile support</Text>
         </View>
 
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            This is not a wellness app. It is an evidence collection and report drafting tool 
-            optimized for SSDI documentation.
+            A calm, neutral tool for tracking how you're feeling over time. No wellness advice, no medical claims, just honest records.
           </Text>
         </View>
       </View>
