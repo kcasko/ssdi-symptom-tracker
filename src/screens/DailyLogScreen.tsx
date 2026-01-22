@@ -22,7 +22,7 @@ import { typography } from '../theme/typography';
 import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService, PhotoService } from '../services';
-import { canModifyLog, updateLogWithRevision } from '../services/EvidenceLogService';
+import { canModifyLog, updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { GapExplanation } from '../domain/models/GapExplanation';
@@ -356,6 +356,22 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           </View>
         )}
 
+        {existingLog && (
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.revisionButton}
+              onPress={() => setShowRevisionHistory(true)}
+            >
+              <Text style={styles.revisionButtonText}>
+                Revision history ({getRevisionCount(existingLog.id)})
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.helperText}>
+              Original entry is preserved; revisions are timestamped and counted.
+            </Text>
+          </View>
+        )}
+
         {showGapExplanation && gapRange && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gap explanation (optional)</Text>
@@ -589,6 +605,19 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.gray900,
     fontWeight: typography.weights.medium as any,
+  },
+  revisionButton: {
+    borderWidth: 1,
+    borderColor: colors.gray400,
+    borderRadius: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.white,
+  },
+  revisionButtonText: {
+    fontSize: typography.sizes.md,
+    color: colors.gray900,
+    fontWeight: typography.weights.semibold as any,
   },
   footer: {
     padding: spacing.lg,

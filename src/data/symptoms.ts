@@ -144,7 +144,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Weakness',
     category: 'mobility',
     commonLocations: ['Arms', 'Legs', 'Hands', 'General'],
-    tags: ['weakness', 'strength'],
+    tags: ['weakness'],
   },
 
   // Sensory symptoms

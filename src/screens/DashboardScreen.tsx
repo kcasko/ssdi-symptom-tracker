@@ -22,6 +22,8 @@ import { BigButton, SummaryCard, EvidenceModeControls } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
 import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
+import { calculateDaysDelayed, getDaysBetween, addDays, parseDate } from '../utils/dates';
+import { getRevisionCount } from '../services/EvidenceLogService';
 // Date formatting utilities not currently used in this screen
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
@@ -66,6 +68,64 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const last7DayRatios = timeRangeRatios.last7Days;
   const last30DayRatios = timeRangeRatios.last30Days;
 
+  const sortedLogs = React.useMemo(
+    () => [...profileDailyLogs].sort((a, b) => b.logDate.localeCompare(a.logDate)),
+    [profileDailyLogs]
+  );
+  const latestLog = sortedLogs[0];
+
+  const latestLogMeta = React.useMemo(() => {
+    if (!latestLog) return null;
+    const createdIso = latestLog.createdAt ? new Date(latestLog.createdAt).toISOString() : 'Not recorded';
+    const updatedIso = (latestLog as any).updatedAt
+      ? new Date((latestLog as any).updatedAt).toISOString()
+      : createdIso;
+    const daysDelayed = calculateDaysDelayed(latestLog.logDate, latestLog.createdAt || createdIso);
+    const delayLabel =
+      daysDelayed > 0
+        ? `Logged ${daysDelayed} ${daysDelayed === 1 ? 'day' : 'days'} after event`
+        : 'Logged same-day';
+    const revisionCount = getRevisionCount(latestLog.id);
+    const finalized = Boolean((latestLog as any).finalized);
+
+    return {
+      eventDate: latestLog.logDate,
+      createdIso,
+      updatedIso,
+      daysDelayed,
+      delayLabel,
+      revisionCount,
+      finalized,
+    };
+  }, [latestLog]);
+
+  const gapSummary = React.useMemo(() => {
+    if (sortedLogs.length === 0) {
+      return { daysMissed: 0, longestGap: 0, lastGapRange: null as null | { start: string; end: string } };
+    }
+
+    let daysMissed = 0;
+    let longestGap = 0;
+    let lastGapRange: { start: string; end: string } | null = null;
+
+    for (let i = 1; i < sortedLogs.length; i++) {
+      const current = sortedLogs[i - 1].logDate;
+      const previous = sortedLogs[i].logDate;
+      const gap = Math.max(0, getDaysBetween(previous, current) - 1);
+      if (gap > 0) {
+        daysMissed += gap;
+        if (gap > longestGap) {
+          longestGap = gap;
+          const start = addDays(parseDate(previous) || new Date(previous), 1).toISOString().split('T')[0];
+          const end = addDays(parseDate(current) || new Date(current), -1).toISOString().split('T')[0];
+          lastGapRange = { start, end };
+        }
+      }
+    }
+
+    return { daysMissed, longestGap, lastGapRange };
+  }, [sortedLogs]);
+
   // Check if logged today
   const loggedToday = profileDailyLogs.some(l => l.logDate === today);
 
@@ -94,7 +154,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             style={styles.settingsButton}
             onPress={() => navigation.navigate('Settings')}
           >
-            <Text style={styles.settingsIcon}>⚙</Text>
+            <Text style={styles.settingsIcon}>Settings</Text>
           </TouchableOpacity>
         </View>
 
@@ -109,9 +169,59 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </Text>
 
           <View style={styles.explanationInstructions}>
-            <Text style={styles.instructionLine}>• Daily symptom severity logs required</Text>
-            <Text style={styles.instructionLine}>• Activity limitation logs as applicable</Text>
-            <Text style={styles.instructionLine}>• Consistent logging establishes pattern documentation</Text>
+            <Text style={styles.instructionLine}>- Daily symptom severity logs required</Text>
+            <Text style={styles.instructionLine}>- Activity limitation logs as applicable</Text>
+            <Text style={styles.instructionLine}>- Consistent logging establishes documented history</Text>
+          </View>
+        </View>
+
+        {latestLogMeta && (
+          <View style={styles.timelineSection}>
+            <Text style={styles.sectionTitle}>Latest Entry Timeline</Text>
+            <View style={styles.timelineGrid}>
+              <View style={styles.timelineItem}>
+                <Text style={styles.timelineLabel}>Event date (user)</Text>
+                <Text style={styles.timelineValue}>{latestLogMeta.eventDate}</Text>
+              </View>
+              <View style={styles.timelineItem}>
+                <Text style={styles.timelineLabel}>Record created (system)</Text>
+                <Text style={styles.timelineValue}>{latestLogMeta.createdIso}</Text>
+              </View>
+              <View style={styles.timelineItem}>
+                <Text style={styles.timelineLabel}>Last modified (system)</Text>
+                <Text style={styles.timelineValue}>{latestLogMeta.updatedIso}</Text>
+              </View>
+              <View style={styles.timelineItem}>
+                <Text style={styles.timelineLabel}>Delay between event and creation</Text>
+                <Text style={styles.timelineValue}>{latestLogMeta.delayLabel}</Text>
+              </View>
+            </View>
+            <View style={styles.timelineFooter}>
+              <Text style={styles.timelineMeta}>Revisions: {latestLogMeta.revisionCount}</Text>
+              <Text style={styles.timelineMeta}>Finalized: {latestLogMeta.finalized ? 'Yes' : 'No'}</Text>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.gapSection}>
+          <Text style={styles.sectionTitle}>Gap Visibility</Text>
+          <View style={styles.timelineGrid}>
+            <View style={styles.timelineItem}>
+              <Text style={styles.timelineLabel}>Total missed days</Text>
+              <Text style={styles.timelineValue}>{gapSummary.daysMissed}</Text>
+            </View>
+            <View style={styles.timelineItem}>
+              <Text style={styles.timelineLabel}>Longest gap (days)</Text>
+              <Text style={styles.timelineValue}>{gapSummary.longestGap}</Text>
+            </View>
+            <View style={styles.timelineItem}>
+              <Text style={styles.timelineLabel}>Most recent gap range</Text>
+              <Text style={styles.timelineValue}>
+                {gapSummary.lastGapRange
+                  ? `${gapSummary.lastGapRange.start} to ${gapSummary.lastGapRange.end}`
+                  : 'None recorded'}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -272,7 +382,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>See patterns over time</Text>
+            <Text style={styles.actionHelper}>View date ranges, gaps, and counts</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -292,7 +402,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper">Treatment records and provider visit preparation</Text>
+            <Text style={styles.actionHelper}>Treatment records and provider visit preparation</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -420,6 +530,51 @@ const styles = StyleSheet.create({
     lineHeight: typography.sizes.sm * 1.5,
     color: colors.gray600,
     textAlign: 'center' as any,
+  },
+  timelineSection: {
+    backgroundColor: colors.white,
+    padding: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    gap: spacing.md,
+  },
+  gapSection: {
+    backgroundColor: colors.white,
+    padding: spacing.lg,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    gap: spacing.md,
+  },
+  timelineGrid: {
+    gap: spacing.sm,
+  },
+  timelineItem: {
+    paddingVertical: spacing.xs,
+  },
+  timelineLabel: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray700,
+  },
+  timelineValue: {
+    fontSize: typography.sizes.md,
+    color: colors.gray900,
+    fontWeight: typography.weights.semibold as any,
+  },
+  timelineFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  timelineMeta: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray700,
+    fontWeight: typography.weights.medium as any,
   },
   todaySection: {
     padding: spacing.lg,

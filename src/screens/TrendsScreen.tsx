@@ -442,21 +442,21 @@ export function TrendsScreen() {
         <View style={styles.flareNotesCard}>
           <Text style={styles.flareNotesTitle}>Flare Impact Summary</Text>
           <Text style={styles.flareNotesText}>
-            • Flares defined as 3+ consecutive days with pain/severity >=6/10
+            - Flares defined as 3+ consecutive days with pain/severity >=6/10
           </Text>
           {flareSummary.flaresPerMonth >= 2 && (
             <Text style={styles.flareNotesText}>
-              • Experiencing {flareSummary.flaresPerMonth.toFixed(1)} flares per month indicates frequent severe episodes
+              - Experiencing {flareSummary.flaresPerMonth.toFixed(1)} flares per month indicates frequent severe episodes
             </Text>
           )}
           {flareSummary.totalDaysInFlare > 0 && (
             <Text style={styles.flareNotesText}>
-              • {flareSummary.totalDaysInFlare} total days lost to flares in this period
+              - {flareSummary.totalDaysInFlare} total days lost to flares in this period
             </Text>
           )}
           {flareSummary.averageDuration >= 5 && (
             <Text style={styles.flareNotesText}>
-              • Average flare duration of {flareSummary.averageDuration.toFixed(1)} days shows prolonged episodes
+              - Average flare duration of {flareSummary.averageDuration.toFixed(1)} days shows prolonged episodes
             </Text>
           )}
         </View>
@@ -584,16 +584,16 @@ export function TrendsScreen() {
             <Text style={styles.environmentalNotesTitle}>Observed Correlations</Text>
             {environmentalAnalysis.weather.some(w => w.impact === 'worsens') && (
               <Text style={styles.environmentalNotesText}>
-                • Weather conditions logged: {environmentalAnalysis.weather.length} types
+                - Weather conditions logged: {environmentalAnalysis.weather.length} types
               </Text>
             )}
             {environmentalAnalysis.stress.hasData && environmentalAnalysis.stress.correlation > 0.3 && (
               <Text style={styles.environmentalNotesText}>
-                • Stress data: {environmentalAnalysis.totalLogsWithStress} days logged
+                - Stress data: {environmentalAnalysis.totalLogsWithStress} days logged
               </Text>
             )}
             <Text style={styles.environmentalNotesText}>
-              • Correlation data available for review
+              - Correlation data available for review
             </Text>
           </View>
         )}
@@ -821,20 +821,20 @@ export function TrendsScreen() {
         <View style={styles.medicationNotesCard}>
           <Text style={styles.medicationNotesTitle}>Medication Analysis Notes</Text>
           <Text style={styles.medicationNotesText}>
-            • Analysis compares symptom severity before and during medication use
+            - Analysis compares symptom severity before and during medication use
           </Text>
           {medicationAnalysis.effectiveMedications > 0 && (
             <Text style={styles.medicationNotesText}>
-              • {medicationAnalysis.effectiveMedications} medication(s) show measurable symptom improvement
+              - {medicationAnalysis.effectiveMedications} medication(s) show measurable symptom improvement
             </Text>
           )}
           {medicationAnalysis.hasInsufficientData && (
             <Text style={styles.medicationNotesText}>
-              • Some medications have limited data - continue logging for better analysis
+              - Some medications have limited data - continue logging for better analysis
             </Text>
           )}
           <Text style={styles.medicationNotesText}>
-            • Correlation data supports treatment documentation and efficacy assessment
+            - Correlation data supports treatment documentation and efficacy assessment
           </Text>
         </View>
       </View>
