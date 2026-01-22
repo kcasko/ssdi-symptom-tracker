@@ -80,6 +80,7 @@ export function useAppState(): AppState {
   // Use refs to prevent infinite loops and track initialization
   const hasInitialized = useRef(false);
   const [initComplete, setInitComplete] = useState(false);
+  const [isFirstLaunch, setIsFirstLaunch] = useState(false);
   const lastSyncedProfileId = useRef<string | null>(null);
 
   // Derived state
@@ -113,9 +114,10 @@ export function useAppState(): AppState {
       
       try {
         // Check if first launch
-        const isFirstLaunch = await SettingsStorage.isFirstLaunch();
-        console.log('First launch check:', isFirstLaunch);
-        
+        const firstLaunchCheck = await SettingsStorage.isFirstLaunch();
+        console.log('First launch check:', firstLaunchCheck);
+        setIsFirstLaunch(firstLaunchCheck);
+
         // Check if migration needed
         const needsMigration = await MigrationManager.needsMigration();
         console.log('Migration needed:', needsMigration);
@@ -168,12 +170,7 @@ export function useAppState(): AppState {
           await useReportStore.getState().loadDrafts(currentActiveProfileId);
           lastSyncedProfileId.current = currentActiveProfileId;
         }
-        
-        // Mark first launch complete if needed
-        if (isFirstLaunch) {
-          await SettingsStorage.setFirstLaunchComplete();
-        }
-        
+
         console.log('App initialized successfully');
       } catch (error) {
         console.error('App initialization failed:', error);
@@ -243,9 +240,9 @@ export function useAppState(): AppState {
   return {
     // Initialization - use explicit flag instead of derived state
     isInitialized: initComplete,
-    isFirstLaunch: false, // Would need to track this properly
+    isFirstLaunch,
     needsMigration: false, // Would need to check this properly
-    
+
     // Current state
     activeProfileId: profileStore.activeProfileId,
     activeProfile: profileStore.activeProfile,
