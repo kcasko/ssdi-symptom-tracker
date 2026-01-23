@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     marginTop: spacing.lg,
     padding: spacing.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     gap: spacing.md,
     shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   tipBox: {
     backgroundColor: colors.primaryLight,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderLeftWidth: 3,
     borderLeftColor: colors.primaryMain,
   },

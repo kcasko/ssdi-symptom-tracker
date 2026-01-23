@@ -61,7 +61,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     borderLeftWidth: 4,
     gap: spacing.sm,

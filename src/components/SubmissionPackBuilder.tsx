@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 8,
+    borderRadius: 4,
     padding: 12,
     fontSize: 16,
     color: '#000',
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primaryMain,
     paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
     marginTop: 8,
   },
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
   },
   packCard: {
     backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    borderRadius: 4,
     padding: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',

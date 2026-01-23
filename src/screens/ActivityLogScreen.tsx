@@ -2,6 +2,7 @@
  * Activity Log Screen
  * Log activity impact
  */
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -81,12 +82,11 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
     if (existingLog) {
       setRetrospectiveReason(existingLog.retrospectiveContext?.reason || '');
       setRetrospectiveNote(existingLog.retrospectiveContext?.note || '');
-      return;
+    } else {
+      setRetrospectiveReason('');
+      setRetrospectiveNote('');
     }
-
-    setRetrospectiveReason('');
-    setRetrospectiveNote('');
-  }, [existingLog?.id, date]);
+  }, [existingLog]);
 
   const handleSave = () => {
     if (!activeProfile || !selectedActivityId) {
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
   dateInput: {
     borderWidth: 1,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: typography.sizes.md,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.gray200,
-    borderRadius: 8,
+    borderRadius: 4,
     gap: spacing.xs,
     backgroundColor: colors.background.primary,
   },
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
   noticeBox: {
     marginTop: spacing.sm,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.warningMain,
     backgroundColor: colors.warningLight,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
   reasonButton: {
     borderWidth: 1,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
     backgroundColor: colors.white,

@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 2,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     fontSize: typography.sizes.md,
     color: colors.gray900,

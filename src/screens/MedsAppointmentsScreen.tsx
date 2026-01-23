@@ -1177,7 +1177,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMain,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   addButtonText: {
     ...typography.labelLarge,
@@ -1198,7 +1198,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderLeftWidth: 4,
@@ -1255,7 +1255,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     padding: spacing.sm,
     backgroundColor: colors.warning.light,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   sideEffectsLabel: {
     ...typography.labelMedium,
@@ -1290,7 +1290,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 6,
+    borderRadius: 4,
     backgroundColor: colors.gray100,
     alignItems: 'center',
   },
@@ -1301,7 +1301,7 @@ const styles = StyleSheet.create({
   deleteButton: {
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 6,
+    borderRadius: 4,
     backgroundColor: colors.error.light,
     alignItems: 'center',
   },
@@ -1343,7 +1343,7 @@ const styles = StyleSheet.create({
   },
   modalCancelButton: {
     paddingVertical: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray400,
     alignItems: 'center',
@@ -1369,7 +1369,7 @@ const styles = StyleSheet.create({
     ...typography.bodyLarge,
     borderWidth: 1,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     color: colors.gray900,
     backgroundColor: colors.white,
@@ -1413,7 +1413,7 @@ const styles = StyleSheet.create({
   saveButton: {
     backgroundColor: colors.primaryMain,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
   },
   saveButtonText: {
@@ -1426,7 +1426,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     padding: spacing.md,
     backgroundColor: colors.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   addSideEffectRow: {
     flexDirection: 'row',
@@ -1439,7 +1439,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMain,
     paddingHorizontal: spacing.md,
     justifyContent: 'center',
-    borderRadius: 8,
+    borderRadius: 4,
   },
   addSideEffectButtonText: {
     ...typography.labelMedium,
@@ -1460,7 +1460,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     backgroundColor: colors.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
     marginBottom: spacing.sm,
   },
   sideEffectText: {
@@ -1532,13 +1532,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     padding: spacing.sm,
     backgroundColor: colors.gray50,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   primaryActionButton: {
     backgroundColor: colors.primaryMain,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   primaryActionButtonText: {
     ...typography.labelMedium,
@@ -1628,7 +1628,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.primaryMain,
     paddingVertical: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
   },
   shareButtonText: {
@@ -1638,7 +1638,7 @@ const styles = StyleSheet.create({
   closeActionButton: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray400,
     alignItems: 'center',

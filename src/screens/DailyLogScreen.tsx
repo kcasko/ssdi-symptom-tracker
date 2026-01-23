@@ -13,6 +13,7 @@ import {
   Alert,
   TouchableOpacity,
   TextInput,
+  Platform,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -37,12 +38,7 @@ interface SymptomEntry {
   notes?: string;
 }
 
-const RETROSPECTIVE_REASONS = [
-  'Symptoms prevented logging earlier',
-  'No access to the app or device',
-  'Collecting supporting details before logging',
-  'Delayed entry to keep timeline complete',
-];
+// Retrospective reasons removed - require free-form text to avoid coached language
 
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity, addGapExplanation } = useAppState();
@@ -53,7 +49,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const [generalNotes, setGeneralNotes] = useState('');
   const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
   const [gapExplanation, setGapExplanation] = useState('');
-  const [retrospectiveReason, setRetrospectiveReason] = useState('');
   const [retrospectiveNote, setRetrospectiveNote] = useState('');
   const [showRevisionHistory, setShowRevisionHistory] = useState(false);
 
@@ -119,8 +114,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         setActiveSymptomId(ids[0]);
       }
 
-      setRetrospectiveReason(existingLog.retrospectiveContext?.reason || '');
-      setRetrospectiveNote(existingLog.retrospectiveContext?.note || '');
+      setRetrospectiveNote(existingLog.retrospectiveContext?.note || existingLog.retrospectiveContext?.reason || '');
       setGapExplanation('');
 
       // Load photos for this log
@@ -135,10 +129,9 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     setSymptomEntries({});
     setGeneralNotes('');
     setActiveSymptomId(null);
-      setLogPhotos([]);
-      setRetrospectiveReason('');
-      setRetrospectiveNote('');
-      setGapExplanation('');
+    setLogPhotos([]);
+    setRetrospectiveNote('');
+    setGapExplanation('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingLog?.id, date]); // Reset when the date changes
 
@@ -196,6 +189,25 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       return;
     }
 
+    // Block future dates
+    const today = new Date().toISOString().split('T')[0];
+    if (date > today) {
+      Alert.alert('Invalid Date', 'Cannot log events that have not occurred. Maximum date: today.');
+      return;
+    }
+
+    // Require gap explanation for gaps >7 days
+    if (showGapExplanation && gapRange && (!gapExplanation || gapExplanation.trim().length < 20)) {
+      Alert.alert('Gap Explanation Required', 'Please provide an explanation of at least 20 characters for the logging gap.');
+      return;
+    }
+
+    // Require retrospective context for entries >7 days delayed
+    if (showRetrospectiveContext && isBackdated && (!retrospectiveNote || retrospectiveNote.trim().length < 20)) {
+      Alert.alert('Retrospective Context Required', 'Please provide an explanation of at least 20 characters for why this entry was logged after the event date.');
+      return;
+    }
+
     // Check if log can be modified (Evidence Mode finalization check)
     if (existingLog && !canModifyLog(existingLog.id).canModify) {
       Alert.alert(
@@ -219,8 +231,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       const delayAtSave = calculateDaysDelayed(date, creationTimestamp);
       const retrospectiveContext = delayAtSave > 7
         ? {
-            reason: retrospectiveReason || existingLog?.retrospectiveContext?.reason,
-            note: retrospectiveNote || existingLog?.retrospectiveContext?.note,
+            reason: '', // No longer using pre-filled reasons
+            note: retrospectiveNote || existingLog?.retrospectiveContext?.note || existingLog?.retrospectiveContext?.reason || '',
             flaggedAt: existingLog?.retrospectiveContext?.flaggedAt || creationTimestamp,
             daysDelayed: delayAtSave,
           }
@@ -319,7 +331,10 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           autoCorrect={false}
           keyboardType="numbers-and-punctuation"
         />
-        <View style={styles.timelineCard}>
+        <View style={[
+          styles.timelineCard,
+          isBackdated && styles.timelineCardWarning
+        ]}>
           <Text style={styles.timelineLabel}>Record created timestamp (system)</Text>
           <Text style={styles.timelineValue}>{createdTimestampDisplay}</Text>
           <Text style={styles.timelineLabel}>Last modified timestamp (system)</Text>
@@ -327,10 +342,16 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           <Text style={styles.timelineLabel}>Evidence timestamp (system, immutable)</Text>
           <Text style={styles.timelineValue}>{evidenceTimestampDisplay}</Text>
           <Text style={styles.timelineLabel}>Delay between event date and creation</Text>
-          <Text style={styles.timelineValue}>
+          <Text style={[
+            styles.timelineValue,
+            isBackdated && styles.delayValueWarning
+          ]}>
             {eventDateValid ? `${daysDelayed} days` : 'N/A'}
           </Text>
-          <Text style={styles.delayLabel}>{delayLabel}</Text>
+          <Text style={[
+            styles.delayLabel,
+            isBackdated && styles.delayLabelWarning
+          ]}>{delayLabel}</Text>
         </View>
         {showRetrospectiveContext && (
           <View style={styles.noticeBox}>
@@ -374,48 +395,30 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
         {showGapExplanation && gapRange && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Gap explanation (optional)</Text>
+            <Text style={styles.sectionTitle}>Gap explanation (required for gaps &gt;7 days)</Text>
             <Text style={styles.helperText}>
-              No daily logs between {gapRange.start} and {gapRange.end} ({gapDaysSinceLast} days). Add context if needed.
+              No daily logs between {gapRange.start} and {gapRange.end} ({gapDaysSinceLast} days). Explanation required.
             </Text>
             <NotesField
               value={gapExplanation}
               onChange={setGapExplanation}
               label="Gap context"
-              placeholder="Optional note about why logging paused"
+              placeholder="Explain why no entries were made during this period (minimum 20 characters)"
             />
           </View>
         )}
 
         {showRetrospectiveContext && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Retrospective context (optional)</Text>
+            <Text style={styles.sectionTitle}>Retrospective context (required for entries &gt;7 days delayed)</Text>
             <Text style={styles.helperText}>
-              Add neutral context for entries logged after the event date.
+              This entry is dated {daysDelayed} days before the creation timestamp. Provide context in your own words.
             </Text>
-            <View style={styles.reasonList}>
-              {RETROSPECTIVE_REASONS.map(reason => (
-                <TouchableOpacity
-                  key={reason}
-                  style={[
-                    styles.reasonButton,
-                    retrospectiveReason === reason && styles.reasonButtonSelected,
-                  ]}
-                  onPress={() =>
-                    setRetrospectiveReason(
-                      retrospectiveReason === reason ? '' : reason
-                    )
-                  }
-                >
-                  <Text style={styles.reasonButtonText}>{reason}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
             <NotesField
               value={retrospectiveNote}
               onChange={setRetrospectiveNote}
-              label="Context note"
-              placeholder="Optional details for why this was logged after the event date"
+              label="Explanation for delay"
+              placeholder="Explain in your own words why this entry was logged after the event date (minimum 20 characters)"
             />
           </View>
         )}
@@ -477,14 +480,14 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       <View style={styles.footer}>
         <BigButton
-          label="Voice Entry (Accessibility Mode)"
+          label="Voice Entry (Alternative Input Method)"
           onPress={() => navigation.navigate('VoiceLog')}
           variant="secondary"
           fullWidth
           style={{ marginBottom: spacing.sm }}
         />
         <BigButton
-          label={existingLog?.finalized ? 'Create Revision (original preserved)' : existingLog ? 'Amend Log (replaces previous entry)' : 'Save Log'}
+          label={existingLog?.finalized ? 'Create Revision (original preserved)' : existingLog ? 'Replace Entry (draft mode only)' : 'Save Entry'}
           onPress={handleSave}
           variant="primary"
           fullWidth
@@ -524,39 +527,53 @@ const styles = StyleSheet.create({
     fontWeight: typography.weights.medium as any,
   },
   dateInput: {
-    borderWidth: 1,
-    borderColor: colors.gray300,
-    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: colors.gray400,
+    borderRadius: 4,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: typography.sizes.md,
     color: colors.gray900,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   timelineCard: {
     marginTop: spacing.sm,
     padding: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    borderRadius: 8,
-    gap: spacing.xs,
-    backgroundColor: colors.background.primary,
+    borderWidth: 2,
+    borderColor: colors.gray400,
+    borderRadius: 4,
+    gap: spacing.sm,
+    backgroundColor: colors.white,
   },
   timelineValue: {
-    fontSize: typography.sizes.md,
+    fontSize: typography.sizes.lg,
     color: colors.gray900,
+    fontWeight: typography.weights.bold as any,
+    fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   delayLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray700,
-    fontWeight: typography.weights.medium as any,
+    fontSize: typography.sizes.md,
+    color: colors.gray900,
+    fontWeight: typography.weights.semibold as any,
+  },
+  timelineCardWarning: {
+    borderColor: colors.errorMain,
+    borderWidth: 3,
+    backgroundColor: colors.errorLight,
+  },
+  delayValueWarning: {
+    color: colors.errorMain,
+  },
+  delayLabelWarning: {
+    color: colors.errorMain,
   },
   noticeBox: {
     marginTop: spacing.sm,
     padding: spacing.md,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.warningMain,
-    backgroundColor: colors.warningLight,
+    borderWidth: 2,
+    borderColor: colors.errorMain,
+    backgroundColor: colors.errorLight,
     gap: spacing.xs,
   },
   noticeTitle: {
@@ -583,28 +600,6 @@ const styles = StyleSheet.create({
   helperText: {
     fontSize: typography.sizes.sm,
     color: colors.gray700,
-  },
-  reasonList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  reasonButton: {
-    borderWidth: 1,
-    borderColor: colors.gray300,
-    borderRadius: 8,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: colors.white,
-  },
-  reasonButtonSelected: {
-    borderColor: colors.primary600,
-    backgroundColor: colors.primaryLight,
-  },
-  reasonButtonText: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray900,
-    fontWeight: typography.weights.medium as any,
   },
   revisionButton: {
     borderWidth: 1,

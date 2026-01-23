@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   transcriptionContainer: {
     width: '100%',
     backgroundColor: colors.gray[50],
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginTop: spacing.md,
   },
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
   errorContainer: {
     padding: spacing.lg,
     backgroundColor: colors.error.light,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: 'center',
   },
   errorText: {

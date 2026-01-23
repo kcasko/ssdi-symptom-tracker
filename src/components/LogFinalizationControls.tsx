@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 12,
     backgroundColor: '#f9f9f9',
-    borderRadius: 6,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1976d2',
     paddingVertical: 10,
     paddingHorizontal: 16,
-    borderRadius: 6,
+    borderRadius: 4,
     alignItems: 'center',
     marginTop: 8,
   },

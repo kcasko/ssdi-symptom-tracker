@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.primaryMain,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
     gap: SPACING.xs,
   },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     backgroundColor: COLORS.warningLight,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
     marginTop: SPACING.md,
   },
   tipText: {

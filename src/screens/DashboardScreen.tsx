@@ -234,7 +234,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             <View style={styles.statusCard}>
               <Text style={styles.statusText}>Entry recorded</Text>
               <TouchableOpacity onPress={() => navigation.navigate('DailyLog')}>
-                <Text style={styles.editLink}>Amend</Text>
+                <Text style={styles.editLink}>Modify</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -353,9 +353,9 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Quick Actions */}
+        {/* Functions */}
         <View style={styles.actionsSection}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <Text style={styles.sectionTitle}>Functions</Text>
 
           <View style={styles.actionItem}>
             <BigButton
@@ -369,7 +369,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="Voice Entry (Accessibility Mode)"
+              label="Voice Entry (Alternative Input Method)"
               onPress={() => navigation.navigate('VoiceLog')}
               variant="secondary"
               fullWidth
@@ -468,7 +468,7 @@ const styles = StyleSheet.create({
   settingsButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 4,
     backgroundColor: colors.gray100,
     alignItems: 'center',
     justifyContent: 'center',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     marginTop: spacing.md,
     marginBottom: spacing.md,
-    borderRadius: 12,
+    borderRadius: 4,
     gap: spacing.md,
     borderWidth: 1,
     borderColor: colors.primaryLight,
@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   explanationFooter: {
     backgroundColor: colors.gray50,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     marginTop: spacing.xs,
   },
   explanationReassurance: {
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    borderRadius: 12,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray200,
     gap: spacing.md,
@@ -549,7 +549,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.md,
-    borderRadius: 12,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray200,
     gap: spacing.md,
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   statusCard: {
     backgroundColor: colors.successLight,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: colors.successMain,
     flexDirection: 'row',
@@ -661,12 +661,12 @@ const styles = StyleSheet.create({
   capacityBarTrack: {
     height: 32,
     backgroundColor: colors.gray200,
-    borderRadius: 16,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   capacityBarFill: {
     height: '100%',
-    borderRadius: 16,
+    borderRadius: 4,
   },
   capacityBarLabel: {
     fontSize: typography.sizes.sm,
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
     gap: spacing.xs,
   },
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     backgroundColor: colors.white,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     gap: spacing.sm,
   },
   summaryRow: {

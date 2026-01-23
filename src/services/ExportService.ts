@@ -13,10 +13,11 @@ import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { getRevisionCount } from './EvidenceLogService';
 import { calculateDaysDelayed, countInclusiveDays, findDateGaps } from '../utils/dates';
 import { GapExplanation } from '../domain/models/GapExplanation';
-import { Share, Alert } from 'react-native';
+import { Share, Alert, Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
+import Constants from 'expo-constants';
 
 const EXPORT_VERSION = 'Daymark Evidence-Hardened v1.0';
 
@@ -317,9 +318,87 @@ export class ExportService {
   }
 
   /**
+   * Generate metadata header rows for exports
+   */
+  private static generateMetadataHeaders(
+    dataType: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations',
+    data: any[],
+    context?: ExportContextOptions
+  ): string[][] {
+    const now = new Date();
+    const metadata: string[][] = [
+      ['METADATA_SECTION', ''],
+      ['Export_Generated', now.toISOString()],
+      ['Export_Generated_Local', now.toLocaleString()],
+      ['Application_Version', EXPORT_VERSION],
+      ['App_Version_Number', Constants.expoConfig?.version || 'unknown'],
+      ['Device_OS', Platform.OS],
+      ['Device_OS_Version', Platform.Version?.toString() || 'unknown'],
+      ['Device_Platform', Platform.select({ ios: 'iOS', android: 'Android', default: 'Other' })],
+      ['Record_Count', data.length.toString()],
+      [''],
+    ];
+
+    // Add data quality flags for daily/activity logs
+    if (dataType === 'daily-logs' || dataType === 'activity-logs') {
+      const logs = data as (DailyLog | ActivityLog)[];
+      const backdatedCount = logs.filter(log => {
+        const eventDate = (log as DailyLog).logDate || (log as ActivityLog).activityDate;
+        const delayed = calculateDaysDelayed(eventDate, log.createdAt);
+        return delayed > 7;
+      }).length;
+
+      const finalizedCount = logs.filter(log => {
+        const evidenceStore = useEvidenceModeStore.getState();
+        return evidenceStore.isLogFinalized(log.id) || Boolean((log as any).finalized);
+      }).length;
+
+      const revisedCount = logs.filter(log => getRevisionCount(log.id) > 0).length;
+
+      // Calculate gap statistics
+      const sortedDates = [...logs]
+        .map(log => (log as DailyLog).logDate || (log as ActivityLog).activityDate)
+        .sort();
+      const gapSegments = this.buildGapSegments(
+        sortedDates,
+        context?.gapExplanations,
+        context?.dateRange
+      );
+      const unexplainedGaps = gapSegments.filter(g => !g.hasExplanation).length;
+      const totalGapDays = gapSegments.reduce((sum, g) => sum + g.lengthDays, 0);
+
+      metadata.push(
+        ['DATA_QUALITY_FLAGS', ''],
+        ['Backdated_Entries_Over_7_Days', backdatedCount.toString()],
+        ['Finalized_Entries', finalizedCount.toString()],
+        ['Entries_With_Revisions', revisedCount.toString()],
+        ['Unexplained_Gaps_Over_4_Days', unexplainedGaps.toString()],
+        ['Total_Gap_Days', totalGapDays.toString()],
+        ['Total_Gap_Segments', gapSegments.length.toString()],
+        ['']
+      );
+    }
+
+    if (context?.dateRange) {
+      metadata.push(
+        ['Date_Range_Filter', `${context.dateRange.start} to ${context.dateRange.end}`],
+        ['']
+      );
+    }
+
+    metadata.push(
+      ['DATA_SECTION_BEGINS_BELOW', ''],
+      ['']
+    );
+
+    return metadata;
+  }
+
+  /**
    * Convert daily logs to CSV
    */
   private static dailyLogsToCSV(logs: DailyLog[], context?: ExportContextOptions): string {
+    const metadataRows = this.generateMetadataHeaders('daily-logs', logs, context);
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -435,13 +514,14 @@ export class ExportService {
     this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Overall Severity');
     this.appendVersionRow(rows, headers);
 
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert activity logs to CSV
    */
   private static activityLogsToCSV(logs: ActivityLog[], context?: ExportContextOptions): string {
+    const metadataRows = this.generateMetadataHeaders('activity-logs', logs, context);
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -545,13 +625,14 @@ export class ExportService {
     this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Impact Severity');
     this.appendVersionRow(rows, headers);
 
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert medications to CSV
    */
   private static medicationsToCSV(medications: Medication[]): string {
+    const metadataRows = this.generateMetadataHeaders('medications', medications);
     const headers = [
       'Name',
       'Generic Name',
@@ -584,13 +665,14 @@ export class ExportService {
 
     this.appendVersionRow(rows, headers);
 
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert limitations to CSV
    */
   private static limitationsToCSV(limitations: Limitation[]): string {
+    const metadataRows = this.generateMetadataHeaders('limitations', limitations);
     const headers = [
       'Category',
       'Frequency',
@@ -609,7 +691,7 @@ export class ExportService {
 
     this.appendVersionRow(rows, headers);
 
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
+    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
   /**

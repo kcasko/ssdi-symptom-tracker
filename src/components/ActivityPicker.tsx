@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 2,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     paddingHorizontal: spacing.md,
     fontSize: typography.sizes.md,
     color: colors.gray900,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.md,
     backgroundColor: colors.gray100,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   categoryTitle: {
     fontSize: typography.sizes.md,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 2,
     borderColor: colors.gray200,
-    borderRadius: 8,
+    borderRadius: 4,
     marginTop: spacing.xs,
   },
   activityButtonSelected: {

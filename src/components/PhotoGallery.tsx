@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     width: 120,
     height: 120,
-    borderRadius: 8,
+    borderRadius: 4,
     overflow: 'hidden',
     backgroundColor: COLORS.background.secondary,
     position: 'relative',
@@ -278,12 +278,12 @@ const styles = StyleSheet.create({
   fullImage: {
     width: width - SPACING.xl * 2,
     height: height * 0.6,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   photoInfo: {
     width: '100%',
     backgroundColor: COLORS.background.secondary,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: SPACING.md,
     marginTop: SPACING.md,
   },

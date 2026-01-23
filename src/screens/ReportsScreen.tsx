@@ -20,7 +20,7 @@ import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 import { BigButton, DateRangePicker, SubmissionPackBuilder } from '../components';
 import { useAppState } from '../state/useAppState';
-import { ReportService, ExportService, CredibilityScorer, BackupRestoreService } from '../services';
+import { ReportService, ExportService, BackupRestoreService } from '../services';
 import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
@@ -53,15 +53,6 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
   const profileReports = reportDrafts.filter((r) => r.profileId === activeProfile?.id);
 
-  // Calculate qualitative credibility indicators
-  const credibilityIndicators = activeProfile
-    ? CredibilityScorer.calculateCredibility(
-        dailyLogs.filter(l => l.profileId === activeProfile.id),
-        activityLogs.filter(l => l.profileId === activeProfile.id),
-        medications.filter(m => m.profileId === activeProfile.id),
-        limitations.filter(l => l.profileId === activeProfile.id)
-      )
-    : null;
   const profileGapExplanations = gapExplanations.filter((g) => g.profileId === activeProfile?.id);
 
   const handleExportData = async (type: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations' | 'all') => {
@@ -438,7 +429,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.white,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     marginBottom: spacing.sm,
     borderWidth: 2,
     borderColor: colors.gray200,
@@ -466,7 +457,7 @@ const styles = StyleSheet.create({
   },
   credibilityCard: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.lg,
     borderLeftWidth: 4,
     borderLeftColor: colors.primaryMain,
@@ -503,7 +494,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.md,
     backgroundColor: colors.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   recommendationsTitle: {
     fontSize: typography.sizes.md,
@@ -524,7 +515,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderWidth: 2,
     borderColor: colors.primaryMain,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     alignItems: 'center',
   },

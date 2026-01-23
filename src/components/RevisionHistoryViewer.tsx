@@ -184,8 +184,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
     maxHeight: '80%',
     paddingTop: 16,
   },
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   revisionCard: {
     backgroundColor: '#f9f9f9',
-    borderRadius: 8,
+    borderRadius: 4,
     marginBottom: 12,
     borderWidth: 1,
     borderColor: '#e0e0e0',

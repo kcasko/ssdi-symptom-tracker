@@ -258,7 +258,7 @@ export function TrendsScreen() {
             <Text style={[styles.ratioValue, { color: COLORS.successMain }]}>
               {dayRatios.goodDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Lower-impact days (severity &lt;5)</Text>
+            <Text style={styles.ratioLabel}>Lower-impact days (severity &lt; 5)</Text>
             <Text style={styles.ratioCount}>({dayRatios.goodDays} days)</Text>
           </View>
 
@@ -266,7 +266,7 @@ export function TrendsScreen() {
             <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}>
               {dayRatios.badDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Higher-impact days (severity >=6)</Text>
+            <Text style={styles.ratioLabel}>Higher-impact days (severity &gt;= 6)</Text>
             <Text style={styles.ratioCount}>({dayRatios.badDays + dayRatios.veryBadDays} days)</Text>
           </View>
         </View>
@@ -340,7 +340,7 @@ export function TrendsScreen() {
             gapDetails.map((gap) => (
               <View key={`${gap.startDate}-${gap.endDate}`} style={styles.gapItem}>
                 <Text style={styles.gapItemText}>
-                  Gap: {gap.startDate} -> {gap.endDate} ({gap.lengthDays} days)
+                  Gap: {gap.startDate} → {gap.endDate} ({gap.lengthDays} days)
                 </Text>
                 <Text style={styles.gapItemNote}>
                   Explanation: {gap.hasExplanation ? gap.explanation : 'None recorded'}
@@ -442,7 +442,7 @@ export function TrendsScreen() {
         <View style={styles.flareNotesCard}>
           <Text style={styles.flareNotesTitle}>Flare Impact Summary</Text>
           <Text style={styles.flareNotesText}>
-            - Flares defined as 3+ consecutive days with pain/severity >=6/10
+            - Flares defined as 3+ consecutive days with pain/severity &gt;= 6/10
           </Text>
           {flareSummary.flaresPerMonth >= 2 && (
             <Text style={styles.flareNotesText}>
@@ -956,7 +956,7 @@ const styles = StyleSheet.create({
     flexBasis: '48%',
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 10,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: COLORS.gray200,
   },
@@ -973,7 +973,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     backgroundColor: COLORS.gray100,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   gapListText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -1001,7 +1001,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     marginHorizontal: SPACING.xs,
-    borderRadius: 8,
+    borderRadius: 4,
     backgroundColor: COLORS.white,
     alignItems: 'center',
   },
@@ -1028,7 +1028,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.xl,
     backgroundColor: COLORS.white,
-    borderRadius: 16,
+    borderRadius: 4,
     marginVertical: SPACING.sm,
   },
   noDataText: {
@@ -1053,7 +1053,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: 'center',
     marginHorizontal: SPACING.xs,
   },
@@ -1071,7 +1071,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     padding: SPACING.md,
     backgroundColor: COLORS.white,
-    borderRadius: 12,
+    borderRadius: 4,
   },
   insightText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -1101,7 +1101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: COLORS.gray200,
@@ -1123,7 +1123,7 @@ const styles = StyleSheet.create({
   functionalCapacityCard: {
     backgroundColor: COLORS.white,
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.lg,
   },
   functionalCapacityTitle: {
@@ -1134,13 +1134,13 @@ const styles = StyleSheet.create({
   functionalCapacityBar: {
     height: 24,
     backgroundColor: COLORS.gray200,
-    borderRadius: 12,
+    borderRadius: 4,
     overflow: 'hidden',
     marginBottom: SPACING.sm,
   },
   functionalCapacityFill: {
     height: '100%',
-    borderRadius: 12,
+    borderRadius: 4,
   },
   functionalCapacityText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -1150,7 +1150,7 @@ const styles = StyleSheet.create({
   streakCard: {
     backgroundColor: COLORS.gray100,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.lg,
   },
   streakTitle: {
@@ -1170,7 +1170,7 @@ const styles = StyleSheet.create({
   ssdiInsightsCard: {
     backgroundColor: COLORS.primaryLight,
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary600,
   },
@@ -1201,7 +1201,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: COLORS.error.light,
@@ -1230,7 +1230,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.gray100,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
   },
   flareDetailLabel: {
@@ -1247,7 +1247,7 @@ const styles = StyleSheet.create({
   longestFlareCard: {
     backgroundColor: COLORS.error.light,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.lg,
   },
   longestFlareTitle: {
@@ -1268,7 +1268,7 @@ const styles = StyleSheet.create({
   recentFlaresCard: {
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.gray300,
@@ -1283,7 +1283,7 @@ const styles = StyleSheet.create({
     padding: SPACING.sm,
     marginBottom: SPACING.sm,
     backgroundColor: COLORS.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
     borderLeftWidth: 3,
     borderLeftColor: COLORS.errorMain,
   },
@@ -1310,7 +1310,7 @@ const styles = StyleSheet.create({
   flareNotesCard: {
     backgroundColor: COLORS.warningLight,
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.warningMain,
   },
@@ -1348,7 +1348,7 @@ const styles = StyleSheet.create({
   weatherCorrelationCard: {
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.gray300,
@@ -1403,7 +1403,7 @@ const styles = StyleSheet.create({
   stressCorrelationCard: {
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.gray300,
@@ -1434,7 +1434,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.gray100,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
   },
   stressLevelLabel: {
@@ -1456,7 +1456,7 @@ const styles = StyleSheet.create({
   stressInsightCard: {
     backgroundColor: COLORS.primaryLight,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   stressInsightText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -1466,7 +1466,7 @@ const styles = StyleSheet.create({
   environmentalNotesCard: {
     backgroundColor: COLORS.primary[50],
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary600,
   },
@@ -1497,7 +1497,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.gray300,
@@ -1515,7 +1515,7 @@ const styles = StyleSheet.create({
   medicationCorrelationCard: {
     backgroundColor: COLORS.white,
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: 4,
     marginBottom: SPACING.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.gray300,
@@ -1563,7 +1563,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
     backgroundColor: COLORS.gray100,
     padding: SPACING.md,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   medicationStatItem: {
     alignItems: 'center',
@@ -1581,7 +1581,7 @@ const styles = StyleSheet.create({
   medicationImpactSection: {
     padding: SPACING.sm,
     backgroundColor: COLORS.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
     marginBottom: SPACING.sm,
   },
   medicationImpactText: {
@@ -1626,7 +1626,7 @@ const styles = StyleSheet.create({
   medicationWarning: {
     backgroundColor: COLORS.warning.light,
     padding: SPACING.sm,
-    borderRadius: 8,
+    borderRadius: 4,
     marginTop: SPACING.sm,
   },
   medicationWarningText: {
@@ -1637,7 +1637,7 @@ const styles = StyleSheet.create({
   medicationNotesCard: {
     backgroundColor: COLORS.primary[100],
     padding: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary600,
   },

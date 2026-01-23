@@ -134,7 +134,6 @@ export class BackupRestoreService {
    */
   static async restoreFromBackup(
     backup: BackupData,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _options?: {
       mergeWithExisting?: boolean; // If false, clears existing data first
       skipPhotos?: boolean; // Photos may not restore if files don't exist

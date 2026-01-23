@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.md,
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: colors.primary[300],
   },
@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
   },
   symptomCard: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginBottom: spacing.sm,
     borderWidth: 1,
@@ -514,7 +514,7 @@ const styles = StyleSheet.create({
   severityBadge: {
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: 16,
+    borderRadius: 4,
   },
   severityText: {
     ...typography.labelSmall,
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
   },
   generalNotesContainer: {
     backgroundColor: colors.gray[100],
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginTop: spacing.md,
   },
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
   clearButton: {
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray[400],
   },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     margin: spacing.lg,
     padding: spacing.md,
     backgroundColor: colors.warning.light,
-    borderRadius: 12,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.warning.main,
   },
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
     margin: spacing.lg,
     padding: spacing.lg,
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.primary[200],
   },
@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     padding: spacing.sm,
     backgroundColor: colors.primary[50],
-    borderRadius: 8,
+    borderRadius: 4,
   },
   bottomNav: {
     padding: spacing.lg,
@@ -663,7 +663,7 @@ const styles = StyleSheet.create({
   },
   transcriptionBox: {
     backgroundColor: colors.gray[50],
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.primary[400],
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   },
   editableSymptomCard: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 1,
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.error.light,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   removeButtonText: {
     ...typography.labelSmall,
@@ -713,7 +713,7 @@ const styles = StyleSheet.create({
   },
   noSymptomsBox: {
     backgroundColor: colors.warning.light,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.warning.main,
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
   },
   notesInput: {
     backgroundColor: colors.gray[50],
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     borderWidth: 1,
     borderColor: colors.gray[300],
@@ -745,7 +745,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
     backgroundColor: colors.warning.light,
     padding: spacing.sm,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   modalActions: {
     flexDirection: 'row',
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
   modalCancelButton: {
     flex: 1,
     paddingVertical: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray[400],
     alignItems: 'center',
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
   modalSaveButton: {
     flex: 1,
     paddingVertical: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     backgroundColor: colors.primary[500],
     alignItems: 'center',
   },

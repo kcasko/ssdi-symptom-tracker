@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   stepDot: {
     width: 12,
     height: 12,
-    borderRadius: 6,
+    borderRadius: 4,
     backgroundColor: colors.gray300,
   },
   stepDotActive: {
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderWidth: 1,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     fontSize: typography.sizes.md,
     color: colors.gray900,
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
   timeInput: {
     borderWidth: 1,
     borderColor: colors.gray300,
-    borderRadius: 8,
+    borderRadius: 4,
     padding: spacing.md,
     fontSize: typography.sizes.md,
     color: colors.gray900,
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.sm,
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray200,
   },
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: spacing.md,
     backgroundColor: colors.white,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: colors.gray200,
   },
@@ -583,7 +583,7 @@ const styles = StyleSheet.create({
   toggle: {
     width: 50,
     height: 30,
-    borderRadius: 15,
+    borderRadius: 4,
     backgroundColor: colors.gray300,
     position: 'relative',
     justifyContent: 'center',
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
   toggleKnob: {
     width: 26,
     height: 26,
-    borderRadius: 13,
+    borderRadius: 4,
     backgroundColor: colors.white,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

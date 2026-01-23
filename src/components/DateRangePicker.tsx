@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     backgroundColor: colors.gray200,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 2,
     borderColor: colors.gray300,
   },

@@ -7,7 +7,7 @@
 
 const sharp = require('sharp');
 const fs = require('fs');
-const path = require('path');
+// path is unused; keep imports minimal
 
 async function convertIcons() {
   console.log('🎨 Converting daymark_icon.png to all required sizes...\n');
@@ -137,7 +137,7 @@ async function convertIcons() {
 // Check if Sharp is installed
 try {
   require.resolve('sharp');
-} catch (e) {
+} catch {
   console.error('❌ Sharp is not installed!');
   console.error('\nInstall it with:');
   console.error('  npm install sharp --save-dev\n');

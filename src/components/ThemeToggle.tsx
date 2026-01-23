@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.white,
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 4,
     borderWidth: 2,
     borderColor: colors.gray200,
   },

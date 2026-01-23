@@ -22,19 +22,23 @@ export const PainScale: React.FC<PainScaleProps> = ({
   label = 'Severity (0-10)',
   disabled = false,
 }) => {
+  // Monochromatic scale to prevent visual bias
   const getSeverityColor = (severity: number): string => {
-    if (severity === 0) return colors.gray300;
-    if (severity <= 3) return colors.successMain;
-    if (severity <= 6) return colors.warningMain;
-    return colors.errorMain;
-  };
-
-  const getSeverityLabel = (severity: number): string => {
-    if (severity === 0) return 'None';
-    if (severity <= 3) return 'Mild';
-    if (severity <= 6) return 'Moderate';
-    if (severity <= 8) return 'Severe';
-    return 'Very Severe';
+    // Progressive gray scale - no emotional color associations
+    const grayScale = [
+      colors.gray200,  // 0
+      colors.gray300,  // 1
+      colors.gray300,  // 2
+      colors.gray400,  // 3
+      colors.gray400,  // 4
+      colors.gray500,  // 5
+      colors.gray500,  // 6
+      colors.gray600,  // 7
+      colors.gray600,  // 8
+      colors.gray700,  // 9
+      colors.gray800,  // 10
+    ];
+    return grayScale[severity] || colors.gray500;
   };
 
   return (
@@ -70,11 +74,11 @@ export const PainScale: React.FC<PainScaleProps> = ({
         <View style={styles.feedbackContainer}>
           <View style={[styles.colorIndicator, { backgroundColor: getSeverityColor(value) }]} />
           <Text style={styles.feedbackText}>
-            {value}/10 - {getSeverityLabel(value)}
+            Selected: {value}/10
           </Text>
         </View>
       ) : (
-        <Text style={styles.unselectedText}>Select a severity</Text>
+        <Text style={styles.unselectedText}>Select a value (0-10)</Text>
       )}
     </View>
   );
@@ -95,14 +99,14 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   scaleButton: {
-    width: 60,
-    height: 56,
-    backgroundColor: colors.gray200,
-    borderRadius: 8,
+    width: 72,
+    height: 72,
+    backgroundColor: colors.white,
+    borderRadius: 4, // Sharp edges for document-like appearance
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: colors.gray300,
+    borderColor: colors.gray400,
   },
   scaleButtonActive: {
     borderColor: colors.gray900,

@@ -421,56 +421,51 @@ export class CredibilityScorer {
   }
 
   /**
-   * Generate recommendations for improving credibility
+   * Generate neutral observations about documentation completeness
    */
   private static generateRecommendations(indicators: CredibilityIndicators): string[] {
-    const recommendations: string[] = [];
+    const observations: string[] = [];
 
-    // Consistency recommendations
-    if (indicators.loggingConsistency.score < 70) {
-      if (indicators.loggingConsistency.loggingRate < 50) {
-        recommendations.push('Log symptoms more consistently. Aim for at least 3-4 entries per week.');
-      }
-      if (indicators.loggingConsistency.longestGap > 14) {
-        recommendations.push('Avoid long gaps in logging. Large gaps reduce claim credibility.');
-      }
+    // Consistency observations
+    if (indicators.loggingConsistency.loggingRate < 50) {
+      observations.push(`Current logging rate: ${indicators.loggingConsistency.loggingRate}%. SSA review typically evaluates consistency over 12+ months.`);
+    }
+    if (indicators.loggingConsistency.longestGap > 14) {
+      observations.push(`Longest gap between entries: ${indicators.loggingConsistency.longestGap} days.`);
     }
 
-    // Coverage recommendations
-    if (indicators.durationCoverage.score < 80) {
-      if (indicators.durationCoverage.totalMonthsCovered < 12) {
-        recommendations.push(`Continue logging to reach 12+ months of data. Currently at ${indicators.durationCoverage.totalMonthsCovered} months.`);
-      }
+    // Coverage observations
+    if (indicators.durationCoverage.totalMonthsCovered < 12) {
+      observations.push(`Current coverage: ${indicators.durationCoverage.totalMonthsCovered} months of documented records.`);
     }
 
-    // Completeness recommendations
-    if (indicators.dataCompleteness.score < 70) {
-      if (indicators.dataCompleteness.logsWithNotes / indicators.dataCompleteness.totalLogs < 0.5) {
-        recommendations.push('Add detailed notes to more log entries. Specific examples increase clarity in the record.');
-      }
-      if (indicators.dataCompleteness.logsWithMultipleSymptoms / indicators.dataCompleteness.totalLogs < 0.5) {
-        recommendations.push('Track multiple symptoms when present. Co-occurring symptoms demonstrate impact.');
-      }
+    // Completeness observations
+    const notesRate = Math.round((indicators.dataCompleteness.logsWithNotes / indicators.dataCompleteness.totalLogs) * 100);
+    if (notesRate < 50) {
+      observations.push(`${notesRate}% of entries include contextual notes.`);
     }
 
-    // Evidence recommendations
-    if (indicators.corroboratingEvidence.score < 60) {
-      if (!indicators.corroboratingEvidence.hasMedications) {
-        recommendations.push('Add your medications to show treatment compliance.');
-      }
-      if (!indicators.corroboratingEvidence.hasActiveLimitations) {
-        recommendations.push('Document functional limitations to demonstrate daily impact.');
-      }
-      if (!indicators.corroboratingEvidence.hasActivityLogs) {
-        recommendations.push('Log activities and their impact to show functional capacity.');
-      }
+    const multiSymptomRate = Math.round((indicators.dataCompleteness.logsWithMultipleSymptoms / indicators.dataCompleteness.totalLogs) * 100);
+    if (multiSymptomRate < 50) {
+      observations.push(`${multiSymptomRate}% of entries document multiple symptoms.`);
     }
 
-    if (recommendations.length === 0) {
-      recommendations.push('Excellent documentation! Continue logging consistently to maintain strong evidence.');
+    // Evidence observations
+    if (!indicators.corroboratingEvidence.hasMedications) {
+      observations.push('No medication records on file.');
+    }
+    if (!indicators.corroboratingEvidence.hasActiveLimitations) {
+      observations.push('No functional limitation records on file.');
+    }
+    if (!indicators.corroboratingEvidence.hasActivityLogs) {
+      observations.push('No activity impact records on file.');
     }
 
-    return recommendations;
+    if (observations.length === 0) {
+      observations.push('No data integrity issues detected.');
+    }
+
+    return observations;
   }
 
   /**

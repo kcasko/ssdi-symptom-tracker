@@ -141,7 +141,7 @@ async function convertAssets() {
 // Check if Sharp is installed
 try {
   require.resolve('sharp');
-} catch (e) {
+} catch {
   console.error('❌ Sharp is not installed!');
   console.error('\nInstall it with:');
   console.error('  npm install sharp --save-dev\n');

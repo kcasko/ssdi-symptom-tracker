@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   bodyText: { fontSize: typography.sizes.md, lineHeight: typography.sizes.md * 1.6, color: colors.gray700 },
   features: { gap: spacing.sm, paddingLeft: spacing.xs },
   featureText: { fontSize: typography.sizes.md, lineHeight: typography.sizes.md * 1.5, color: colors.gray700 },
-  disclaimer: { backgroundColor: colors.primaryLight, padding: spacing.md, borderRadius: 8, borderLeftWidth: 3, borderLeftColor: colors.primaryMain },
+  disclaimer: { backgroundColor: colors.primaryLight, padding: spacing.md, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: colors.primaryMain },
   disclaimerText: { fontSize: typography.sizes.sm, lineHeight: typography.sizes.sm * 1.5, color: colors.gray700, textAlign: 'center' },
   footerSpacer: { height: spacing.md },
   footer: { padding: spacing.lg, backgroundColor: colors.white, borderTopWidth: 1, borderTopColor: colors.gray200 },

@@ -197,7 +197,7 @@ export const SymptomTrendChart: React.FC<SymptomTrendChartProps> = ({
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
-    borderRadius: 12,
+    borderRadius: 4,
     padding: spacing.md,
     marginBottom: spacing.md,
     borderWidth: 2,
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.gray50,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   emptyText: {
     fontSize: typography.sizes.md,
