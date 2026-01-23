@@ -19,6 +19,7 @@ import { useLogStore, useAppState } from '../state/useAppState';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import { BigButton } from '../components';
 import {
   Medication,
   MedicationFrequency,
@@ -1121,11 +1122,14 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
         </ScrollView>
 
         <View style={styles.modalFooter}>
+          <BigButton
+            label={appointment ? 'Update Appointment' : 'Save Appointment'}
+            onPress={handleSave}
+            variant="primary"
+            fullWidth
+          />
           <TouchableOpacity onPress={onClose} style={styles.modalCancelButton}>
             <Text style={styles.modalCancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleSave} style={styles.modalSaveButton}>
-            <Text style={styles.modalSaveButtonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1331,6 +1335,23 @@ const styles = StyleSheet.create({
   modalContent: {
     flex: 1,
     padding: spacing.lg,
+  },
+  modalFooter: {
+    padding: spacing.lg,
+    gap: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.gray200,
+  },
+  modalCancelButton: {
+    paddingVertical: spacing.md,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.gray400,
+    alignItems: 'center',
+  },
+  modalCancelButtonText: {
+    ...typography.labelLarge,
+    color: colors.gray700,
   },
   formGroup: {
     marginBottom: spacing.lg,
