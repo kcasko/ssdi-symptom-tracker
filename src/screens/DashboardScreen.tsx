@@ -154,7 +154,9 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
             style={styles.settingsButton}
             onPress={() => navigation.navigate('Settings')}
           >
-            <Text style={styles.settingsIcon}>Settings</Text>
+            <Text style={styles.settingsIcon} accessibilityLabel="Open settings">
+              ⚙
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -473,6 +475,7 @@ const styles = StyleSheet.create({
   },
   settingsIcon: {
     fontSize: typography.sizes.xl,
+    color: colors.gray900,
   },
   explanationBlock: {
     backgroundColor: colors.white,
