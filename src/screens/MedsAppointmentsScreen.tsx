@@ -57,7 +57,6 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
-  // ...existing code...
 
   const activeMeds = medications.filter(m => m.isActive);
   const inactiveMeds = medications.filter(m => !m.isActive);
@@ -1034,7 +1033,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Provider Type</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+            <View style={styles.pillWrap}>
               {providerTypes.map((type) => (
                 <TouchableOpacity
                   key={type}
@@ -1046,7 +1045,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
                   </Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </View>
           </View>
 
           <View style={styles.formGroup}>
@@ -1062,7 +1061,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Purpose</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+            <View style={styles.pillWrap}>
               {purposes.map((p) => (
                 <TouchableOpacity
                   key={p}
@@ -1074,7 +1073,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
                   </Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </View>
           </View>
 
           <View style={styles.formGroup}>
@@ -1092,7 +1091,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Status</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.pillScroll}>
+            <View style={styles.pillWrap}>
               {statuses.map((s) => (
                 <TouchableOpacity
                   key={s}
@@ -1104,7 +1103,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
                   </Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
+            </View>
           </View>
 
           <View style={styles.formGroup}>
@@ -1360,6 +1359,11 @@ const styles = StyleSheet.create({
     ...typography.labelLarge,
     color: colors.gray900,
     marginBottom: spacing.sm,
+  },
+  pillWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
   input: {
     ...typography.bodyLarge,
