@@ -335,7 +335,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               />
             </View>
             <Text style={styles.capacityBarLabel}>
-              {last30DayRatios.goodDayPercentage.toFixed(0)}% Functional Days (severity <5)
+              {last30DayRatios.goodDayPercentage.toFixed(0)}% Functional Days (severity &lt;5)
             </Text>
           </View>
 
