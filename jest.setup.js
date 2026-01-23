@@ -7,6 +7,20 @@ if (typeof global !== 'undefined') {
   };
 }
 
+// Provide base64 helpers for Node test environment
+if (typeof global.btoa === 'undefined') {
+  global.btoa = (str) => Buffer.from(str, 'binary').toString('base64');
+}
+
+if (typeof global.atob === 'undefined') {
+  global.atob = (b64) => Buffer.from(b64, 'base64').toString('binary');
+}
+
+// Mock react-native Platform to avoid loading native modules in tests
+jest.mock('react-native', () => ({
+  Platform: { OS: 'ios' }
+}));
+
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
