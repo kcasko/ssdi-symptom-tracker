@@ -18,6 +18,8 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 
+const EXPORT_VERSION = 'Daymark Evidence-Hardened v1.0';
+
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf';
   dataType: 'daily-logs' | 'activity-logs' | 'medications' | 'all';
@@ -307,6 +309,13 @@ export class ExportService {
     });
   }
 
+  private static appendVersionRow(rows: string[][], headers: string[]) {
+    const row = new Array(headers.length).fill('');
+    row[0] = 'Generated_By';
+    row[1] = EXPORT_VERSION;
+    rows.push(row);
+  }
+
   /**
    * Convert daily logs to CSV
    */
@@ -424,6 +433,7 @@ export class ExportService {
 
     const severityMetrics = this.calculateSeverityMetrics(sortedLogs.map((l) => l.overallSeverity));
     this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Overall Severity');
+    this.appendVersionRow(rows, headers);
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
@@ -533,6 +543,7 @@ export class ExportService {
         .filter((v): v is number => typeof v === 'number')
     );
     this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Impact Severity');
+    this.appendVersionRow(rows, headers);
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
@@ -571,6 +582,8 @@ export class ExportService {
       this.escapeCSV(med.notes || ''),
     ]);
 
+    this.appendVersionRow(rows, headers);
+
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
@@ -593,6 +606,8 @@ export class ExportService {
       lim.isActive ? 'Yes' : 'No',
       this.escapeCSV(lim.notes || ''),
     ]);
+
+    this.appendVersionRow(rows, headers);
 
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
