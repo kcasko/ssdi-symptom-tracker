@@ -28,6 +28,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDarkMode, onToggle }
         onValueChange={onToggle}
         trackColor={{ false: colors.gray300, true: colors.primary[300] }}
         thumbColor={isDarkMode ? colors.primaryMain : colors.white}
+        accessibilityLabel="Toggle dark mode"
+        testID="theme-toggle-switch"
       />
     </View>
   );

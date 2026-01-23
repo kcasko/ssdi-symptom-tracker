@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: typography.sizes.md,
     fontWeight: typography.weights.semibold as any,
-    color: colors.gray900,
+    color: colors.gray700,
   },
   scaleContainer: {
     flexDirection: 'row',
@@ -99,14 +99,14 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   scaleButton: {
-    width: 72,
-    height: 72,
-    backgroundColor: colors.white,
-    borderRadius: 4, // Sharp edges for document-like appearance
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 60,
+    height: 60,
+    borderRadius: 8,
     borderWidth: 2,
     borderColor: colors.gray400,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scaleButtonActive: {
     borderColor: colors.gray900,

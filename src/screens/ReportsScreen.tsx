@@ -359,7 +359,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                       {stats.totalSections} sections - {stats.totalWords} words
                     </Text>
                     <Text style={styles.reportMeta}>
-                      Last edited {formatDate(report.lastModified, DISPLAY_DATE_SHORT)}
+                      Last edited {formatDate(report.updatedAt, DISPLAY_DATE_SHORT)}
                     </Text>
                   </View>
                   <Text style={styles.arrow}>{'>'}</Text>

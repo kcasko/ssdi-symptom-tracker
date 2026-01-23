@@ -12,61 +12,72 @@ import { useEvidenceModeStore } from './evidenceModeStore';
 import { MigrationManager } from '../storage/migrations';
 import { SettingsStorage } from '../storage/storage';
 
+import { Profile } from '../domain/models/Profile';
+import { DailyLog } from '../domain/models/DailyLog';
+import { ActivityLog } from '../domain/models/ActivityLog';
+import { Limitation } from '../domain/models/Limitation';
+import { Medication } from '../domain/models/Medication';
+import { Appointment } from '../domain/models/Appointment';
+import { PhotoAttachment } from '../domain/models/PhotoAttachment';
+import { GapExplanation } from '../domain/models/GapExplanation';
+import { ReportDraft, ReportType } from '../domain/models/ReportDraft';
+import type { AppSettings } from './settingsStore';
+
 interface AppState {
   // Initialization
   isInitialized: boolean;
   isFirstLaunch: boolean;
   needsMigration: boolean;
-  
+
   // Current state
   activeProfileId: string | null;
-  activeProfile: any | null;
-  profiles: any[];
-  
+  activeProfile: Profile | null;
+  profiles: Profile[];
+
   // Loading states
   isLoading: boolean;
   hasError: boolean;
   errorMessage: string | null;
-  
+
   // Profile actions
   setActiveProfile: (profileId: string | null) => Promise<void>;
-  createProfile: (name: string, options?: any) => Promise<string | null>;
+  createProfile: (name: string, options?: Partial<Profile>) => Promise<string | null>;
   deleteProfile: (profileId: string) => Promise<void>;
-  
+
   // Log data
-  dailyLogs: any[];
-  activityLogs: any[];
-  limitations: any[];
-  medications: any[];
-  appointments: any[];
-  photos: any[];
-  gapExplanations: any[];
-  
+  dailyLogs: DailyLog[];
+  activityLogs: ActivityLog[];
+  limitations: Limitation[];
+  medications: Medication[];
+  appointments: Appointment[];
+  photos: PhotoAttachment[];
+  gapExplanations: GapExplanation[];
+
   // Log actions
-  addDailyLog: (log: any) => Promise<void>;
-  updateDailyLog: (log: any) => Promise<void>;
-  addActivityLog: (log: any) => Promise<void>;
-  addLimitation: (limitation: any) => Promise<void>;
-  updateLimitation: (limitation: any) => Promise<void>;
+  addDailyLog: (log: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateDailyLog: (log: DailyLog) => Promise<void>;
+  addActivityLog: (log: Omit<ActivityLog, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  addLimitation: (limitation: Omit<Limitation, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateLimitation: (limitation: Limitation) => Promise<void>;
   deleteLimitation: (limitationId: string) => Promise<void>;
-  addGapExplanation: (explanation: any) => Promise<void>;
-  
+  addGapExplanation: (explanation: GapExplanation) => Promise<void>;
+
   // Photo actions
-  addPhoto: (photo: any) => Promise<void>;
+  addPhoto: (photo: PhotoAttachment) => Promise<void>;
   deletePhoto: (photoId: string) => Promise<void>;
-  getPhotosByEntity: (entityType: string, entityId: string) => any[];
-  
+  getPhotosByEntity: (entityType: string, entityId: string) => PhotoAttachment[];
+
   // Report data
-  reportDrafts: any[];
-  
+  reportDrafts: ReportDraft[];
+
   // Report actions
-  addReportDraft: (title: string, reportType: any, dateRange: any) => Promise<string | null>;
-  updateReportDraft: (draft: any) => Promise<void>;
-  
+  addReportDraft: (title: string, reportType: ReportType, dateRange: { start: string; end: string }) => Promise<string | null>;
+  updateReportDraft: (draft: ReportDraft) => Promise<void>;
+
   // Settings
-  settings: any;
-  updateSettings: (updates: any) => Promise<void>;
-  
+  settings: AppSettings;
+  updateSettings: (updates: Partial<AppSettings>) => Promise<void>;
+
   // General actions
   initializeApp: () => Promise<void>;
   switchProfile: (profileId: string | null) => Promise<void>;

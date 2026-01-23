@@ -77,6 +77,10 @@ export function LogFinalizationControls({
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleFinalize}
           disabled={loading}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={loading ? 'Finalizing log' : 'Finalize log and make read-only'}
+          testID="finalize-log-button"
         >
           <Text style={styles.buttonText}>
             {loading ? 'Finalizing...' : 'Finalize Log'}

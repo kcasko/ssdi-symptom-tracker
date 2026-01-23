@@ -81,6 +81,10 @@ export const ActivityPicker: React.FC<ActivityPickerProps> = ({
               <TouchableOpacity
                 style={styles.categoryHeader}
                 onPress={() => toggleCategory(category as ActivityCategory)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Toggle activity category: ${category}`}
+                testID={`activity-category-${category}`}
               >
                 <Text style={styles.categoryTitle}>
                   {category} ({categoryActivities?.length || 0})
@@ -100,6 +104,10 @@ export const ActivityPicker: React.FC<ActivityPickerProps> = ({
                         selected && styles.activityButtonSelected,
                       ]}
                       onPress={() => onSelectActivity(activity.id)}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select activity: ${activity.name}`}
+                      testID={`activity-btn-${activity.id}`}
                     >
                       <View style={styles.activityContent}>
                         <Text

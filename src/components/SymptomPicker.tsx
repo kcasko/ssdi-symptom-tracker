@@ -95,6 +95,10 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
               <TouchableOpacity
                 style={styles.categoryHeader}
                 onPress={() => toggleCategory(category as SymptomCategory)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={`Toggle symptom category: ${category}`}
+                testID={`symptom-category-${category}`}
               >
                 <Text style={styles.categoryTitle}>
                   {category} ({categorySymptoms?.length || 0})
@@ -117,6 +121,10 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
                       ]}
                       onPress={() => onToggleSymptom(symptom.id)}
                       disabled={disabled}
+                      accessible={true}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select symptom: ${symptom.name}`}
+                      testID={`symptom-btn-${symptom.id}`}
                     >
                       <View style={styles.symptomContent}>
                         <Text

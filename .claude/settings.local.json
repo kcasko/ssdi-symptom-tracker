@@ -4,7 +4,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm test:*)",
       "Bash(ls:*)",
-      "Read(//e/Repos/symptom_tracker/**)"
+      "Read(//e/Repos/symptom_tracker/**)",
+      "Bash(npm install:*)"
     ]
   }
 }

@@ -157,7 +157,7 @@ export const LimitationsScreen: React.FC = () => {
         }
       } else {
         // Add new
-        await addLimitation(limitationData);
+        await addLimitation(limitationData as Omit<Limitation, 'id' | 'createdAt' | 'updatedAt'>);
       }
 
       setShowAddForm(false);
@@ -239,7 +239,7 @@ export const LimitationsScreen: React.FC = () => {
                   
                   {limitation.weightThreshold && (
                     <Text style={styles.limitationText}>
-                      Weight Limit: {limitation.weightThreshold.pounds} lbs
+                      Weight Limit: {limitation.weightThreshold.maxPounds} lbs
                     </Text>
                   )}
                   

@@ -261,6 +261,10 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         onPress={handlePress}
         disabled={isProcessing || hasPermission === null}
         activeOpacity={0.7}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={isRecording ? 'Stop voice recording' : 'Start voice recording'}
+        testID="voice-recorder-button"
       >
         <View style={styles.recordButtonInner}>
           <Text style={[
@@ -283,6 +287,10 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           <TouchableOpacity
             style={styles.clearButton}
             onPress={clearTranscription}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear voice transcription"
+            testID="clear-transcription-button"
           >
             <Text style={styles.clearButtonText}>Clear</Text>
           </TouchableOpacity>

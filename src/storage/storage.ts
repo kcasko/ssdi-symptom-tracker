@@ -5,6 +5,14 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS, CURRENT_SCHEMA_VERSION } from '../utils/constants';
+import { DailyLogArraySchema } from '../domain/models/DailyLog.zod';
+import { ActivityLogArraySchema } from '../domain/models/ActivityLog.zod';
+import { LimitationArraySchema } from '../domain/models/Limitation.zod';
+import { MedicationArraySchema } from '../domain/models/Medication.zod';
+import { AppointmentArraySchema } from '../domain/models/Appointment.zod';
+import { PhotoAttachmentArraySchema } from '../domain/models/PhotoAttachment.zod';
+import { GapExplanationArraySchema } from '../domain/models/GapExplanation.zod';
+import { ReportDraftArraySchema } from '../domain/models/ReportDraft.zod';
 
 // Type definitions for storage operations
 export interface StorageResult<T> {
@@ -169,7 +177,13 @@ export class LogStorage {
   static async getDailyLogs(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.DAILY_LOGS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = DailyLogArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid daily logs data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveDailyLogs(profileId: string, logs: any[]): Promise<boolean> {
@@ -181,7 +195,13 @@ export class LogStorage {
   static async getActivityLogs(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.ACTIVITY_LOGS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = ActivityLogArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid activity logs data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveActivityLogs(profileId: string, logs: any[]): Promise<boolean> {
@@ -193,7 +213,13 @@ export class LogStorage {
   static async getGapExplanations(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.GAP_EXPLANATIONS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = GapExplanationArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid gap explanations data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveGapExplanations(profileId: string, explanations: any[]): Promise<boolean> {
@@ -205,7 +231,13 @@ export class LogStorage {
   static async getLimitations(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.LIMITATIONS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = LimitationArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid limitations data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveLimitations(profileId: string, limitations: any[]): Promise<boolean> {
@@ -217,7 +249,13 @@ export class LogStorage {
   static async getMedications(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.MEDICATIONS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = MedicationArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid medications data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveMedications(profileId: string, medications: any[]): Promise<boolean> {
@@ -229,7 +267,13 @@ export class LogStorage {
   static async getAppointments(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.APPOINTMENTS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = AppointmentArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid appointments data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveAppointments(profileId: string, appointments: any[]): Promise<boolean> {
@@ -242,7 +286,13 @@ export class LogStorage {
   static async getPhotos(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.PHOTOS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = PhotoAttachmentArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid photo attachments data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async savePhotos(profileId: string, photos: any[]): Promise<boolean> {
@@ -254,7 +304,13 @@ export class LogStorage {
   static async getReportDrafts(profileId: string): Promise<any[]> {
     const key = `${STORAGE_KEYS.REPORT_DRAFTS}_${profileId}`;
     const result = await Storage.get(key, []);
-    return result.data || [];
+    if (!result.data) return [];
+    const validation = ReportDraftArraySchema.safeParse(result.data);
+    if (!validation.success) {
+      console.error('Invalid report drafts data loaded from storage:', validation.error);
+      return [];
+    }
+    return validation.data;
   }
 
   static async saveReportDrafts(profileId: string, drafts: any[]): Promise<boolean> {

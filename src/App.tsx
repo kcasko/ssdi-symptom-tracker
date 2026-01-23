@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
 import { View, Text, ActivityIndicator, StyleSheet, LogBox } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -18,54 +19,38 @@ export default function App() {
   // Initialize app state
   const { isInitialized, isFirstLaunch, hasError, errorMessage } = useAppState();
 
-  // Loading screen while app initializes (ONLY during init, not after)
-  if (!isInitialized) {
-    return (
-      <SafeAreaProvider>
-        <View style={styles.loadingContainer}>
-          <Text style={[styles.appTitle, { color: colors.primary600 }]}>
-            Daymark
-          </Text>
-          <ActivityIndicator
-            size="large"
-            color={colors.primary600}
-            style={styles.spinner}
-          />
-          <Text style={[styles.loadingText, { color: colors.text.secondary }]}>
-            Initializing your health tracker...
-          </Text>
-        </View>
-        <StatusBar style="auto" />
-      </SafeAreaProvider>
-    );
-  }
-
-  // Error screen if initialization failed
-  if (hasError && errorMessage) {
-    return (
-      <SafeAreaProvider>
-        <View style={styles.errorContainer}>
-          <Text style={[styles.errorTitle, { color: colors.error.main }]}>
-            Initialization Error
-          </Text>
-          <Text style={[styles.errorMessage, { color: colors.text.secondary }]}>
-            {errorMessage}
-          </Text>
-          <Text style={[styles.errorHelp, { color: colors.text.secondary }]}>
-            Please restart the app. If the problem persists, check that your device has sufficient storage space.
-          </Text>
-        </View>
-        <StatusBar style="auto" />
-      </SafeAreaProvider>
-    );
-  }
-
-  // Main app
   return (
-    <SafeAreaProvider>
-      <AppNavigator isFirstLaunch={isFirstLaunch} />
-      <StatusBar style="auto" />
-    </SafeAreaProvider>
+    <AppErrorBoundary>
+      {/* Loading screen while app initializes (ONLY during init, not after) */}
+      {!isInitialized ? (
+        <SafeAreaProvider>
+          <View style={styles.loadingContainer}>
+            <Text style={[styles.appTitle, { color: colors.primary600 }]}>Daymark</Text>
+            <ActivityIndicator
+              size="large"
+              color={colors.primary600}
+              style={styles.spinner}
+            />
+            <Text style={[styles.loadingText, { color: colors.text.secondary }]}>Initializing your health tracker...</Text>
+          </View>
+          <StatusBar style="auto" />
+        </SafeAreaProvider>
+      ) : hasError && errorMessage ? (
+        <SafeAreaProvider>
+          <View style={styles.errorContainer}>
+            <Text style={[styles.errorTitle, { color: colors.error.main }]}>Initialization Error</Text>
+            <Text style={[styles.errorMessage, { color: colors.text.secondary }]}>{errorMessage}</Text>
+            <Text style={[styles.errorHelp, { color: colors.text.secondary }]}>Please restart the app. If the problem persists, check that your device has sufficient storage space.</Text>
+          </View>
+          <StatusBar style="auto" />
+        </SafeAreaProvider>
+      ) : (
+        <SafeAreaProvider>
+          <AppNavigator isFirstLaunch={isFirstLaunch} />
+          <StatusBar style="auto" />
+        </SafeAreaProvider>
+      )}
+    </AppErrorBoundary>
   );
 }
 

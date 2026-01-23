@@ -199,6 +199,10 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
               selectedCategory === cat && styles.categoryChipSelected,
             ]}
             onPress={() => setSelectedCategory(cat)}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Select category: ${CATEGORY_LABELS[cat]}`}
+            testID={`category-chip-${cat}`}
           >
             <Text
               style={[
@@ -224,6 +228,10 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           style={[styles.actionButton, !canAddMore && styles.actionButtonDisabled]}
           onPress={handleTakePhoto}
           disabled={!canAddMore}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Take a new photo for evidence"
+          testID="take-photo-button"
         >
           <MaterialIcons name="photo-camera" size={24} color={COLORS.white} />
           <Text style={styles.actionButtonText}>Take Photo</Text>
@@ -233,6 +241,10 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           style={[styles.actionButton, !canAddMore && styles.actionButtonDisabled]}
           onPress={handlePickPhoto}
           disabled={!canAddMore}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Choose a photo from library for evidence"
+          testID="choose-photo-button"
         >
           <MaterialIcons name="photo-library" size={24} color={COLORS.white} />
           <Text style={styles.actionButtonText}>Choose Photo</Text>
@@ -242,6 +254,10 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           style={[styles.actionButton, !canAddMore && styles.actionButtonDisabled]}
           onPress={handlePickMultiple}
           disabled={!canAddMore}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Choose multiple photos from library for evidence"
+          testID="choose-multiple-button"
         >
           <MaterialIcons name="collections" size={24} color={COLORS.white} />
           <Text style={styles.actionButtonText}>Choose Multiple</Text>

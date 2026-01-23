@@ -80,6 +80,8 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
           value={evidenceStore.config.enabled}
           onValueChange={handleToggle}
           disabled={loading}
+          accessibilityLabel="Toggle evidence mode"
+          testID="evidence-mode-switch"
         />
       </View>
 

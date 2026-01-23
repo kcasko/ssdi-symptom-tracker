@@ -196,6 +196,10 @@ export function SubmissionPackBuilder({
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleCreatePack}
           disabled={loading}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={loading ? 'Creating submission pack' : 'Create submission pack'}
+          testID="create-submission-pack-button"
         >
           <Text style={styles.buttonText}>
             {loading ? 'Creating...' : 'Create Submission Pack'}

@@ -17,6 +17,8 @@ interface BigButtonProps {
   fullWidth?: boolean;
   icon?: React.ReactNode;
   style?: ViewStyle;
+  accessibilityLabel?: string;
+  testID?: string;
 }
 
 export const BigButton: React.FC<BigButtonProps> = ({
@@ -27,6 +29,8 @@ export const BigButton: React.FC<BigButtonProps> = ({
   fullWidth = false,
   icon,
   style,
+  accessibilityLabel,
+  testID,
 }) => {
   const buttonStyles: ViewStyle[] = [styles.button];
   const textStyles: TextStyle[] = [styles.text];
@@ -65,6 +69,10 @@ export const BigButton: React.FC<BigButtonProps> = ({
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.7}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || label}
+      testID={testID || label.replace(/\s+/g, '-') + '-button'}
     >
       {icon && icon}
       <Text style={textStyles}>{label}</Text>

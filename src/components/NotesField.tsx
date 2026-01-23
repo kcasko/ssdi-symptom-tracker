@@ -16,6 +16,8 @@ interface NotesFieldProps {
   placeholder?: string;
   maxLength?: number;
   height?: number;
+  accessibilityLabel?: string;
+  testID?: string;
 }
 
 export const NotesField: React.FC<NotesFieldProps> = ({
@@ -25,6 +27,8 @@ export const NotesField: React.FC<NotesFieldProps> = ({
   placeholder = 'Add any relevant context...',
   maxLength = 500,
   height = 120,
+  accessibilityLabel,
+  testID,
 }) => {
   return (
     <View style={styles.container}>
@@ -44,6 +48,9 @@ export const NotesField: React.FC<NotesFieldProps> = ({
         multiline
         textAlignVertical="top"
         maxLength={maxLength}
+        accessible={true}
+        accessibilityLabel={accessibilityLabel || label}
+        testID={testID || label.replace(/\s+/g, '-') + '-notes-input'}
       />
     </View>
   );

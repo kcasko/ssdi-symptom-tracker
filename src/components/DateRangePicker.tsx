@@ -68,6 +68,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <TouchableOpacity
           style={styles.presetButton}
           onPress={() => handlePresetSelect('last7')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Select last 7 days as date range"
+          testID="date-range-last7"
         >
           <Text style={styles.presetText}>Last 7 Days</Text>
         </TouchableOpacity>
@@ -75,6 +79,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <TouchableOpacity
           style={styles.presetButton}
           onPress={() => handlePresetSelect('last30')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Select last 30 days as date range"
+          testID="date-range-last30"
         >
           <Text style={styles.presetText}>Last 30 Days</Text>
         </TouchableOpacity>
@@ -82,6 +90,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <TouchableOpacity
           style={styles.presetButton}
           onPress={() => handlePresetSelect('last90')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Select last 90 days as date range"
+          testID="date-range-last90"
         >
           <Text style={styles.presetText}>Last 90 Days</Text>
         </TouchableOpacity>
@@ -89,6 +101,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <TouchableOpacity
           style={styles.presetButton}
           onPress={() => handlePresetSelect('all')}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Select all time as date range"
+          testID="date-range-all"
         >
           <Text style={styles.presetText}>All Time</Text>
         </TouchableOpacity>

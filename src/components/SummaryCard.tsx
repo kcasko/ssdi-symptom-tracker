@@ -41,14 +41,23 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 
   const Container = (onPress ? TouchableOpacity : View) as any;
 
+  const containerProps = onPress
+    ? {
+        accessible: true,
+        accessibilityRole: 'button',
+        accessibilityLabel: `${title}, value: ${value}${subtitle ? ', ' + subtitle : ''}`,
+        testID: `summary-card-${title.replace(/\s+/g, '-').toLowerCase()}`,
+        onPress,
+        activeOpacity: 0.7,
+      }
+    : {};
+
   return (
     <Container
       style={[styles.card, { borderLeftColor: getVariantColor() }]}
-      onPress={onPress}
-      activeOpacity={onPress ? 0.7 : 1}
+      {...containerProps}
     >
       {icon && <View style={styles.iconContainer}>{icon}</View>}
-      
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
         <Text style={[styles.value, { color: getVariantColor() }]}>{value}</Text>

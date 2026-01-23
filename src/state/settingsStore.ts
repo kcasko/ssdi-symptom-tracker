@@ -7,7 +7,7 @@ import { create } from 'zustand';
 import { SettingsStorage } from '../storage/storage';
 import { EncryptionManager } from '../storage/encryption';
 
-interface AppSettings {
+export interface AppSettings {
   // Privacy & Security
   appLockEnabled: boolean;
   encryptionEnabled: boolean;
