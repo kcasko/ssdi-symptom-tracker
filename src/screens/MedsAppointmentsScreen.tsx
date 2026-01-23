@@ -28,6 +28,9 @@ import {
 } from '../domain/models/Medication';
 import {
   Appointment,
+  ProviderType,
+  AppointmentPurpose,
+  AppointmentStatus,
   getProviderTypeLabel,
   getPurposeLabel,
 } from '../domain/models/Appointment';
@@ -1364,6 +1367,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+  },
+  pill: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    backgroundColor: colors.white,
+    marginBottom: spacing.xs,
+  },
+  pillActive: {
+    borderColor: colors.primaryMain,
+    backgroundColor: colors.primaryLight,
+  },
+  pillText: {
+    ...typography.labelMedium,
+    color: colors.gray900,
+  },
+  pillTextActive: {
+    color: colors.primaryMain,
+    fontWeight: '600',
   },
   input: {
     ...typography.bodyLarge,

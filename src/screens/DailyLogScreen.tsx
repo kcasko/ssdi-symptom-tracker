@@ -559,7 +559,7 @@ const styles = StyleSheet.create({
   timelineCardWarning: {
     borderColor: colors.errorMain,
     borderWidth: 3,
-    backgroundColor: colors.errorLight,
+    backgroundColor: colors.error.light,
   },
   delayValueWarning: {
     color: colors.errorMain,
@@ -573,7 +573,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: colors.errorMain,
-    backgroundColor: colors.errorLight,
+    backgroundColor: colors.error.light,
     gap: spacing.xs,
   },
   noticeTitle: {

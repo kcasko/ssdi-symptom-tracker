@@ -241,7 +241,7 @@ export function TrendsScreen() {
       return {
         labels: expandedSeries.map((p, i) => (i % labelInterval === 0 ? p.label : '')),
         datasets: [{
-          data: expandedSeries.map((p) => p.value),
+          data: expandedSeries.map((p) => p.value ?? 0),
         }],
       };
     }
