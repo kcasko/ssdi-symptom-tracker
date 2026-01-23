@@ -308,9 +308,9 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
 
   const renderAppointments = () => {
     if (!payload.appointments || payload.appointments.length === 0) return '<p>No appointments recorded in this range.</p>';
-    const sorted = [...payload.appointments].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    const sorted = [...payload.appointments].sort((a, b) => (a.appointmentDate || '').localeCompare(b.appointmentDate || ''));
     return `<ul>${sorted
-      .map((appt) => `<li>${formatDate(appt.date)} — ${escapeHTML(appt.providerName || 'Provider')} (${escapeHTML(appt.purpose || 'Purpose not specified')}); Status: ${escapeHTML((appt as any).status || 'unknown')}; Last modified: ${formatDate((appt as any).updatedAt || (appt as any).createdAt || exportDate)}</li>`)
+      .map((appt) => `<li>${formatDate(appt.appointmentDate)} — ${escapeHTML(appt.providerName || 'Provider')} (${escapeHTML(appt.purpose || 'Purpose not specified')}); Status: ${escapeHTML((appt as any).status || 'unknown')}; Last modified: ${formatDate((appt as any).updatedAt || (appt as any).createdAt || exportDate)}</li>`)
       .join('')}</ul>`;
   };
 
