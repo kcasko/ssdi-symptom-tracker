@@ -1130,9 +1130,6 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
             variant="primary"
             fullWidth
           />
-          <TouchableOpacity onPress={onClose} style={styles.modalCancelButton}>
-            <Text style={styles.modalCancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </Modal>

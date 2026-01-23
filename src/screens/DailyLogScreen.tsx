@@ -480,7 +480,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       <View style={styles.footer}>
         <BigButton
-          label="Voice Entry (Alternative Input Method)"
+          label="Voice Entry (Accessibility Mode)"
           onPress={() => navigation.navigate('VoiceLog')}
           variant="secondary"
           fullWidth
