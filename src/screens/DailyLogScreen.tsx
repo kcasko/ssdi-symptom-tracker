@@ -89,7 +89,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     : 'Pending (set on save)';
   const evidenceTimestampDisplay = existingLog?.evidenceTimestamp
     ? new Date(existingLog.evidenceTimestamp).toISOString()
-    : 'None recorded';
+    : 'Pending (set on save)';
   const showRetrospectiveContext =
     (eventDateValid && isBackdated) || Boolean(existingLog?.retrospectiveContext);
 
@@ -365,7 +365,11 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         )}
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Evidence Mode Controls */}
         {existingLog && activeProfile && (
           <View style={styles.section}>
@@ -441,11 +445,11 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
             <NotesField
               value={symptomEntries[activeSymptomId!]?.notes || ''}
               onChange={(notes) => handleNotesChange(activeSymptomId!, notes)}
-          label="Symptom Context"
-          placeholder="What triggered it? How long? What helped?"
-        />
-      </View>
-    )}
+              label="Symptom Context"
+              placeholder="What triggered it? How long? What helped?"
+            />
+          </View>
+        )}
 
         <View style={styles.section}>
           <NotesField

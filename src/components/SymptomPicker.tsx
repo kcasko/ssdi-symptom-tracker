@@ -82,7 +82,11 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
         {maxSelections ? ` (max ${maxSelections})` : ''}
       </Text>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         {Object.entries(groupedSymptoms).map(([category, categorySymptoms]) => {
           const isExpanded = expandedCategories.has(category as SymptomCategory);
 
@@ -95,7 +99,7 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
                 <Text style={styles.categoryTitle}>
                   {category} ({categorySymptoms?.length || 0})
                 </Text>
-                <Text style={styles.expandIcon}>{isExpanded ? '−' : '+'}</Text>
+                <Text style={styles.expandIcon}>{isExpanded ? '-' : '+'}</Text>
               </TouchableOpacity>
 
               {isExpanded &&
