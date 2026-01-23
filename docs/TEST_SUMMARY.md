@@ -3,7 +3,7 @@
 
 
 ## ✅ Test Infrastructure Created
-A comprehensive test suite has been created to validate all core functionality of the SSDI Symptom Tracker application.
+A comprehensive test suite has been created to validate all core functionality of the Daymark application.
 
 ### What Was Built
 
@@ -298,3 +298,4 @@ The test suite validates the three critical aspects of the application:
 3. **Safe filing** - SSA forms never use raw logs directly
 
 This ensures the app helps users build **credible, defensible SSDI claims** backed by **solid evidence**.
+

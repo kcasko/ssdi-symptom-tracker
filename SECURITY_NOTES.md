@@ -1,6 +1,6 @@
 # SECURITY_NOTES.md
 
-## SSDI Symptom Tracker: Security & Compliance Notes
+## Daymark: Security & Compliance Notes
 
 ### Data Locality
 
@@ -42,4 +42,5 @@
 **This file documents the app's defensible security and compliance posture.**
 
 For any change to these promises, explicit review and approval is required.
+
 

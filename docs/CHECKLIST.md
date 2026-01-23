@@ -1,4 +1,4 @@
-# SSDI Symptom Tracker - Pre-Launch Checklist
+# Daymark - Pre-Launch Checklist
 
 ## ✅ Code Complete
 
@@ -137,3 +137,4 @@ All core features implemented and functional. Ready for:
 - Deployment preparation
 
 No blocking issues. All specified requirements met.
+

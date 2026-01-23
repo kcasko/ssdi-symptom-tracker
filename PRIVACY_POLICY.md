@@ -1,12 +1,12 @@
 # Privacy Policy
 
-**SSDI Symptom Tracker**  
+**Daymark**  
 **Effective Date:** January 1, 2026  
 **Last Updated:** January 1, 2026
 
 ## Our Commitment to Privacy
 
-SSDI Symptom Tracker is designed with privacy as a fundamental principle. We believe your health information is deeply personal and should remain under your complete control.
+Daymark is designed with privacy as a fundamental principle. We believe your health information is deeply personal and should remain under your complete control.
 
 ## Information Collection and Storage
 
@@ -250,4 +250,5 @@ By using this app, you acknowledge:
 **Document Version**: 1.0  
 **Last Updated**: January 1, 2026  
 **Effective Date**: January 1, 2026
+
 

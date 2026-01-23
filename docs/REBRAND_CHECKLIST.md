@@ -46,7 +46,7 @@ Use the prompts in `docs/BRAND_ASSETS.md` to generate these assets:
 
 ### User-Facing Text Changes
 
-- [ ] Update `SettingsScreen.tsx` - Change "SSDI Symptom Tracker" to "Daymark"
+- [ ] Update `SettingsScreen.tsx` - Change "Daymark" to "Daymark"
   - Line 128: Info card title
   - Line 129-131: Description text (suggest: "A calm, neutral tool for marking your days.")
 
@@ -58,7 +58,7 @@ Use the prompts in `docs/BRAND_ASSETS.md` to generate these assets:
 
 ### Documentation Updates
 
-- [ ] Update `README.md` - Replace SSDI Symptom Tracker with Daymark
+- [ ] Update `README.md` - Replace Daymark with Daymark
 - [ ] Update `USER_GUIDE.md` - Replace branding
 - [ ] Update `PRIVACY_POLICY.md` - Replace app name
 - [ ] Update `TERMS_OF_SERVICE.md` - Replace app name
@@ -216,3 +216,4 @@ After completing the rebrand:
 - Color questions? Reference `docs/BRAND_COLORS.md`
 - Build problems? Check Expo docs for package name changes
 - Brand questions? Remember: "marking time, not judging it"
+

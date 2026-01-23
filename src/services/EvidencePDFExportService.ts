@@ -25,7 +25,7 @@ export interface PDFExportConfig {
 }
 
 const DEFAULT_CONFIG: PDFExportConfig = {
-  appName: 'SSDI Symptom Tracker',
+  appName: 'Daymark',
   appVersion: '1.0.0',
   includePageNumbers: true,
   fontSize: 11,
@@ -602,3 +602,4 @@ function escapeHTML(text: string): string {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+

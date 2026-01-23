@@ -1,5 +1,5 @@
 /**
- * SSDI Symptom Tracker - ID Utilities
+ * Daymark - ID Utilities
  * Stable, unique identifiers for all records
  */
 
@@ -79,3 +79,4 @@ export function idsEqual(id1: string | null | undefined, id2: string | null | un
   if (!id1 || !id2) return false;
   return id1 === id2;
 }
+

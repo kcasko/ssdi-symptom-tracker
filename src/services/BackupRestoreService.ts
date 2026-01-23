@@ -101,7 +101,7 @@ export class BackupRestoreService {
 
       // Validate backup structure
       if (!this.validateBackup(backup)) {
-        Alert.alert('Invalid Backup', 'The selected file is not a valid SSDI Symptom Tracker backup.');
+        Alert.alert('Invalid Backup', 'The selected file is not a valid Daymark backup.');
         return null;
       }
 
@@ -331,3 +331,4 @@ export class BackupRestoreService {
     console.log('Backup ready for sharing:', fileUri);
   }
 }
+

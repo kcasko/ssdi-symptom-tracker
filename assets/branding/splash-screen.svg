@@ -1,4 +1,4 @@
-<!-- SSDI Symptom Tracker Splash Screen -->
+<!-- Daymark Splash Screen -->
 <svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Background Gradient -->
   <defs>
@@ -98,7 +98,7 @@
       <text x="400" y="0" text-anchor="middle" fill="white" 
             font-family="system-ui, -apple-system, sans-serif" 
             font-size="56" font-weight="700">
-        SSDI Symptom Tracker
+        Daymark
       </text>
       
       <!-- Subtitle -->

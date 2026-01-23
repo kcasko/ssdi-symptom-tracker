@@ -1,7 +1,7 @@
 import { format, formatDistanceToNow, parseISO, isValid, startOfDay, endOfDay, differenceInMinutes, differenceInDays, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameDay, isWithinInterval } from 'date-fns';
 
 /**
- * SSDI Symptom Tracker - Date Utilities
+ * Daymark - Date Utilities
  * Consistent date handling throughout the app
  */
 
@@ -280,3 +280,4 @@ export function todayEnd(): string {
 }
 
 export { addDays, subDays, startOfDay, endOfDay, parseISO, isValid };
+

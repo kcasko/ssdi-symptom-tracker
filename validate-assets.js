@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// SSDI Symptom Tracker - Asset Validation Script
-console.log('🔍 SSDI Symptom Tracker - Asset Validation');
+// Daymark - Asset Validation Script
+console.log('🔍 Daymark - Asset Validation');
 console.log('===========================================');
 
 const ASSETS_DIR = 'assets';

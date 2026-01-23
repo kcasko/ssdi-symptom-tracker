@@ -1,6 +1,6 @@
 # Terms of Service
 
-**SSDI Symptom Tracker**  
+**Daymark**  
 **Version 1.0**  
 **Effective Date:** January 1, 2026
 
@@ -8,7 +8,7 @@
 
 ## Agreement to Terms
 
-By accessing, downloading, installing, or using the SSDI Symptom Tracker application ("the App," "our App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
+By accessing, downloading, installing, or using the Daymark application ("the App," "our App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App.
 
 ---
 
@@ -16,7 +16,7 @@ By accessing, downloading, installing, or using the SSDI Symptom Tracker applica
 
 ### Open Source License
 
-The SSDI Symptom Tracker is open source software licensed under **[MIT License]** (see LICENSE file in repository).
+The Daymark is open source software licensed under **[MIT License]** (see LICENSE file in repository).
 
 ### Personal Use License
 
@@ -112,7 +112,7 @@ You agree to:
 
 ### Trademarks
 
-- "SSDI Symptom Tracker" and associated branding are property of the developers
+- "Daymark" and associated branding are property of the developers
 - Social Security Administration and SSA are trademarks of the U.S. government (not affiliated with this app)
 
 ---
@@ -405,7 +405,7 @@ For SSDI-related questions, contact:
 
 ## 21. Acknowledgment
 
-By using the SSDI Symptom Tracker, you acknowledge that:
+By using the Daymark, you acknowledge that:
 
 ✅ You have read and understood these Terms of Service  
 ✅ You agree to be bound by these Terms  
@@ -455,4 +455,5 @@ By using the SSDI Symptom Tracker, you acknowledge that:
 - ❌ Take liability for SSDI outcomes
 
 **Read the full Terms above for complete details.**
+
 

@@ -2,8 +2,8 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 
-// SSDI Symptom Tracker - Asset Generation Script
-console.log('🎨 SSDI Symptom Tracker - Asset Generation');
+// Daymark - Asset Generation Script
+console.log('🎨 Daymark - Asset Generation');
 console.log('==========================================');
 
 const ASSETS_DIR = 'assets';

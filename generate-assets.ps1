@@ -1,8 +1,8 @@
-# SSDI Symptom Tracker - Asset Generation Script (PowerShell)
+# Daymark - Asset Generation Script (PowerShell)
 # This script converts SVG assets to required PNG formats
 # Requires: Inkscape (command line version)
 
-Write-Host "🎨 SSDI Symptom Tracker - Asset Generation" -ForegroundColor Cyan
+Write-Host "🎨 Daymark - Asset Generation" -ForegroundColor Cyan
 Write-Host "==========================================" -ForegroundColor Cyan
 
 # Function to convert SVG to PNG using Inkscape

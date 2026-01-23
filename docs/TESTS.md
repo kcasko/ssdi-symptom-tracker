@@ -1,7 +1,7 @@
 
 # Test Suite Documentation
 
-This document describes the comprehensive test suite created for the SSDI Symptom Tracker application.
+This document describes the comprehensive test suite created for the Daymark application.
 
 ## Test Infrastructure
 
@@ -366,3 +366,4 @@ Consider adding tests for:
 - [ ] Report export formats
 - [ ] HIPAA compliance checks
 - [ ] UI component testing (when components implemented)
+

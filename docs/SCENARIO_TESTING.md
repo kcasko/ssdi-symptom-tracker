@@ -1,6 +1,6 @@
 # SCENARIO_TESTING.md
 
-## SSDI Symptom Tracker: Scenario Testing Plan
+## Daymark: Scenario Testing Plan
 
 ### Purpose
 
@@ -57,3 +57,4 @@ To validate real-world credibility, determinism, and explainability, we simulate
 **Scenario testing is required before release. Output must be credible, boring, and defensible.**
 
 Any changes to logic or templates after scenario testing require re-validation.
+

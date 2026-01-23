@@ -1,6 +1,6 @@
-# SSDI Symptom Tracker - Asset System
+# Daymark - Asset System
 
-This directory contains the visual assets for the SSDI Symptom Tracker app, including app icons, splash screens, and branding elements.
+This directory contains the visual assets for the Daymark app, including app icons, splash screens, and branding elements.
 
 ## 🎨 Asset Overview
 
@@ -137,7 +137,7 @@ node generate-assets.js
 ### Splash Screen Design
 
 - **Large Icon**: Prominent app branding
-- **App Title**: "SSDI Symptom Tracker"
+- **App Title**: "Daymark"
 - **Subtitle**: "Evidence Collection for SSDI Documentation"
 - **Feature Highlights**: Key app capabilities listed
 - **Medical Symbols**: Professional healthcare iconography
@@ -169,4 +169,5 @@ node generate-assets.js
 
 ---
 
-**SSDI Symptom Tracker Asset System**
+**Daymark Asset System**
+

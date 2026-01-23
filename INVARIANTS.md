@@ -1,6 +1,6 @@
 # INVARIANTS.md
 
-## SSDI Symptom Tracker: Frozen Invariants
+## Daymark: Frozen Invariants
 
 The following rules are **frozen** and may not be changed without explicit approval. These are the guardrails that protect the credibility, auditability, and defensibility of this evidence system.
 
@@ -39,3 +39,4 @@ The following rules are **frozen** and may not be changed without explicit appro
 **Any change to these invariants must be reviewed and approved by the project owner.**
 
 This file is not documentation fluff. It is a guardrail for the integrity of the system.
+

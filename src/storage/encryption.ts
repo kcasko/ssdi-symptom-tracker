@@ -134,7 +134,7 @@ export class EncryptionManager {
       }
 
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: reason || 'Authenticate to access SSDI Symptom Tracker',
+        promptMessage: reason || 'Authenticate to access Daymark',
         cancelLabel: 'Cancel',
         disableDeviceFallback: false,
         requireConfirmation: false,

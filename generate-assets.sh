@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# SSDI Symptom Tracker - Asset Generation Script
+# Daymark - Asset Generation Script
 # This script converts SVG assets to required PNG formats
 # Requires: rsvg-convert (librsvg2-bin package)
 
-echo "🎨 SSDI Symptom Tracker - Asset Generation"
+echo "🎨 Daymark - Asset Generation"
 echo "=========================================="
 
 # Check if rsvg-convert is available

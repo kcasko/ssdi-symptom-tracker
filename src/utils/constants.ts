@@ -1,10 +1,10 @@
 /**
- * SSDI Symptom Tracker - Constants
+ * Daymark - Constants
  * App-wide constant values
  */
 
 // App info
-export const APP_NAME = 'SSDI Symptom Tracker';
+export const APP_NAME = 'Daymark';
 export const APP_VERSION = '1.0.0';
 
 // Storage keys
@@ -131,3 +131,4 @@ export const VALIDATION = {
   MIN_DURATION_MINUTES: 1,
   MAX_DURATION_MINUTES: 1440, // 24 hours
 } as const;
+

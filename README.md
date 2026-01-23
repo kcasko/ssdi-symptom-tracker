@@ -1,5 +1,5 @@
 
-# SSDI Symptom Tracker
+# Daymark
 
 Production-ready React Native + Expo app for SSDI documentation.
 
@@ -445,3 +445,4 @@ accessibility best practices, and the real needs of people navigating the
 disability system.
 Use it to collect the evidence you need to tell your story clearly and
 professionally.
+

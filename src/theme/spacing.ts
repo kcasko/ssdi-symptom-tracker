@@ -1,5 +1,5 @@
 /**
- * SSDI Symptom Tracker - Spacing System
+ * Daymark - Spacing System
  * Consistent spacing for accessible, touch-friendly UI
  */
 
@@ -75,3 +75,4 @@ export const layout = {
 
 export type Spacing = typeof spacing;
 export type Layout = typeof layout;
+

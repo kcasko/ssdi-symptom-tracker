@@ -1,6 +1,6 @@
 # EXPORT_EXPLANATION.md
 
-## SSDI Symptom Tracker: How Reports Are Generated
+## Daymark: How Reports Are Generated
 
 ### Overview
 
@@ -41,3 +41,4 @@ All reports are generated from immutable source logs (symptoms, activities, limi
 **This file documents the report generation process for transparency and auditability.**
 
 Any change to this process requires explicit review and approval.
+

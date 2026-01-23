@@ -1,5 +1,5 @@
 
-# SSDI Symptom Tracker - User Guide
+# Daymark - User Guide
 
 **Version 1.0**  
 **Last Updated:** January 1, 2026
@@ -622,7 +622,7 @@ Export individual datasets as CSV:
 
 - Restart your device
 - Update to the latest app version
-- Clear app cache (Settings → Apps → SSDI Symptom Tracker → Clear Cache)
+- Clear app cache (Settings → Apps → Daymark → Clear Cache)
 - If persists, report issue on GitHub
 
 #### "Data disappeared" after update
@@ -824,7 +824,7 @@ Export individual datasets as CSV:
 
 ## Conclusion
 
-SSDI Symptom Tracker is a powerful tool for documenting your disability, but remember:
+Daymark is a powerful tool for documenting your disability, but remember:
 
 ✅ **This app is a tool, not a solution** - Consult professionals  
 ✅ **Consistency is critical** - Log regularly for best results  
@@ -841,5 +841,6 @@ SSDI Symptom Tracker is a powerful tool for documenting your disability, but rem
 **App Version**: 1.0.0
 
 **For support**: <https://github.com/kcasko/ssdi-symptom-tracker/issues>
+
 
 

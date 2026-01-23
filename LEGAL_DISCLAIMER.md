@@ -1,6 +1,6 @@
 # Legal Disclaimer
 
-**SSDI Symptom Tracker**  
+**Daymark**  
 **Version 1.0**  
 **Effective Date:** January 1, 2026
 
@@ -8,7 +8,7 @@
 
 ## IMPORTANT: READ CAREFULLY BEFORE USE
 
-This legal disclaimer governs your use of the SSDI Symptom Tracker application ("the App"). By installing, accessing, or using the App, you acknowledge that you have read, understood, and agree to be bound by this disclaimer.
+This legal disclaimer governs your use of the Daymark application ("the App"). By installing, accessing, or using the App, you acknowledge that you have read, understood, and agree to be bound by this disclaimer.
 
 ---
 
@@ -307,5 +307,6 @@ For SSDI legal questions, contact:
 **Effective Date**: January 1, 2026
 
 **BY USING THIS APP, YOU ACCEPT THIS DISCLAIMER IN FULL.**
+
 
 

@@ -1,6 +1,6 @@
 # APP_IDENTITY.md
 
-## SSDI Symptom Tracker: App Identity Statement
+## Daymark: App Identity Statement
 
 ### What This App Is
 
@@ -36,3 +36,4 @@
 ---
 
 **This file documents the app's identity and priorities. Any change to these statements requires explicit review.**
+

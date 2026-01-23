@@ -1,6 +1,6 @@
 # RELEASE_CANDIDATE_PLAN.md
 
-## SSDI Symptom Tracker: Release Candidate Planning
+## Daymark: Release Candidate Planning
 
 ### Purpose
 
@@ -52,3 +52,4 @@ To ensure a stable, defensible, and auditable release, the following process is 
 ---
 
 **This file documents the release candidate process. Any deviation requires explicit review and approval.**
+

@@ -1,5 +1,5 @@
 /**
- * SSDI Symptom Tracker - Main App Entry Point
+ * Daymark - Main App Entry Point
  * Production-ready React Native + Expo app optimized for SSDI documentation
  */
 

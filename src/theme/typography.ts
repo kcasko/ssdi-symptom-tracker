@@ -1,7 +1,7 @@
 import { Platform, TextStyle } from 'react-native';
 
 /**
- * SSDI Symptom Tracker - Typography System
+ * Daymark - Typography System
  * Clear, readable fonts optimized for fatigued users
  */
 
@@ -204,3 +204,4 @@ export const typography = {
 
 export type Typography = typeof typography;
 export { fontWeights };
+
