@@ -39,7 +39,7 @@ index 71d54fc..c2d0102 100644
    }
  }
 diff --git a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
-index 7c22069..eafbc99 100644
+index 7c22069..cb9ce07 100644
 --- a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
 +++ b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
 @@ -15,7 +15,6 @@ import expo.modules.plugin.android.createReleasePublication
@@ -80,6 +80,15 @@ index 7c22069..eafbc99 100644
      applyLinterOptions()
    }
  }
+@@ -75,8 +76,6 @@ internal fun Project.applyPublishing(expoModulesExtension: ExpoModuleExtension)
+   val libraryExtension = androidLibraryExtension()
+ 
+   libraryExtension
+-    .applyPublishingVariant()
+-
+   afterEvaluate {
+     val publicationInfo = PublicationInfo(this)
+ 
 diff --git a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt
 index 896cc50..cde7995 100644
 --- a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt
