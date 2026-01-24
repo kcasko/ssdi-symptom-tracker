@@ -332,38 +332,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           keyboardType="numbers-and-punctuation"
           blurOnSubmit={false}
         />
-        <View style={[
-          styles.timelineCard,
-          isBackdated && styles.timelineCardWarning
-        ]}>
-          <Text style={styles.timelineLabel}>Record created timestamp (system)</Text>
-          <Text style={styles.timelineValue}>{createdTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Last modified timestamp (system)</Text>
-          <Text style={styles.timelineValue}>{updatedTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Evidence timestamp (system, immutable)</Text>
-          <Text style={styles.timelineValue}>{evidenceTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Delay between event date and creation</Text>
-          <Text style={[
-            styles.timelineValue,
-            isBackdated && styles.delayValueWarning
-          ]}>
-            {eventDateValid ? `${daysDelayed} days` : 'N/A'}
-          </Text>
-          <Text style={[
-            styles.delayLabel,
-            isBackdated && styles.delayLabelWarning
-          ]}>{delayLabel}</Text>
-        </View>
-        {showRetrospectiveContext && (
-          <View style={styles.noticeBox}>
-            <Text style={styles.noticeTitle}>Retrospective entry</Text>
-            <Text style={styles.noticeBody}>
-              {eventDateValid
-                ? `This date is ${daysDelayed} days before the creation timestamp. The entry will be marked as retrospective.`
-                : 'This entry has retrospective context. Enter a valid event date to confirm the delay.'}
-            </Text>
-          </View>
-        )}
       </View>
 
       <ScrollView
