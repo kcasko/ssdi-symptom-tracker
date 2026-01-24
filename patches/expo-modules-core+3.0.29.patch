@@ -1,3 +1,16 @@
+diff --git a/node_modules/expo-modules-core/android/build.gradle b/node_modules/expo-modules-core/android/build.gradle
+index 61ed6d6..c111e14 100644
+--- a/node_modules/expo-modules-core/android/build.gradle
++++ b/node_modules/expo-modules-core/android/build.gradle
+@@ -10,6 +10,8 @@ buildscript {
+ 
+   repositories {
+     mavenCentral()
++    google()
++    gradlePluginPortal()
+   }
+ 
+   dependencies {
 diff --git a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ExpoModulesGradlePlugin.kt b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ExpoModulesGradlePlugin.kt
 index 71d54fc..c2d0102 100644
 --- a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ExpoModulesGradlePlugin.kt
@@ -26,7 +39,7 @@ index 71d54fc..c2d0102 100644
    }
  }
 diff --git a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
-index 7c22069..36411d1 100644
+index 7c22069..eafbc99 100644
 --- a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
 +++ b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/ProjectConfiguration.kt
 @@ -15,7 +15,6 @@ import expo.modules.plugin.android.createReleasePublication
@@ -48,7 +61,7 @@ index 7c22069..36411d1 100644
  
    project.dependencies.add("implementation", "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion")
  }
-@@ -50,11 +49,11 @@ internal fun Project.applyDefaultDependencies() {
+@@ -50,13 +49,15 @@ internal fun Project.applyDefaultDependencies() {
  internal fun Project.applyDefaultAndroidSdkVersions() {
    with(androidLibraryExtension()) {
      applySDKVersions(
@@ -62,7 +75,11 @@ index 7c22069..36411d1 100644
 +      targetSdk = rootProject.extensions.extraProperties.safeGet("targetSdkVersion")
          ?: logger.warnIfNotDefined("targetSdkVersion", 36)
      )
++    // Must be configured during DSL configuration so the `release` SoftwareComponent exists later.
++    applyPublishingVariant()
      applyLinterOptions()
+   }
+ }
 diff --git a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt b/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt
 index 896cc50..cde7995 100644
 --- a/node_modules/expo-modules-core/expo-module-gradle-plugin/src/main/kotlin/expo/modules/plugin/gradle/ExpoModuleExtension.kt
