@@ -330,6 +330,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           style={styles.dateInput}
           autoCorrect={false}
           keyboardType="numbers-and-punctuation"
+          blurOnSubmit={false}
         />
         <View style={[
           styles.timelineCard,
@@ -368,7 +369,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
       >
         {/* Evidence Mode Controls */}
         {existingLog && activeProfile && (

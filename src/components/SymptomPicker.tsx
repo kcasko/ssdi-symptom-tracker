@@ -75,6 +75,7 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
         value={searchQuery}
         onChangeText={setSearchQuery}
         placeholderTextColor={colors.gray500}
+        blurOnSubmit={false}
       />
 
       <Text style={styles.selectionCount}>
@@ -85,7 +86,8 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
       >
         {Object.entries(groupedSymptoms).map(([category, categorySymptoms]) => {
           const isExpanded = expandedCategories.has(category as SymptomCategory);
