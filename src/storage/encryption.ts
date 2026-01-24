@@ -1,21 +1,18 @@
 /**
  * Encryption Utilities
- * AES-256-CTR with SHA-256 auth tag for integrity (authenticated encryption surrogate)
+ * AES-256-GCM via react-native-aes-crypto
  *
- * - 256-bit key stored in SecureStore (base64)
- * - 16-byte IV per message
- * - Auth tag = first 16 bytes of SHA-256(keyBase64 + base64(dataForAuth))
+ * Payload format (string):
+ *   v2:<base64IV>:<base64CiphertextWithTag>
  *
- * NOTE: Expo does not expose native AES-GCM; this implementation uses AES-CTR + HMAC-style tag.
- * For true AES-GCM, swap to a native module like `react-native-aes-crypto`.
+ * Keys are 256-bit, stored in SecureStore (base64).
  */
 
+import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as crypto from 'expo-crypto';
-import * as aesjs from 'aes-js';
-import { Platform } from 'react-native';
-import { Buffer } from 'buffer';
+import AES from 'react-native-aes-crypto';
 
 export interface EncryptionConfig {
   enabled: boolean;
@@ -38,25 +35,11 @@ export interface AuthResult {
 const KEY_VERSION = 'v2';
 const KEY_PREFIX = 'ssdi_secure_';
 const ENCRYPTION_KEY = 'encryption_key';
-const IV_LENGTH = 16;
-const AUTH_TAG_LENGTH = 16;
-const VERSION_BYTE = 2;
+const IV_LENGTH = 12; // 96-bit IV for GCM
+const VERSION_TAG = 'v2';
 
-const b64Encode = (data: Uint8Array) => {
-  return Buffer.from(data).toString('base64');
-};
-
-const b64Decode = (b64: string) => {
-  return new Uint8Array(Buffer.from(b64, 'base64'));
-};
-
-const utf8Encode = (text: string) => {
-  return new TextEncoder().encode(text);
-};
-
-const utf8Decode = (bytes: Uint8Array) => {
-  return new TextDecoder().decode(bytes);
-};
+const b64Encode = (bytes: Uint8Array) => Buffer.from(bytes).toString('base64');
+const b64Decode = (b64: string) => new Uint8Array(Buffer.from(b64, 'base64'));
 
 export class EncryptionManager {
   private static config: EncryptionConfig = {
@@ -86,9 +69,9 @@ export class EncryptionManager {
       }
 
       if (this.config.enabled) {
-        const key = await this.getEncryptionKey();
-        if (!key.success) {
-          return { success: false, capabilities: { secureStoreAvailable, biometricsAvailable: biometricsAvailable && enrolled, biometryType }, error: key.error };
+        const keyResult = await this.getEncryptionKey();
+        if (!keyResult.success) {
+          return { success: false, capabilities: { secureStoreAvailable, biometricsAvailable: biometricsAvailable && enrolled, biometryType }, error: keyResult.error };
         }
       }
 
@@ -152,7 +135,7 @@ export class EncryptionManager {
 
   private static async generateEncryptionKey(): Promise<EncryptionResult> {
     try {
-      const keyBytes = await crypto.getRandomBytesAsync(32); // 256-bit
+      const keyBytes = await crypto.getRandomBytesAsync(32);
       const keyBase64 = b64Encode(keyBytes);
       await this.storeSecure(ENCRYPTION_KEY, `${KEY_VERSION}:${keyBase64}`, true);
       return { success: true, data: keyBase64 };
@@ -181,9 +164,6 @@ export class EncryptionManager {
       const options: SecureStore.SecureStoreOptions = {
         requireAuthentication: requireAuth && this.config.useDeviceAuth,
       };
-      if (Platform.OS === 'ios') {
-        options.keychainService = 'SSIDSymptomTracker';
-      }
       await SecureStore.setItemAsync(secureKey, value, options);
       return { success: true, data: value };
     } catch (error) {
@@ -223,25 +203,12 @@ export class EncryptionManager {
         return { success: false, error: 'Encryption key not available' };
       }
 
-      const keyBytes = b64Decode(keyResult.data);
+      const keyHex = Buffer.from(b64Decode(keyResult.data)).toString('hex');
       const iv = await crypto.getRandomBytesAsync(IV_LENGTH);
-      const plaintextBytes = utf8Encode(plaintext);
+      const ivHex = Buffer.from(iv).toString('hex');
 
-      const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(iv));
-      const encryptedBytes = aesCtr.encrypt(plaintextBytes);
-
-      const dataForAuth = new Uint8Array([...iv, ...encryptedBytes]);
-      const authHex = await crypto.digestStringAsync(
-        crypto.CryptoDigestAlgorithm.SHA256,
-        `${keyResult.data}${b64Encode(dataForAuth)}`
-      );
-      const authTag = new Uint8Array(AUTH_TAG_LENGTH);
-      for (let i = 0; i < AUTH_TAG_LENGTH; i++) {
-        authTag[i] = parseInt(authHex.substr(i * 2, 2), 16);
-      }
-
-      const combined = new Uint8Array([VERSION_BYTE, ...iv, ...authTag, ...encryptedBytes]);
-      const payload = b64Encode(combined);
+      const cipherBase64 = await AES.encrypt(plaintext, keyHex, ivHex, 'aes-256-gcm');
+      const payload = `${VERSION_TAG}:${b64Encode(iv)}:${cipherBase64}`;
 
       return { success: true, data: payload };
     } catch (error) {
@@ -258,39 +225,17 @@ export class EncryptionManager {
         return { success: false, error: 'Decryption key not available' };
       }
 
-      const combined = b64Decode(ciphertext);
-      const version = combined[0];
-      if (version !== VERSION_BYTE) {
-        return { success: false, error: 'Unsupported encryption version' };
+      const parts = ciphertext.split(':');
+      if (parts.length !== 3 || parts[0] !== VERSION_TAG) {
+        return { success: false, error: 'Unsupported encryption format' };
       }
+      const ivB64 = parts[1];
+      const cipherBase64 = parts[2];
 
-      const iv = combined.slice(1, 1 + IV_LENGTH);
-      const authTag = combined.slice(1 + IV_LENGTH, 1 + IV_LENGTH + AUTH_TAG_LENGTH);
-      const encryptedBytes = combined.slice(1 + IV_LENGTH + AUTH_TAG_LENGTH);
+      const keyHex = Buffer.from(b64Decode(keyResult.data)).toString('hex');
+      const ivHex = Buffer.from(b64Decode(ivB64)).toString('hex');
 
-      const dataForAuth = new Uint8Array([...iv, ...encryptedBytes]);
-      const expectedAuthHex = await crypto.digestStringAsync(
-        crypto.CryptoDigestAlgorithm.SHA256,
-        `${keyResult.data}${b64Encode(dataForAuth)}`
-      );
-      const expectedTag = new Uint8Array(AUTH_TAG_LENGTH);
-      for (let i = 0; i < AUTH_TAG_LENGTH; i++) {
-        expectedTag[i] = parseInt(expectedAuthHex.substr(i * 2, 2), 16);
-      }
-
-      let valid = true;
-      for (let i = 0; i < AUTH_TAG_LENGTH; i++) {
-        if (authTag[i] !== expectedTag[i]) valid = false;
-      }
-      if (!valid) {
-        return { success: false, error: 'Authentication failed - data may be corrupted' };
-      }
-
-      const keyBytes = b64Decode(keyResult.data);
-      const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(iv));
-      const decryptedBytes = aesCtr.decrypt(encryptedBytes);
-      const plaintext = utf8Decode(decryptedBytes);
-
+      const plaintext = await AES.decrypt(cipherBase64, keyHex, ivHex, 'aes-256-gcm');
       return { success: true, data: plaintext };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Decryption error' };
