@@ -16,6 +16,7 @@ import {
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { useLogStore } from '../state/logStore';
 import { colors } from '../theme/colors';
+import { parseDate } from '../utils/dates';
 
 interface SubmissionPackBuilderProps {
   profileId: string;
@@ -48,20 +49,25 @@ export function SubmissionPackBuilder({
       return;
     }
 
-    if (new Date(startDate) > new Date(endDate)) {
+    const startParsed = parseDate(startDate);
+    const endParsed = parseDate(endDate);
+    if (!startParsed || !endParsed) {
+      Alert.alert('Error', 'Please enter dates in YYYY-MM-DD format.');
+      return;
+    }
+
+    if (startDate > endDate) {
       Alert.alert('Error', 'Start date must be before end date.');
       return;
     }
 
     // Get logs in date range
     const dailyLogs = logStore.dailyLogs.filter((log) => {
-      const logDate = new Date(log.logDate);
-      return logDate >= new Date(startDate) && logDate <= new Date(endDate);
+      return log.logDate >= startDate && log.logDate <= endDate;
     });
 
     const activityLogs = logStore.activityLogs.filter((log) => {
-      const logDate = new Date(log.activityDate);
-      return logDate >= new Date(startDate) && logDate <= new Date(endDate);
+      return log.activityDate >= startDate && log.activityDate <= endDate;
     });
 
     // Check for finalized logs
@@ -93,13 +99,11 @@ export function SubmissionPackBuilder({
     try {
       // Get logs in date range
       const dailyLogs = logStore.dailyLogs.filter((log) => {
-        const logDate = new Date(log.logDate);
-        return logDate >= new Date(startDate) && logDate <= new Date(endDate);
+        return log.logDate >= startDate && log.logDate <= endDate;
       });
 
       const activityLogs = logStore.activityLogs.filter((log) => {
-        const logDate = new Date(log.activityDate);
-        return logDate >= new Date(startDate) && logDate <= new Date(endDate);
+        return log.activityDate >= startDate && log.activityDate <= endDate;
       });
 
       const dailyLogIds = dailyLogs.map((log) => log.id);
