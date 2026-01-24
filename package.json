@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package",
     "assets": "node generate-assets.js",
     "assets:validate": "node validate-assets.js"
   },
@@ -69,6 +70,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "jest": "^29.7.0",
     "jest-expo": "~51.0.4",
+    "patch-package": "^8.0.1",
     "sharp": "^0.34.5",
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
