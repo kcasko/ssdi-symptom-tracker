@@ -1,6 +1,5 @@
-// @ts-nocheck
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as LogStorage from '../storage';
+import { Storage } from '../storage';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
@@ -8,29 +7,27 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   removeItem: jest.fn(() => Promise.resolve()),
 }));
 
-const mockLog = { id: 'log1', profileId: 'profile1', logDate: '2026-01-01' };
-
-describe('LogStorage', () => {
+describe('Storage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should save a log to AsyncStorage', async () => {
-    await LogStorage.saveLog(mockLog);
+  it('stores data with set', async () => {
+    const result = await Storage.set('key', { foo: 'bar' });
+    expect(result.success).toBe(true);
     expect(AsyncStorage.setItem).toHaveBeenCalled();
   });
 
-  it('should retrieve a log from AsyncStorage', async () => {
-    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(JSON.stringify(mockLog));
-    const log = await LogStorage.getLog('log1');
-    expect(log).toBeDefined();
-    expect(log?.id).toBe('log1');
+  it('retrieves data with get', async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(JSON.stringify({ foo: 'bar' }));
+    const result = await Storage.get('key', {});
+    expect(result.success).toBe(true);
+    expect(result.data).toEqual({ foo: 'bar' });
   });
 
-  it('should remove a log from AsyncStorage', async () => {
-    await LogStorage.deleteLog('log1');
+  it('removes data with remove', async () => {
+    const result = await Storage.remove('key');
+    expect(result.success).toBe(true);
     expect(AsyncStorage.removeItem).toHaveBeenCalled();
   });
-
-  // Add more tests for edge cases and validation as needed
 });

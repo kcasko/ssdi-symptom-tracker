@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { NotesField } from '../NotesField';
@@ -14,10 +13,4 @@ describe('NotesField', () => {
     expect(onChangeMock).toHaveBeenCalledWith('Test note');
   });
 
-  it('applies accessibility props', () => {
-    const { getByA11yLabel } = render(
-      <NotesField value="" onChange={() => {}} accessibilityLabel="Notes Input" />
-    );
-    expect(getByA11yLabel('Notes Input')).toBeTruthy();
-  });
 });

@@ -1,23 +1,27 @@
-// @ts-nocheck
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { LogFinalizationControls } from '../LogFinalizationControls';
 
-describe('LogFinalizationControls', () => {
-  it('renders and handles finalize', () => {
-    const onFinalizeMock = jest.fn();
-    const { getByText } = render(
-      <LogFinalizationControls onFinalize={onFinalizeMock} />
-    );
-    const button = getByText('Finalize');
-    fireEvent.press(button);
-    expect(onFinalizeMock).toHaveBeenCalled();
-  });
+jest.mock('../state/evidenceModeStore', () => ({
+  useEvidenceModeStore: () => ({
+    isLogFinalized: jest.fn().mockReturnValue(false),
+    finalizeLog: jest.fn(),
+  }),
+}));
 
-  it('applies accessibility props', () => {
-    const { getByA11yLabel } = render(
-      <LogFinalizationControls onFinalize={() => {}} accessibilityLabel="Finalize Log" />
+jest.mock('../services/EvidenceLogService', () => ({
+  canFinalizeLog: () => ({ canFinalize: true }),
+  getFinalizationStatus: () => 'Not Finalized',
+  getRevisionCount: () => 0,
+}));
+
+describe('LogFinalizationControls', () => {
+  const baseLog = { id: 'log1', logDate: '2026-01-01' } as any;
+
+  it('renders finalize controls when not finalized', () => {
+    const { getByText } = render(
+      <LogFinalizationControls log={baseLog} logType="daily" profileId="profile-1" />
     );
-    expect(getByA11yLabel('Finalize Log')).toBeTruthy();
+    expect(getByText('Finalize Log')).toBeTruthy();
   });
 });

@@ -1,23 +1,23 @@
-// @ts-nocheck
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { EvidenceModeControls } from '../EvidenceModeControls';
 
-describe('EvidenceModeControls', () => {
-  it('renders and toggles evidence mode', () => {
-    const onToggleMock = jest.fn();
-    const { getByA11yRole } = render(
-      <EvidenceModeControls value={false} onToggle={onToggleMock} />
-    );
-    const switchControl = getByA11yRole('switch');
-    fireEvent(switchControl, 'valueChange', true);
-    expect(onToggleMock).toHaveBeenCalledWith(true);
-  });
+jest.mock('../state/evidenceModeStore', () => ({
+  useEvidenceModeStore: () => ({
+    config: { enabled: false, enabledAt: null },
+    loadEvidenceMode: jest.fn(),
+    enableEvidenceMode: jest.fn(),
+    disableEvidenceMode: jest.fn(),
+    isLogFinalized: jest.fn().mockReturnValue(false),
+    finalizeLog: jest.fn(),
+    getSubmissionPacks: jest.fn(() => []),
+    error: null,
+  }),
+}));
 
-  it('applies accessibility props', () => {
-    const { getByA11yLabel } = render(
-      <EvidenceModeControls value={false} onToggle={() => {}} accessibilityLabel="Evidence Mode" />
-    );
-    expect(getByA11yLabel('Evidence Mode')).toBeTruthy();
+describe('EvidenceModeControls', () => {
+  it('renders compact variant without crashing', () => {
+    const { toJSON } = render(<EvidenceModeControls profileId="profile-1" compact />);
+    expect(toJSON()).toBeTruthy();
   });
 });

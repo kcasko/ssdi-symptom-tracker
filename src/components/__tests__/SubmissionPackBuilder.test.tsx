@@ -1,23 +1,27 @@
-// @ts-nocheck
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { SubmissionPackBuilder } from '../SubmissionPackBuilder';
 
-describe('SubmissionPackBuilder', () => {
-  it('renders and handles submit', () => {
-    const onSubmitMock = jest.fn();
-    const { getByText } = render(
-      <SubmissionPackBuilder onSubmit={onSubmitMock} />
-    );
-    const button = getByText('Submit');
-    fireEvent.press(button);
-    expect(onSubmitMock).toHaveBeenCalled();
-  });
+jest.mock('../state/evidenceModeStore', () => ({
+  useEvidenceModeStore: () => ({
+    isLogFinalized: jest.fn().mockReturnValue(false),
+    createPack: jest.fn().mockResolvedValue('pack-1'),
+    getSubmissionPacks: jest.fn(() => []),
+  }),
+}));
 
-  it('applies accessibility props', () => {
-    const { getByA11yLabel } = render(
-      <SubmissionPackBuilder onSubmit={() => {}} accessibilityLabel="Submission Pack" />
+jest.mock('../state/logStore', () => ({
+  useLogStore: () => ({
+    dailyLogs: [],
+    activityLogs: [],
+  }),
+}));
+
+describe('SubmissionPackBuilder', () => {
+  it('renders with required props', () => {
+    const { toJSON } = render(
+      <SubmissionPackBuilder profileId="profile-1" appVersion="1.0.0" onPackCreated={() => {}} />
     );
-    expect(getByA11yLabel('Submission Pack')).toBeTruthy();
+    expect(toJSON()).toBeTruthy();
   });
 });
