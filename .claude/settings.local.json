@@ -5,7 +5,10 @@
       "Bash(npm test:*)",
       "Bash(ls:*)",
       "Read(//e/Repos/symptom_tracker/**)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(./gradlew assembleRelease:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
