@@ -23,7 +23,11 @@
         "foregroundImage": "./assets/icons/adaptive-icon.png",
         "backgroundColor": "#2f3d4c"
       },
-      "package": "com.daymark.app"
+      "package": "com.daymark.app",
+      "permissions": [
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
+      ]
     },
     "web": {
       "favicon": "./assets/icons/favicon.png"
@@ -32,6 +36,12 @@
       "expo-secure-store",
       "expo-local-authentication",
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "78893b15-6130-45a6-a329-2645eecc8cb4"
+      }
+    },
+    "owner": "keezay"
   }
 }

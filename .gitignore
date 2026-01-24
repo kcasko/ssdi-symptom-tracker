@@ -58,3 +58,7 @@ coverage/
 # Temporary scripts and one-off fixes
 fix-*.ps1
 fix-*.sh
+
+# Local EAS credentials
+credentials.json
+credentials/
