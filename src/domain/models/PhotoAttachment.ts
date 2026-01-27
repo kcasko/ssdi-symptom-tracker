@@ -1,6 +1,6 @@
 /**
  * Photo Attachment Model
- * Evidence multiplier for SSDI documentation
+ * Photo metadata for record documentation
  */
 
 export interface PhotoAttachment {
@@ -25,7 +25,7 @@ export interface PhotoAttachment {
   category: PhotoCategory;
   tags?: string[];
   
-  // Evidence strength
+  // Documentation indicator
   isVisibleEvidence: boolean; // Swelling, rash, device, etc.
   
   // Optional metadata
@@ -99,14 +99,14 @@ export function getCategoryDescription(category: PhotoCategory): string {
     environment: 'Handicap parking, home modifications, ramps',
     treatment: 'Ice packs, heating pads, compression garments',
     documentation: 'Appointment cards, medical forms, doctor notes',
-    other: 'Other evidence',
+    other: 'Other documentation',
   };
   return descriptions[category];
 }
 
 /**
- * Get evidence value rating for photo category
- * Higher value = stronger evidence for SSDI
+ * Get documentation relevance rating for photo category
+ * Higher value = more direct visual context
  */
 export function getEvidenceValue(category: PhotoCategory): 'high' | 'medium' | 'low' {
   const highValue: PhotoCategory[] = [
@@ -127,7 +127,7 @@ export function getEvidenceValue(category: PhotoCategory): 'high' | 'medium' | '
 }
 
 /**
- * Get evidence value label for display
+ * Get documentation level label for display
  */
 export function getEvidenceValueLabel(category: PhotoCategory): string {
   const value = getEvidenceValue(category);

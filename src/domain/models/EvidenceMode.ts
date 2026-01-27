@@ -28,10 +28,17 @@ export interface LogFinalization {
  * Revision record
  * Tracks changes to finalized logs
  */
+export type RevisionTargetType =
+  | 'daily'
+  | 'activity'
+  | 'limitation'
+  | 'medication'
+  | 'appointment';
+
 export interface RevisionRecord {
   id: string;
   logId: string;
-  logType: 'daily' | 'activity';
+  logType: RevisionTargetType;
   profileId: string;
   
   // Revision metadata
@@ -126,7 +133,7 @@ export interface FunctionalImpactMapping {
 export function createRevisionRecord(
   id: string,
   logId: string,
-  logType: 'daily' | 'activity',
+  logType: RevisionTargetType,
   profileId: string,
   fieldPath: string,
   originalValue: any,

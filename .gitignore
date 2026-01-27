@@ -62,3 +62,4 @@ fix-*.sh
 # Local EAS credentials
 credentials.json
 credentials/
+.jest-cache/

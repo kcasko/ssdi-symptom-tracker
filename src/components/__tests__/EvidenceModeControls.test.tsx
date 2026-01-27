@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { EvidenceModeControls } from '../EvidenceModeControls';
 
-jest.mock('../state/evidenceModeStore', () => ({
+jest.mock('../../state/evidenceModeStore', () => ({
   useEvidenceModeStore: () => ({
     config: { enabled: false, enabledAt: null },
     loadEvidenceMode: jest.fn(),

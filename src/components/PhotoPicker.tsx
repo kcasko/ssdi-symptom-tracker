@@ -1,6 +1,6 @@
 /**
  * PhotoPicker Component
- * Allows users to capture or select photos for evidence documentation
+ * Allows users to capture or select photos for record documentation
  */
 
 import React, { useState } from 'react';
@@ -37,7 +37,7 @@ const CATEGORY_LABELS: Record<PhotoCategory, string> = {
   environment: 'Environment/Setup',
   treatment: 'Treatment',
   documentation: 'Medical Documentation',
-  other: 'Other Evidence',
+  other: 'Other',
 };
 
 const CATEGORY_DESCRIPTIONS: Record<PhotoCategory, string> = {
@@ -49,7 +49,7 @@ const CATEGORY_DESCRIPTIONS: Record<PhotoCategory, string> = {
   environment: 'Bedroom setup, accessibility modifications',
   treatment: 'Ice packs, compression, elevation',
   documentation: 'Lab results, doctor notes, prescriptions',
-  other: 'Any other relevant visual evidence',
+  other: 'Any other relevant visual context',
 };
 
 export const PhotoPicker: React.FC<PhotoPickerProps> = ({
@@ -72,7 +72,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     }
 
     if (!selectedCategory) {
-      Alert.alert('Select Category', 'Please select what type of evidence this photo shows');
+      Alert.alert('Select Category', 'Please select what this photo shows');
       return;
     }
 
@@ -104,7 +104,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     }
 
     if (!selectedCategory) {
-      Alert.alert('Select Category', 'Please select what type of evidence this photo shows');
+      Alert.alert('Select Category', 'Please select what this photo shows');
       return;
     }
 
@@ -136,7 +136,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
     }
 
     if (!selectedCategory) {
-      Alert.alert('Select Category', 'Please select what type of evidence this photo shows');
+      Alert.alert('Select Category', 'Please select what this photo shows');
       return;
     }
 
@@ -230,7 +230,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           disabled={!canAddMore}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Take a new photo for evidence"
+          accessibilityLabel="Take a new photo for records"
           testID="take-photo-button"
         >
           <MaterialIcons name="photo-camera" size={24} color={COLORS.white} />
@@ -243,7 +243,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           disabled={!canAddMore}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Choose a photo from library for evidence"
+          accessibilityLabel="Choose a photo from library for records"
           testID="choose-photo-button"
         >
           <MaterialIcons name="photo-library" size={24} color={COLORS.white} />
@@ -256,7 +256,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
           disabled={!canAddMore}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Choose multiple photos from library for evidence"
+          accessibilityLabel="Choose multiple photos from library for records"
           testID="choose-multiple-button"
         >
           <MaterialIcons name="collections" size={24} color={COLORS.white} />
@@ -269,7 +269,7 @@ export const PhotoPicker: React.FC<PhotoPickerProps> = ({
         {currentPhotoCount} / {maxPhotos} photos
       </Text>
 
-      {/* Evidence Tip */}
+      {/* Photo Tip */}
       <View style={styles.tipContainer}>
         <MaterialIcons name="lightbulb-outline" size={20} color={COLORS.warningMain} />
         <Text style={styles.tipText}>

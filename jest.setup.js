@@ -43,6 +43,14 @@ jest.mock('expo-crypto', () => ({
   }
 }));
 
+jest.mock('react-native-aes-crypto', () => ({
+  __esModule: true,
+  default: {
+    encrypt: jest.fn(async (text) => text),
+    decrypt: jest.fn(async (cipher) => cipher),
+  },
+}));
+
 jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(),
   fetch: jest.fn(() => Promise.resolve({ isConnected: true }))

@@ -20,15 +20,17 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer } from '../components';
+import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer, RevisionReasonModal } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService, PhotoService } from '../services';
-import { canModifyLog, updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
+import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { GapExplanation } from '../domain/models/GapExplanation';
 import { calculateDaysDelayed, getDelayLabel, parseDate, getDaysBetween, addDays } from '../utils/dates';
 import { ids } from '../utils/ids';
+import { useEvidenceModeStore } from '../state/evidenceModeStore';
+import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
 type DailyLogProps = NativeStackScreenProps<RootStackParamList, 'DailyLog'>;
 
@@ -39,9 +41,17 @@ interface SymptomEntry {
 }
 
 // Retrospective reasons removed - require free-form text to avoid coached language
+const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
+  { id: 'typo_correction', label: 'Typo or formatting correction' },
+  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
+  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
+  { id: 'clarification_requested', label: 'Clarification requested' },
+  { id: 'other', label: 'Other (describe)' },
+];
 
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity, addGapExplanation } = useAppState();
+  const evidenceStore = useEvidenceModeStore();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<string[]>([]);
   const [symptomEntries, setSymptomEntries] = useState<Record<string, SymptomEntry>>({});
@@ -50,11 +60,15 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
   const [gapExplanation, setGapExplanation] = useState('');
   const [retrospectiveNote, setRetrospectiveNote] = useState('');
+  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
+  const [revisionReasonNote, setRevisionReasonNote] = useState('');
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [showRevisionHistory, setShowRevisionHistory] = useState(false);
 
   const existingLog = dailyLogs.find(
     (l) => l.profileId === activeProfile?.id && l.logDate === date
   );
+  const isFinalized = existingLog ? evidenceStore.isLogFinalized(existingLog.id) : false;
   const profileDailyLogs = dailyLogs.filter((l) => l.profileId === activeProfile?.id);
   const previousLog = profileDailyLogs
     .filter((l) => l.logDate < date)
@@ -80,7 +94,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const updatedReference = existingLog?.updatedAt || existingLog?.createdAt;
   const daysDelayed = eventDateValid ? calculateDaysDelayed(date, creationReference) : 0;
   const delayLabel = eventDateValid ? getDelayLabel(daysDelayed) : 'Event date format is invalid';
-  const isBackdated = eventDateValid && daysDelayed > 7;
+  const isBackdated = eventDateValid && daysDelayed > 0;
   const createdTimestampDisplay = existingLog?.createdAt
     ? new Date(existingLog.createdAt).toISOString()
     : 'Pending (set on save)';
@@ -116,6 +130,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       setRetrospectiveNote(existingLog.retrospectiveContext?.note || existingLog.retrospectiveContext?.reason || '');
       setGapExplanation('');
+      setRevisionReasonCategory('added_detail_omitted_earlier');
+      setRevisionReasonNote('');
 
       // Load photos for this log
       if (existingLog.id) {
@@ -132,6 +148,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     setLogPhotos([]);
     setRetrospectiveNote('');
     setGapExplanation('');
+    setRevisionReasonCategory('added_detail_omitted_earlier');
+    setRevisionReasonNote('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingLog?.id, date]); // Reset when the date changes
 
@@ -168,7 +186,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     });
   };
 
-  const handleSave = async () => {
+  const handleSave = async (forceRevision = false) => {
     if (!activeProfile) return;
 
     if (selectedSymptomIds.length === 0) {
@@ -202,19 +220,19 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       return;
     }
 
-    // Require retrospective context for entries >7 days delayed
+    // Require retrospective context for any backdated entry
     if (showRetrospectiveContext && isBackdated && (!retrospectiveNote || retrospectiveNote.trim().length < 20)) {
       Alert.alert('Retrospective Context Required', 'Please provide an explanation of at least 20 characters for why this entry was logged after the event date.');
       return;
     }
 
-    // Check if log can be modified (Evidence Mode finalization check)
-    if (existingLog && !canModifyLog(existingLog.id).canModify) {
-      Alert.alert(
-        'Log Finalized',
-        'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
-        [{ text: 'OK' }]
-      );
+    if (existingLog && isFinalized && !forceRevision) {
+      setShowRevisionModal(true);
+      return;
+    }
+
+    if (existingLog && isFinalized && (!revisionReasonNote || revisionReasonNote.trim().length < 20)) {
+      Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
       return;
     }
 
@@ -229,7 +247,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       const photoIds = logPhotos.map(p => p.id);
       const creationTimestamp = existingLog?.createdAt || new Date().toISOString();
       const delayAtSave = calculateDaysDelayed(date, creationTimestamp);
-      const retrospectiveContext = delayAtSave > 7
+      const retrospectiveContext = delayAtSave > 0
         ? {
             reason: '', // No longer using pre-filled reasons
             note: retrospectiveNote || existingLog?.retrospectiveContext?.note || existingLog?.retrospectiveContext?.reason || '',
@@ -247,18 +265,21 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         });
         
         // Use revision system if log is finalized
-        if (existingLog.finalized) {
-          await updateLogWithRevision(
+        if (isFinalized) {
+          const revisionResult = await updateLogWithRevision(
             existingLog.id,
             'daily',
             activeProfile.id,
             existingLog,
             updated,
-            'added_detail_omitted_earlier',
-            'Updated symptom entries and notes',
+            revisionReasonCategory,
+            revisionReasonNote.trim(),
             'Symptom severities and notes revised'
           );
-          // updateDailyLog will be called by the revision system
+          if (!revisionResult.success) {
+            throw new Error(revisionResult.error || 'Failed to create revision');
+          }
+          // Original entry remains unchanged; revisions are stored separately
         } else {
           await updateDailyLog(updated);
         }
@@ -291,7 +312,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       }
 
       // Navigate back immediately after successful save
-      console.log('Log saved successfully, navigating back');
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save log');
@@ -340,7 +360,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="none"
       >
-        {/* Evidence Mode Controls */}
+        {/* Record Integrity Mode Controls */}
         {existingLog && activeProfile && (
           <View style={styles.section}>
             <LogFinalizationControls
@@ -384,7 +404,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
         {showRetrospectiveContext && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Retrospective context (required for entries &gt;7 days delayed)</Text>
+            <Text style={styles.sectionTitle}>Retrospective context (required for backdated entries)</Text>
             <Text style={styles.helperText}>
               This entry is dated {daysDelayed} days before the creation timestamp. Provide context in your own words.
             </Text>
@@ -430,10 +450,10 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           />
         </View>
 
-        {/* Photo Evidence Section */}
+        {/* Photo Attachments Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>
-            {existingLog?.finalized ? 'Finalized Evidence Attachments' : 'Supporting Photos (draft)'}
+            {isFinalized ? 'Finalized Photo Attachments' : 'Supporting Photos (draft)'}
           </Text>
 
           {logPhotos.length > 0 && (
@@ -461,8 +481,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           style={{ marginBottom: spacing.sm }}
         />
         <BigButton
-          label={existingLog?.finalized ? 'Create Revision (original preserved)' : existingLog ? 'Replace Entry (draft mode only)' : 'Save Entry'}
-          onPress={handleSave}
+          label={isFinalized ? 'Create Revision (original preserved)' : existingLog ? 'Replace Entry (draft mode only)' : 'Save Entry'}
+          onPress={() => handleSave()}
           variant="primary"
           fullWidth
         />
@@ -476,6 +496,21 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           logId={existingLog.id}
         />
       )}
+
+      <RevisionReasonModal
+        visible={showRevisionModal}
+        reasonOptions={REVISION_REASON_OPTIONS}
+        selectedReason={revisionReasonCategory}
+        note={revisionReasonNote}
+        onSelectReason={setRevisionReasonCategory}
+        onChangeNote={setRevisionReasonNote}
+        onCancel={() => setShowRevisionModal(false)}
+        onConfirm={() => {
+          setShowRevisionModal(false);
+          void handleSave(true);
+        }}
+        confirmLabel="Save revision"
+      />
     </SafeAreaView>
   );
 };

@@ -40,7 +40,7 @@ export function SubmissionPackBuilder({
   const handleCreatePack = async () => {
     // Validation
     if (!title.trim()) {
-      Alert.alert('Error', 'Please provide a title for this submission pack.');
+      Alert.alert('Error', 'Please provide a title for this record pack.');
       return;
     }
 
@@ -124,13 +124,13 @@ export function SubmissionPackBuilder({
       );
 
       if (packId) {
-        Alert.alert('Success', 'Submission pack created successfully.');
+        Alert.alert('Success', 'Record pack created successfully.');
         setTitle('');
         setStartDate('');
         setEndDate('');
         onPackCreated?.(packId);
       } else {
-        Alert.alert('Error', 'Failed to create submission pack.');
+        Alert.alert('Error', 'Failed to create record pack.');
       }
     } catch (error) {
       Alert.alert('Error', error instanceof Error ? error.message : 'Unknown error');
@@ -150,10 +150,10 @@ export function SubmissionPackBuilder({
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.sectionTitle}>Create Submission Pack</Text>
+      <Text style={styles.sectionTitle}>Create Record Pack</Text>
       <Text style={styles.description}>
-        Submission packs bundle finalized logs and reports into an immutable package
-        for submission to legal representatives or agencies.
+        Record packs bundle finalized logs and reports into an immutable package
+        for export or sharing.
       </Text>
 
       <View style={styles.form}>
@@ -202,17 +202,17 @@ export function SubmissionPackBuilder({
           disabled={loading}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel={loading ? 'Creating submission pack' : 'Create submission pack'}
+          accessibilityLabel={loading ? 'Creating record pack' : 'Create record pack'}
           testID="create-submission-pack-button"
         >
           <Text style={styles.buttonText}>
-            {loading ? 'Creating...' : 'Create Submission Pack'}
+            {loading ? 'Creating...' : 'Create Record Pack'}
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.packsList}>
-        <Text style={styles.subsectionTitle}>Existing Submission Packs</Text>
+        <Text style={styles.subsectionTitle}>Existing Record Packs</Text>
         <SubmissionPackList profileId={profileId} />
       </View>
     </ScrollView>
@@ -230,7 +230,7 @@ function SubmissionPackList({ profileId }: SubmissionPackListProps) {
   if (packs.length === 0) {
     return (
       <View style={styles.emptyState}>
-        <Text style={styles.emptyText}>No submission packs created yet.</Text>
+      <Text style={styles.emptyText}>No record packs created yet.</Text>
       </View>
     );
   }

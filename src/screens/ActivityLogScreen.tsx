@@ -28,11 +28,14 @@ import {
   NotesField,
   LogFinalizationControls,
   RevisionHistoryViewer,
+  RevisionReasonModal,
 } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService } from '../services';
-import { canModifyLog } from '../services/EvidenceLogService';
+import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
 import { calculateDaysDelayed, getDelayLabel, parseDate } from '../utils/dates';
+import { useEvidenceModeStore } from '../state/evidenceModeStore';
+import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
 type ActivityLogProps = NativeStackScreenProps<RootStackParamList, 'ActivityLog'>;
 
@@ -43,8 +46,17 @@ const RETROSPECTIVE_REASONS = [
   'Delayed entry to keep timeline complete',
 ];
 
+const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
+  { id: 'typo_correction', label: 'Typo or formatting correction' },
+  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
+  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
+  { id: 'clarification_requested', label: 'Clarification requested' },
+  { id: 'other', label: 'Other (describe)' },
+];
+
 export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) => {
-  const { activeProfile, addActivityLog, activityLogs } = useAppState();
+  const { activeProfile, addActivityLog, updateActivityLog, activityLogs } = useAppState();
+  const evidenceStore = useEvidenceModeStore();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedActivityId, setSelectedActivityId] = useState<string | null>(null);
   const [duration, setDuration] = useState(30);
@@ -53,19 +65,23 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
   const [notes, setNotes] = useState('');
   const [retrospectiveReason, setRetrospectiveReason] = useState('');
   const [retrospectiveNote, setRetrospectiveNote] = useState('');
+  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
+  const [revisionReasonNote, setRevisionReasonNote] = useState('');
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
   const [showRevisionHistory, setShowRevisionHistory] = useState(false);
 
   // Check for existing log on this date
   const existingLog = activityLogs.find(
     (l) => l.profileId === activeProfile?.id && l.activityDate === date && l.activityId === selectedActivityId
   );
+  const isFinalized = existingLog ? evidenceStore.isLogFinalized(existingLog.id) : false;
 
   const eventDateValid = Boolean(parseDate(date));
   const creationReference = existingLog?.createdAt || new Date().toISOString();
   const updatedReference = existingLog?.updatedAt || existingLog?.createdAt;
   const daysDelayed = eventDateValid ? calculateDaysDelayed(date, creationReference) : 0;
   const delayLabel = eventDateValid ? getDelayLabel(daysDelayed) : 'Event date format is invalid';
-  const isBackdated = eventDateValid && daysDelayed > 7;
+  const isBackdated = eventDateValid && daysDelayed > 0;
   const createdTimestampDisplay = existingLog?.createdAt
     ? new Date(existingLog.createdAt).toISOString()
     : 'Pending (set on save)';
@@ -80,15 +96,30 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
 
   useEffect(() => {
     if (existingLog) {
+      setDuration(existingLog.duration);
+      setImpactSeverity(existingLog.immediateImpact?.overallImpact ?? -1);
+      setStoppedEarly(existingLog.stoppedEarly);
+      setNotes(existingLog.notes || existingLog.immediateImpact?.notes || '');
       setRetrospectiveReason(existingLog.retrospectiveContext?.reason || '');
       setRetrospectiveNote(existingLog.retrospectiveContext?.note || '');
-    } else {
+      setRevisionReasonCategory('added_detail_omitted_earlier');
+      setRevisionReasonNote('');
+      return;
+    }
+
+    if (selectedActivityId) {
+      setDuration(30);
+      setImpactSeverity(-1);
+      setStoppedEarly(false);
+      setNotes('');
       setRetrospectiveReason('');
       setRetrospectiveNote('');
+      setRevisionReasonCategory('added_detail_omitted_earlier');
+      setRevisionReasonNote('');
     }
-  }, [existingLog]);
+  }, [existingLog?.id, date, selectedActivityId]);
 
-  const handleSave = () => {
+  const handleSave = async (forceRevision = false) => {
     if (!activeProfile || !selectedActivityId) {
       Alert.alert('Missing Info', 'Please select an activity');
       return;
@@ -99,25 +130,38 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
       return;
     }
 
+    // Block future dates
+    const today = new Date().toISOString().split('T')[0];
+    if (date > today) {
+      Alert.alert('Invalid Date', 'Cannot log events that have not occurred. Maximum date: today.');
+      return;
+    }
+
     if (impactSeverity < 0) {
       Alert.alert('Impact Severity Required', 'Select an impact severity before saving.');
       return;
     }
 
-    // Check if log can be modified (Evidence Mode finalization check)
-    if (existingLog && !canModifyLog(existingLog.id).canModify) {
-      Alert.alert(
-        'Log Finalized',
-        'This log has been finalized for evidence purposes and cannot be directly edited. Use the revision system to record changes.',
-        [{ text: 'OK' }]
-      );
+    // Require retrospective context for any backdated entry
+    if (showRetrospectiveContext && isBackdated && (!retrospectiveNote || retrospectiveNote.trim().length < 20)) {
+      Alert.alert('Retrospective Context Required', 'Please provide an explanation of at least 20 characters for why this entry was logged after the event date.');
+      return;
+    }
+
+    if (existingLog && isFinalized && !forceRevision) {
+      setShowRevisionModal(true);
+      return;
+    }
+
+    if (existingLog && isFinalized && (!revisionReasonNote || revisionReasonNote.trim().length < 20)) {
+      Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
       return;
     }
 
     try {
       const creationTimestamp = existingLog?.createdAt || new Date().toISOString();
       const delayAtSave = calculateDaysDelayed(date, creationTimestamp);
-      const retrospectiveContext = delayAtSave > 7
+      const retrospectiveContext = delayAtSave > 0
         ? {
             reason: retrospectiveReason || existingLog?.retrospectiveContext?.reason,
             note: retrospectiveNote || existingLog?.retrospectiveContext?.note,
@@ -126,18 +170,47 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           }
         : existingLog?.retrospectiveContext;
 
-      const log = LogService.createActivityLog({
-        profileId: activeProfile.id,
-        activityId: selectedActivityId,
-        date,
-        duration,
-        stoppedEarly,
-        impacts: impactSeverity >= 0 ? [{ symptomId: 'general', severity: impactSeverity }] : [],
-        notes,
-        retrospectiveContext,
-      });
+      if (existingLog) {
+        const updated = LogService.updateActivityLog(existingLog, {
+          duration,
+          stoppedEarly,
+          impacts: impactSeverity >= 0 ? [{ symptomId: 'general', severity: impactSeverity }] : [],
+          notes,
+          retrospectiveContext,
+        });
 
-      addActivityLog(log);
+        if (isFinalized) {
+          const revisionResult = await updateLogWithRevision(
+            existingLog.id,
+            'activity',
+            activeProfile.id,
+            existingLog,
+            updated,
+            revisionReasonCategory,
+            revisionReasonNote.trim(),
+            'Activity impact and notes revised'
+          );
+          if (!revisionResult.success) {
+            throw new Error(revisionResult.error || 'Failed to create revision');
+          }
+        } else {
+          await updateActivityLog(updated);
+        }
+      } else {
+        const log = LogService.createActivityLog({
+          profileId: activeProfile.id,
+          activityId: selectedActivityId,
+          date,
+          duration,
+          stoppedEarly,
+          impacts: impactSeverity >= 0 ? [{ symptomId: 'general', severity: impactSeverity }] : [],
+          notes,
+          retrospectiveContext,
+        });
+
+        await addActivityLog(log);
+      }
+
       Alert.alert('Success', 'Activity log saved', [
         { text: 'OK', onPress: () => navigation.goBack() },
       ]);
@@ -164,7 +237,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           <Text style={styles.timelineValue}>{createdTimestampDisplay}</Text>
           <Text style={styles.timelineLabel}>Last modified timestamp (system)</Text>
           <Text style={styles.timelineValue}>{updatedTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Evidence timestamp (system, immutable)</Text>
+          <Text style={styles.timelineLabel}>Record timestamp (system, immutable)</Text>
           <Text style={styles.timelineValue}>{evidenceTimestampDisplay}</Text>
           <Text style={styles.timelineLabel}>Delay between event date and creation</Text>
           <Text style={styles.timelineValue}>
@@ -185,7 +258,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Evidence Mode Controls */}
+        {/* Record Integrity Mode Controls */}
         {existingLog && activeProfile && (
           <View style={styles.section}>
             <LogFinalizationControls
@@ -196,9 +269,25 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           </View>
         )}
 
+        {existingLog && (
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.revisionButton}
+              onPress={() => setShowRevisionHistory(true)}
+            >
+              <Text style={styles.revisionButtonText}>
+                Revision history ({getRevisionCount(existingLog.id)})
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.helperText}>
+              Original entry is preserved; revisions are timestamped and counted.
+            </Text>
+          </View>
+        )}
+
         {showRetrospectiveContext && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Retrospective context (optional)</Text>
+            <Text style={styles.sectionTitle}>Retrospective context (required for backdated entries)</Text>
             <Text style={styles.helperText}>
               Add neutral context for entries logged after the event date.
             </Text>
@@ -224,7 +313,7 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
               value={retrospectiveNote}
               onChange={setRetrospectiveNote}
               label="Context note"
-              placeholder="Optional details for why this was logged after the event date"
+              placeholder="Explain in your own words why this entry was logged after the event date (minimum 20 characters)"
             />
           </View>
         )}
@@ -274,8 +363,8 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
 
       <View style={styles.footer}>
         <BigButton
-          label="Save Activity Log"
-          onPress={handleSave}
+          label={isFinalized ? 'Create Revision (original preserved)' : existingLog ? 'Replace Entry (draft mode only)' : 'Save Activity Log'}
+          onPress={() => handleSave()}
           variant="primary"
           fullWidth
           disabled={!selectedActivityId}
@@ -290,6 +379,21 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           logId={existingLog.id}
         />
       )}
+
+      <RevisionReasonModal
+        visible={showRevisionModal}
+        reasonOptions={REVISION_REASON_OPTIONS}
+        selectedReason={revisionReasonCategory}
+        note={revisionReasonNote}
+        onSelectReason={setRevisionReasonCategory}
+        onChangeNote={setRevisionReasonNote}
+        onCancel={() => setShowRevisionModal(false)}
+        onConfirm={() => {
+          setShowRevisionModal(false);
+          void handleSave(true);
+        }}
+        confirmLabel="Save revision"
+      />
     </SafeAreaView>
   );
 };
@@ -375,27 +479,19 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.gray700,
   },
-  reasonList: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  reasonButton: {
+  revisionButton: {
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.gray300,
     borderRadius: 4,
-    paddingVertical: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    backgroundColor: colors.white,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    alignSelf: 'flex-start',
   },
-  reasonButtonSelected: {
-    borderColor: colors.primary600,
-    backgroundColor: colors.primaryLight,
-  },
-  reasonButtonText: {
+  revisionButtonText: {
     fontSize: typography.sizes.sm,
-    color: colors.gray900,
-    fontWeight: typography.weights.medium as any,
+    color: colors.primary600,
+    fontWeight: typography.weights.semibold as any,
   },
   footer: {
     padding: spacing.lg,

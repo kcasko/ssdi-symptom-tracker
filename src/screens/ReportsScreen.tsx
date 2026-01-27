@@ -301,12 +301,12 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Evidence Mode Submission Packs */}
+        {/* Record Submission Packs */}
         {activeProfile && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Evidence Submission Packs</Text>
+            <Text style={styles.sectionTitle}>Record Submission Packs</Text>
             <Text style={styles.sectionDescription}>
-              Generate comprehensive evidence packages for review
+              Generate comprehensive record packages for review
             </Text>
             <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
           </View>

@@ -1,6 +1,6 @@
 /**
  * Evidence PDF Export Service
- * Generates clean, lawyer-ready PDF reports with no styling, icons, or branding
+ * Generates clean, review-oriented PDF reports with no styling, icons, or branding
  */
 
 import { EvidenceReport } from './EvidenceReportBuilder';
@@ -32,7 +32,7 @@ const DEFAULT_CONFIG: PDFExportConfig = {
   lineHeight: 1.5,
 };
 
-const EXPORT_VERSION = 'Daymark Evidence-Hardened v1.0';
+const EXPORT_VERSION = 'Daymark Export v1.0';
 
 /**
  * Generate plain text content for PDF
@@ -46,7 +46,7 @@ export function generatePlainTextReport(
 
   // Header
   lines.push(config.appName);
-  lines.push('Evidence Report');
+  lines.push('Record Summary Report');
   lines.push('');
   
   // Metadata
@@ -167,7 +167,7 @@ export function generateStructuredPDFContent(report: EvidenceReport): PDFSection
   const sections: PDFSection[] = [];
 
   // Header
-  sections.push({ type: 'heading', content: 'Evidence Report', level: 1 });
+  sections.push({ type: 'heading', content: 'Record Summary Report', level: 1 });
   sections.push({ type: 'divider', content: '' });
 
   // Metadata
@@ -411,7 +411,7 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
         : meta.retrospectiveSummary;
 
       items.push(
-        `<li>Event date (user-selected): ${escapeHTML(log.logDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Severity: ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
+        `<li>Event date (user-selected): ${escapeHTML(log.logDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Record timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Severity: ${log.overallSeverity}/10; Symptoms: ${escapeHTML(symptoms)}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
       );
     });
 
@@ -453,7 +453,7 @@ export function generateStrictPDFHtml(payload: StrictPDFPayload): string {
       const impactText = impact === undefined ? 'Impact not recorded' : `Impact ${impact}/10`;
 
       items.push(
-        `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Evidence timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; ${escapeHTML(impactText)}; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
+        `<li>Event date (user-selected): ${escapeHTML(log.activityDate)}; Record created timestamp (system): ${escapeHTML(meta.created || 'N/A')}; Last modified timestamp (system): ${escapeHTML(meta.updated || 'N/A')}; Record timestamp (system, immutable): ${escapeHTML(meta.evidenceTimestamp || 'None')}; Days delayed: ${meta.daysDelayed}; ${escapeHTML(meta.delayLabel)}; Finalized: ${meta.finalized ? 'Yes' : 'No'}; Revision count: ${meta.revisionCount}; Retrospective context: ${retrospectiveText}; Activity: ${escapeHTML(log.activityName)}; Duration (min): ${log.duration}; ${escapeHTML(impactText)}; Stopped early: ${log.stoppedEarly ? 'Yes' : 'No'}; Recovery (min): ${recovery}; Notes: ${escapeHTML(log.notes || 'None')}</li>`
       );
     });
 

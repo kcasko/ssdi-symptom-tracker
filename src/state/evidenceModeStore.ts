@@ -11,6 +11,7 @@ import {
   RevisionRecord, 
   SubmissionPack,
   RevisionReasonCategory,
+  RevisionTargetType,
   createRevisionRecord,
   createSubmissionPack
 } from '../domain/models/EvidenceMode';
@@ -53,7 +54,7 @@ interface EvidenceModeState {
   // Actions - Revisions
   createRevision: (
     logId: string,
-    logType: 'daily' | 'activity',
+    logType: RevisionTargetType,
     profileId: string,
     fieldPath: string,
     originalValue: any,
@@ -216,7 +217,7 @@ export const useEvidenceModeStore = create<EvidenceModeState>((set, get) => ({
   // Create a revision
   createRevision: async (
     logId: string,
-    logType: 'daily' | 'activity',
+    logType: RevisionTargetType,
     profileId: string,
     fieldPath: string,
     originalValue: any,

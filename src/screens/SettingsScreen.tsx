@@ -101,7 +101,7 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Evidence Documentation</Text>
+          <Text style={styles.sectionTitle}>Record Integrity</Text>
           {activeProfile && (
             <>
               <EvidenceModeControls profileId={activeProfile.id} />

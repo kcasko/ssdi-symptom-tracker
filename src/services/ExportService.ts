@@ -19,7 +19,7 @@ import * as Sharing from 'expo-sharing';
 import * as Print from 'expo-print';
 import Constants from 'expo-constants';
 
-const EXPORT_VERSION = 'Daymark Evidence-Hardened v1.0';
+const EXPORT_VERSION = 'Daymark Export v1.0';
 
 export interface ExportOptions {
   format: 'csv' | 'json' | 'pdf';
@@ -310,33 +310,33 @@ export class ExportService {
     });
   }
 
-  private static appendVersionRow(rows: string[][], headers: string[]) {
-    const row = new Array(headers.length).fill('');
-    row[0] = 'Generated_By';
-    row[1] = EXPORT_VERSION;
-    rows.push(row);
+  private static padRow(row: string[], width: number): string[] {
+    if (row.length >= width) return row;
+    return [...row, ...new Array(width - row.length).fill('')];
   }
 
   /**
    * Generate metadata header rows for exports
    */
-  private static generateMetadataHeaders(
+  private static generateMetadataSection(
     dataType: 'daily-logs' | 'activity-logs' | 'medications' | 'limitations',
     data: any[],
-    context?: ExportContextOptions
+    context: ExportContextOptions | undefined,
+    width: number
   ): string[][] {
     const now = new Date();
     const metadata: string[][] = [
-      ['METADATA_SECTION', ''],
-      ['Export_Generated', now.toISOString()],
-      ['Export_Generated_Local', now.toLocaleString()],
-      ['Application_Version', EXPORT_VERSION],
-      ['App_Version_Number', Constants.expoConfig?.version || 'unknown'],
-      ['Device_OS', Platform.OS],
-      ['Device_OS_Version', Platform.Version?.toString() || 'unknown'],
-      ['Device_Platform', Platform.select({ ios: 'iOS', android: 'Android', default: 'Other' })],
-      ['Record_Count', data.length.toString()],
-      [''],
+      this.padRow(['METADATA_SECTION', ''], width),
+      this.padRow(['Export_Generated', now.toISOString()], width),
+      this.padRow(['Export_Generated_Local', now.toLocaleString()], width),
+      this.padRow(['Application_Version', EXPORT_VERSION], width),
+      this.padRow(['App_Version_Number', Constants.expoConfig?.version || 'unknown'], width),
+      this.padRow(['Device_OS', Platform.OS], width),
+      this.padRow(['Device_OS_Version', Platform.Version?.toString() || 'unknown'], width),
+      this.padRow(['Device_Platform', Platform.select({ ios: 'iOS', android: 'Android', default: 'Other' })], width),
+      this.padRow(['Record_Count', data.length.toString()], width),
+      this.padRow(['Generated_By', EXPORT_VERSION], width),
+      this.padRow([''], width),
     ];
 
     // Add data quality flags for daily/activity logs
@@ -345,7 +345,7 @@ export class ExportService {
       const backdatedCount = logs.filter(log => {
         const eventDate = (log as DailyLog).logDate || (log as ActivityLog).activityDate;
         const delayed = calculateDaysDelayed(eventDate, log.createdAt);
-        return delayed > 7;
+        return delayed > 0;
       }).length;
 
       const finalizedCount = logs.filter(log => {
@@ -368,28 +368,23 @@ export class ExportService {
       const totalGapDays = gapSegments.reduce((sum, g) => sum + g.lengthDays, 0);
 
       metadata.push(
-        ['DATA_QUALITY_FLAGS', ''],
-        ['Backdated_Entries_Over_7_Days', backdatedCount.toString()],
-        ['Finalized_Entries', finalizedCount.toString()],
-        ['Entries_With_Revisions', revisedCount.toString()],
-        ['Unexplained_Gaps_Over_4_Days', unexplainedGaps.toString()],
-        ['Total_Gap_Days', totalGapDays.toString()],
-        ['Total_Gap_Segments', gapSegments.length.toString()],
-        ['']
+        this.padRow(['DATA_QUALITY_FLAGS', ''], width),
+        this.padRow(['Backdated_Entries', backdatedCount.toString()], width),
+        this.padRow(['Finalized_Entries', finalizedCount.toString()], width),
+        this.padRow(['Entries_With_Revisions', revisedCount.toString()], width),
+        this.padRow(['Unexplained_Gaps_Over_4_Days', unexplainedGaps.toString()], width),
+        this.padRow(['Total_Gap_Days', totalGapDays.toString()], width),
+        this.padRow(['Total_Gap_Segments', gapSegments.length.toString()], width),
+        this.padRow([''], width)
       );
     }
 
     if (context?.dateRange) {
       metadata.push(
-        ['Date_Range_Filter', `${context.dateRange.start} to ${context.dateRange.end}`],
-        ['']
+        this.padRow(['Date_Range_Filter', `${context.dateRange.start} to ${context.dateRange.end}`], width),
+        this.padRow([''], width)
       );
     }
-
-    metadata.push(
-      ['DATA_SECTION_BEGINS_BELOW', ''],
-      ['']
-    );
 
     return metadata;
   }
@@ -398,12 +393,12 @@ export class ExportService {
    * Convert daily logs to CSV
    */
   private static dailyLogsToCSV(logs: DailyLog[], context?: ExportContextOptions): string {
-    const metadataRows = this.generateMetadataHeaders('daily-logs', logs, context);
+    const metadataRows = this.generateMetadataSection('daily-logs', logs, context, headers.length);
     const headers = [
       'Event_Date',
       'Created_DateTime',
       'Last_Modified_DateTime',
-      'Evidence_Timestamp',
+      'Record_Timestamp',
       'Days_Delayed',
       'Finalized',
       'Revision_Count',
@@ -430,42 +425,9 @@ export class ExportService {
       context?.gapExplanations,
       context?.dateRange
     );
-    let gapIndex = 0;
     const rows: string[][] = [];
 
-    const pushGapRowsBefore = (currentDate: string) => {
-      while (gapIndex < gapSegments.length && gapSegments[gapIndex].endDate < currentDate) {
-        const gap = gapSegments[gapIndex];
-        rows.push([
-          'GAP',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          gap.lengthDays.toString(),
-          `${gap.startDate} to ${gap.endDate}`,
-          gap.hasExplanation ? 'Yes' : 'No',
-          this.escapeCSV(gap.explanationNote || ''),
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-        ]);
-        gapIndex++;
-      }
-    };
-
     sortedLogs.forEach(log => {
-      pushGapRowsBefore(log.logDate);
       const symptoms = log.symptoms
         .map(s => {
           const symptomDef = getSymptomById(s.symptomId);
@@ -507,26 +469,60 @@ export class ExportService {
         this.escapeCSV(log.notes || ''),
       ]);
     });
-
-    pushGapRowsBefore('9999-12-31');
+    const gapRows = gapSegments.map(gap => ([
+      'GAP',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      gap.lengthDays.toString(),
+      `${gap.startDate} to ${gap.endDate}`,
+      gap.hasExplanation ? 'Yes' : 'No',
+      this.escapeCSV(gap.explanationNote || ''),
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ]));
 
     const severityMetrics = this.calculateSeverityMetrics(sortedLogs.map((l) => l.overallSeverity));
-    this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Overall Severity');
-    this.appendVersionRow(rows, headers);
+    const summaryRows: string[][] = [];
+    this.appendSeveritySummaryRows(summaryRows, headers, severityMetrics, 'Overall Severity');
 
-    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
+    const outputRows: string[][] = [headers, ...rows];
+    if (gapRows.length > 0) {
+      outputRows.push(this.padRow(['GAP_SECTION', ''], headers.length));
+      outputRows.push(...gapRows);
+    }
+    if (summaryRows.length > 0) {
+      outputRows.push(this.padRow(['SUMMARY_SECTION', ''], headers.length));
+      outputRows.push(...summaryRows);
+    }
+    outputRows.push(this.padRow([''], headers.length));
+    outputRows.push(...metadataRows);
+
+    return outputRows.map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert activity logs to CSV
    */
   private static activityLogsToCSV(logs: ActivityLog[], context?: ExportContextOptions): string {
-    const metadataRows = this.generateMetadataHeaders('activity-logs', logs, context);
+    const metadataRows = this.generateMetadataSection('activity-logs', logs, context, headers.length);
     const headers = [
       'Event_Date',
       'Created_DateTime',
       'Last_Modified_DateTime',
-      'Evidence_Timestamp',
+      'Record_Timestamp',
       'Days_Delayed',
       'Finalized',
       'Revision_Count',
@@ -551,40 +547,9 @@ export class ExportService {
       context?.gapExplanations,
       context?.dateRange
     );
-    let gapIndex = 0;
     const rows: string[][] = [];
 
-    const pushGapRowsBefore = (currentDate: string) => {
-      while (gapIndex < gapSegments.length && gapSegments[gapIndex].endDate < currentDate) {
-        const gap = gapSegments[gapIndex];
-        rows.push([
-          'GAP',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-          gap.lengthDays.toString(),
-          `${gap.startDate} to ${gap.endDate}`,
-          gap.hasExplanation ? 'Yes' : 'No',
-          this.escapeCSV(gap.explanationNote || ''),
-          '',
-          '',
-          '',
-          '',
-          '',
-          '',
-        ]);
-        gapIndex++;
-      }
-    };
-
     sortedLogs.forEach(log => {
-      pushGapRowsBefore(log.activityDate);
       const activityDef = getActivityById(log.activityId);
       const meta = this.getLogMetadata(log, log.activityDate);
       const immediateImpactScore = log.immediateImpact?.overallImpact;
@@ -614,25 +579,57 @@ export class ExportService {
         this.escapeCSV(log.notes || ''),
       ]);
     });
-
-    pushGapRowsBefore('9999-12-31');
+    const gapRows = gapSegments.map(gap => ([
+      'GAP',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      gap.lengthDays.toString(),
+      `${gap.startDate} to ${gap.endDate}`,
+      gap.hasExplanation ? 'Yes' : 'No',
+      this.escapeCSV(gap.explanationNote || ''),
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+    ]));
 
     const severityMetrics = this.calculateSeverityMetrics(
       sortedLogs
         .map((l) => l.immediateImpact?.overallImpact)
         .filter((v): v is number => typeof v === 'number')
     );
-    this.appendSeveritySummaryRows(rows, headers, severityMetrics, 'Impact Severity');
-    this.appendVersionRow(rows, headers);
+    const summaryRows: string[][] = [];
+    this.appendSeveritySummaryRows(summaryRows, headers, severityMetrics, 'Impact Severity');
 
-    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
+    const outputRows: string[][] = [headers, ...rows];
+    if (gapRows.length > 0) {
+      outputRows.push(this.padRow(['GAP_SECTION', ''], headers.length));
+      outputRows.push(...gapRows);
+    }
+    if (summaryRows.length > 0) {
+      outputRows.push(this.padRow(['SUMMARY_SECTION', ''], headers.length));
+      outputRows.push(...summaryRows);
+    }
+    outputRows.push(this.padRow([''], headers.length));
+    outputRows.push(...metadataRows);
+
+    return outputRows.map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert medications to CSV
    */
   private static medicationsToCSV(medications: Medication[]): string {
-    const metadataRows = this.generateMetadataHeaders('medications', medications);
+    const metadataRows = this.generateMetadataSection('medications', medications, undefined, headers.length);
     const headers = [
       'Name',
       'Generic Name',
@@ -663,16 +660,18 @@ export class ExportService {
       this.escapeCSV(med.notes || ''),
     ]);
 
-    this.appendVersionRow(rows, headers);
+    const outputRows: string[][] = [headers, ...rows];
+    outputRows.push(this.padRow([''], headers.length));
+    outputRows.push(...metadataRows);
 
-    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
+    return outputRows.map(row => row.join(',')).join('\n');
   }
 
   /**
    * Convert limitations to CSV
    */
   private static limitationsToCSV(limitations: Limitation[]): string {
-    const metadataRows = this.generateMetadataHeaders('limitations', limitations);
+    const metadataRows = this.generateMetadataSection('limitations', limitations, undefined, headers.length);
     const headers = [
       'Category',
       'Frequency',
@@ -689,9 +688,11 @@ export class ExportService {
       this.escapeCSV(lim.notes || ''),
     ]);
 
-    this.appendVersionRow(rows, headers);
+    const outputRows: string[][] = [headers, ...rows];
+    outputRows.push(this.padRow([''], headers.length));
+    outputRows.push(...metadataRows);
 
-    return [...metadataRows, headers, ...rows].map(row => row.join(',')).join('\n');
+    return outputRows.map(row => row.join(',')).join('\n');
   }
 
   /**
@@ -722,12 +723,25 @@ export class ExportService {
     limitations: Limitation[]
   ): Promise<void> {
     try {
+      const evidenceStore = useEvidenceModeStore.getState();
+      const exportDate = new Date().toISOString();
       const data = {
-        exportDate: new Date().toISOString(),
         dailyLogs,
         activityLogs,
         medications,
         limitations,
+        revisions: evidenceStore.getAllRevisions(),
+        finalizations: evidenceStore.getFinalizedLogs(),
+        metadata: {
+          exportDate,
+          exportVersion: EXPORT_VERSION,
+          appVersion: Constants.expoConfig?.version || 'unknown',
+          deviceOS: Platform.OS,
+          deviceOSVersion: Platform.Version?.toString() || 'unknown',
+          devicePlatform: Platform.select({ ios: 'iOS', android: 'Android', default: 'Other' }),
+          evidenceModeEnabled: evidenceStore.isEvidenceModeEnabled(),
+          evidenceModeEnabledAt: evidenceStore.config.enabledAt,
+        },
       };
 
       const filename = this.generateFilename('symptom_tracker_backup', 'json');

@@ -462,13 +462,13 @@ export class ReportService {
 
     // Check for source data
     if (!draft.sourceReferences || draft.sourceReferences.length === 0) {
-      errors.push('No source data referenced - report lacks evidence');
+      errors.push('No source data referenced - report lacks linked records');
     }
 
     // Check for daily log data
     const hasDailyLogs = draft.sourceReferences?.some(r => r.type === 'daily_log');
     if (!hasDailyLogs) {
-      errors.push('No daily logs referenced - report lacks symptom evidence');
+      errors.push('No daily logs referenced - report lacks daily log references');
     }
 
     // Check date range
@@ -477,7 +477,7 @@ export class ReportService {
     );
 
     if (daysDiff < 7) {
-      warnings.push('Date range less than 1 week - may not establish pattern consistency');
+      warnings.push('Date range less than 1 week - summaries may be less representative');
     }
 
     const isComplete = errors.length === 0 && emptySections.length === 0;

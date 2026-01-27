@@ -18,9 +18,11 @@ import {
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton } from '../components';
+import { BigButton, RevisionReasonModal } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LimitationCategory, LimitationFrequency, VariabilityLevel, Limitation } from '../domain/models/Limitation';
+import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
+import { createRevisionsForRecord } from '../services/EvidenceLogService';
 
 const LIMITATION_CATEGORIES: { value: LimitationCategory; label: string; description: string }[] = [
   { value: 'sitting', label: 'Sitting', description: 'Time limits for sitting' },
@@ -52,6 +54,14 @@ const VARIABILITY_OPTIONS: { value: VariabilityLevel; label: string }[] = [
   { value: 'high_variability', label: 'High Variability' },
 ];
 
+const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
+  { id: 'typo_correction', label: 'Typo or formatting correction' },
+  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
+  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
+  { id: 'clarification_requested', label: 'Clarification requested' },
+  { id: 'other', label: 'Other (describe)' },
+];
+
 export const LimitationsScreen: React.FC = () => {
   const { activeProfile, limitations, addLimitation, updateLimitation, deleteLimitation } = useAppState();
   const [showAddForm, setShowAddForm] = useState(false);
@@ -68,6 +78,9 @@ export const LimitationsScreen: React.FC = () => {
   const [variabilityNotes, setVariabilityNotes] = useState('');
   const [notes, setNotes] = useState('');
   const [isActive, setIsActive] = useState(true);
+  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
+  const [revisionReasonNote, setRevisionReasonNote] = useState('');
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
 
   const activeLimitations = limitations.filter(
     l => l.profileId === activeProfile?.id && l.isActive
@@ -85,6 +98,8 @@ export const LimitationsScreen: React.FC = () => {
     setNotes('');
     setIsActive(true);
     setEditingId(null);
+    setRevisionReasonCategory('added_detail_omitted_earlier');
+    setRevisionReasonNote('');
   };
 
   const loadLimitationForEdit = (limitation: Limitation) => {
@@ -102,7 +117,7 @@ export const LimitationsScreen: React.FC = () => {
     setShowAddForm(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (forceRevision = false) => {
     if (!activeProfile || !selectedCategory) {
       Alert.alert('Missing Information', 'Please select a limitation category');
       return;
@@ -150,10 +165,38 @@ export const LimitationsScreen: React.FC = () => {
         // Update existing
         const existingLimitation = limitations.find(l => l.id === editingId);
         if (existingLimitation) {
-          await updateLimitation({
+          const updatedLimitation = {
             ...existingLimitation,
             ...limitationData,
-          } as Limitation);
+            updatedAt: new Date().toISOString(),
+          } as Limitation;
+
+          if (!forceRevision) {
+            setShowRevisionModal(true);
+            return;
+          }
+
+          if (!revisionReasonNote || revisionReasonNote.trim().length < 20) {
+            Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
+            return;
+          }
+
+          const revisionResult = await createRevisionsForRecord(
+            existingLimitation.id,
+            'limitation',
+            activeProfile.id,
+            existingLimitation,
+            updatedLimitation,
+            revisionReasonCategory,
+            revisionReasonNote.trim(),
+            'Limitation updated'
+          );
+
+          if (!revisionResult.success) {
+            throw new Error(revisionResult.error || 'Failed to create revision');
+          }
+
+          await updateLimitation(updatedLimitation);
         }
       } else {
         // Add new
@@ -426,7 +469,7 @@ export const LimitationsScreen: React.FC = () => {
               />
               <BigButton
                 label={editingId ? 'Update' : 'Save'}
-                onPress={handleSave}
+                onPress={() => handleSave()}
                 variant="primary"
                 style={styles.flexButton}
               />
@@ -464,6 +507,21 @@ export const LimitationsScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
+
+      <RevisionReasonModal
+        visible={showRevisionModal}
+        reasonOptions={REVISION_REASON_OPTIONS}
+        selectedReason={revisionReasonCategory}
+        note={revisionReasonNote}
+        onSelectReason={setRevisionReasonCategory}
+        onChangeNote={setRevisionReasonNote}
+        onCancel={() => setShowRevisionModal(false)}
+        onConfirm={() => {
+          setShowRevisionModal(false);
+          void handleSave(true);
+        }}
+        confirmLabel="Save revision"
+      />
     </SafeAreaView>
   );
 };

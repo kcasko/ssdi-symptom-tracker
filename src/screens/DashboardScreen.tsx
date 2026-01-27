@@ -160,20 +160,20 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
 
-        {/* Documentation Requirements */}
+        {/* Recordkeeping Notes */}
         <View style={styles.explanationBlock}>
           <View style={styles.explanationHeader}>
-            <Text style={styles.explanationTitle}>Documentation Requirements</Text>
+            <Text style={styles.explanationTitle}>Recordkeeping Notes</Text>
           </View>
 
           <Text style={styles.explanationPrimary}>
-            Daily logging increases evidentiary reliability. Gaps in logging reduce documentation weight. Records are timestamped and cannot be retroactively modified once finalized.
+            Consistent logging helps keep the record clear. Gaps remain visible. Records are timestamped and locked when finalized.
           </Text>
 
           <View style={styles.explanationInstructions}>
-            <Text style={styles.instructionLine}>- Daily symptom severity logs required</Text>
-            <Text style={styles.instructionLine}>- Activity limitation logs as applicable</Text>
-            <Text style={styles.instructionLine}>- Consistent logging establishes documented history</Text>
+            <Text style={styles.instructionLine}>- Suggested: daily symptom entries</Text>
+            <Text style={styles.instructionLine}>- Activity impact entries when applicable</Text>
+            <Text style={styles.instructionLine}>- Consistency helps show history over time</Text>
           </View>
         </View>
 

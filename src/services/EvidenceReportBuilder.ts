@@ -1,6 +1,6 @@
 /**
  * Evidence Report Builder
- * Generates lawyer-ready reports with standardized narratives and revision tracking
+ * Generates review-oriented reports with standardized narratives and revision tracking
  */
 
 import { DailyLog } from '../domain/models/DailyLog';

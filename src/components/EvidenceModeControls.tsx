@@ -1,6 +1,6 @@
 /**
- * Evidence Mode Controls Component
- * Provides UI for enabling/disabling Evidence Mode and viewing status
+ * Record Integrity Mode Controls Component
+ * Provides UI for enabling/disabling integrity mode and viewing status
  * Uses neutral, non-alarmist language
  */
 
@@ -26,8 +26,8 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
     if (value) {
       // Show confirmation before enabling
       Alert.alert(
-        'Enable Evidence Mode',
-        'Evidence Mode adds creation timestamps to all logs. These timestamps cannot be edited. Continue?',
+        'Enable Record Integrity Mode',
+        'Record Integrity Mode adds immutable creation timestamps to all logs. These timestamps cannot be edited. Continue?',
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -43,7 +43,7 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
     } else {
       // Show confirmation before disabling
       Alert.alert(
-        'Disable Evidence Mode',
+        'Disable Record Integrity Mode',
         'Existing logs will keep their timestamps. New logs will not receive timestamps. Continue?',
         [
           { text: 'Cancel', style: 'cancel' },
@@ -65,7 +65,7 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
       <View style={styles.compactContainer}>
         {evidenceStore.config.enabled && (
           <View style={styles.indicatorBadge}>
-            <Text style={styles.indicatorText}>Evidence Mode Active</Text>
+            <Text style={styles.indicatorText}>Record Integrity Mode Active</Text>
           </View>
         )}
       </View>
@@ -75,19 +75,19 @@ export function EvidenceModeControls({ profileId, compact = false }: EvidenceMod
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Evidence Mode</Text>
+        <Text style={styles.title}>Record Integrity Mode</Text>
         <Switch
           value={evidenceStore.config.enabled}
           onValueChange={handleToggle}
           disabled={loading}
-          accessibilityLabel="Toggle evidence mode"
+          accessibilityLabel="Toggle record integrity mode"
           testID="evidence-mode-switch"
         />
       </View>
 
       <Text style={styles.description}>
         When enabled, all logs receive creation timestamps that cannot be edited.
-        This supports documentation of symptom and activity data.
+        This supports traceable recordkeeping for symptom and activity data.
       </Text>
 
       {evidenceStore.config.enabled && evidenceStore.config.enabledAt && (

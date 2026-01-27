@@ -2,14 +2,14 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { LogFinalizationControls } from '../LogFinalizationControls';
 
-jest.mock('../state/evidenceModeStore', () => ({
+jest.mock('../../state/evidenceModeStore', () => ({
   useEvidenceModeStore: () => ({
     isLogFinalized: jest.fn().mockReturnValue(false),
     finalizeLog: jest.fn(),
   }),
 }));
 
-jest.mock('../services/EvidenceLogService', () => ({
+jest.mock('../../services/EvidenceLogService', () => ({
   canFinalizeLog: () => ({ canFinalize: true }),
   getFinalizationStatus: () => 'Not Finalized',
   getRevisionCount: () => 0,

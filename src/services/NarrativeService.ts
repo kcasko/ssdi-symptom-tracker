@@ -133,7 +133,7 @@ export class NarrativeService {
 
     // Activity header
     lines.push(`Activity: ${activityLog.activityName}`);
-    lines.push(`Date: ${new Date(activityLog.createdAt).toLocaleDateString()}`);
+    lines.push(`Date: ${new Date(activityLog.activityDate).toLocaleDateString()}`);
     lines.push(`Duration: ${activityLog.duration} minutes`);
     lines.push('');
 

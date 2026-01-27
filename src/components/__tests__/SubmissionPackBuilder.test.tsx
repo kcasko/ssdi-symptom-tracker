@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react-native';
 import { SubmissionPackBuilder } from '../SubmissionPackBuilder';
 
-jest.mock('../state/evidenceModeStore', () => ({
+jest.mock('../../state/evidenceModeStore', () => ({
   useEvidenceModeStore: () => ({
     isLogFinalized: jest.fn().mockReturnValue(false),
     createPack: jest.fn().mockResolvedValue('pack-1'),
@@ -10,7 +10,7 @@ jest.mock('../state/evidenceModeStore', () => ({
   }),
 }));
 
-jest.mock('../state/logStore', () => ({
+jest.mock('../../state/logStore', () => ({
   useLogStore: () => ({
     dailyLogs: [],
     activityLogs: [],

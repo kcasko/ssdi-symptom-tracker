@@ -131,7 +131,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 </View>
 
                 <View style={styles.photoInfoRow}>
-                  <Text style={styles.photoInfoLabel}>Evidence Value:</Text>
+                  <Text style={styles.photoInfoLabel}>Documentation Level:</Text>
                   <Text style={[styles.photoInfoValue, { color: 
                     evidenceValue === 'High' ? COLORS.success.main :
                     evidenceValue === 'Medium' ? COLORS.warning.main :
@@ -176,7 +176,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
     <View style={styles.container}>
       <View style={styles.header}>
         <MaterialIcons name="photo-library" size={20} color={COLORS.primary[500]} />
-        <Text style={styles.title}>Photo Evidence ({photos.length})</Text>
+        <Text style={styles.title}>Photo Attachments ({photos.length})</Text>
       </View>
 
       <ScrollView

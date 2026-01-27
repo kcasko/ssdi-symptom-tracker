@@ -21,7 +21,7 @@ export interface NarrativeConfig {
  */
 export function generateOpeningStatement(config: NarrativeConfig): string {
   const { dateRange, totalDays, loggedDays } = config;
-  return `The user reports symptom and activity data for the period from ${dateRange.start} to ${dateRange.end}. ` +
+  return `Entries record symptom and activity data for the period from ${dateRange.start} to ${dateRange.end}. ` +
     `This period spans ${totalDays} days. ` +
     `Logs were created on ${loggedDays} of ${totalDays} days.`;
 }
@@ -62,7 +62,7 @@ export function generateActivityImpactStatement(
   avgImpact: number
 ): string {
   const stoppedPercentage = attempts > 0 ? Math.round((stoppedEarly / attempts) * 100) : 0;
-  return `The user reports attempting ${activityName} on ${attempts} occasions. ` +
+  return `Entries record ${activityName} on ${attempts} occasions. ` +
     `Activity was stopped before completion on ${stoppedEarly} occasions (${stoppedPercentage} percent). ` +
     `Average reported impact was ${avgImpact.toFixed(1)} on a scale of 0 to 10.`;
 }
@@ -133,7 +133,7 @@ export function generateAssistanceStatement(
   totalAttempts: number
 ): string {
   const percentage = Math.round((assistanceCount / totalAttempts) * 100);
-  return `The user reports requiring assistance for ${activity} on ${assistanceCount} of ${totalAttempts} logged attempts (${percentage} percent).`;
+  return `Entries record assistance for ${activity} on ${assistanceCount} of ${totalAttempts} logged attempts (${percentage} percent).`;
 }
 
 /**

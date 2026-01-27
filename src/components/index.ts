@@ -17,6 +17,7 @@ export * from './PhotoGallery';
 export * from './EvidenceModeControls';
 export * from './LogFinalizationControls';
 export * from './RevisionHistoryViewer';
+export * from './RevisionReasonModal';
 export * from './SubmissionPackBuilder';
 export * from './ThemeToggle';
 export * from './SymptomTrendChart';

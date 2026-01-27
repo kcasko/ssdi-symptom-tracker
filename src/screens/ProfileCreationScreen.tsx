@@ -304,7 +304,7 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
     <View style={styles.stepContent}>
       <Text style={styles.stepTitle}>Reminder Settings</Text>
       <Text style={styles.stepDescription}>
-        Set up reminders to help maintain consistent logging for better evidence collection.
+        Set up reminders to help maintain consistent logging for clearer documentation.
       </Text>
       
       <View style={styles.settingsGroup}>

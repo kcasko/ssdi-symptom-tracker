@@ -15,6 +15,7 @@ import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { calculateDaysDelayed, isSameDayAs } from '../utils/dates';
 import { applyEvidenceTimestamp } from '../services/EvidenceLogService';
+import { useEvidenceModeStore } from './evidenceModeStore';
 
 interface LogState {
   // Data
@@ -166,11 +167,11 @@ export const useLogStore = create<LogState>((set, get) => ({
       };
 
       const daysDelayed = calculateDaysDelayed(newLog.logDate, newLog.createdAt);
-      if (daysDelayed > 7 || logData.retrospectiveContext) {
+      if (daysDelayed > 0 || logData.retrospectiveContext) {
         newLog.retrospectiveContext = {
           daysDelayed,
           flaggedAt: logData.retrospectiveContext?.flaggedAt || now,
-          reason: logData.retrospectiveContext?.reason || (daysDelayed > 7 ? 'Backdated entry (logged more than 7 days after event date)' : undefined),
+          reason: logData.retrospectiveContext?.reason || (daysDelayed > 0 ? 'Backdated entry (logged after event date)' : undefined),
           note: logData.retrospectiveContext?.note,
         };
       }
@@ -196,6 +197,11 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
+      const evidenceStore = useEvidenceModeStore.getState();
+      if (evidenceStore.isLogFinalized(updatedLog.id)) {
+        throw new Error('Cannot update a finalized log. Create a revision instead.');
+      }
+
       const logWithTimestamp = {
         ...updatedLog,
         updatedAt: new Date().toISOString(),
@@ -218,6 +224,11 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
+      const evidenceStore = useEvidenceModeStore.getState();
+      if (evidenceStore.isLogFinalized(logId)) {
+        throw new Error('Cannot delete a finalized log.');
+      }
+
       const { dailyLogs } = get();
       const updatedLogs = dailyLogs.filter(log => log.id !== logId);
       
@@ -251,11 +262,11 @@ export const useLogStore = create<LogState>((set, get) => ({
       };
 
       const daysDelayed = calculateDaysDelayed(newLog.activityDate, newLog.createdAt);
-      if (daysDelayed > 7 || logData.retrospectiveContext) {
+      if (daysDelayed > 0 || logData.retrospectiveContext) {
         newLog.retrospectiveContext = {
           daysDelayed,
           flaggedAt: logData.retrospectiveContext?.flaggedAt || now,
-          reason: logData.retrospectiveContext?.reason || (daysDelayed > 7 ? 'Backdated entry (logged more than 7 days after event date)' : undefined),
+          reason: logData.retrospectiveContext?.reason || (daysDelayed > 0 ? 'Backdated entry (logged after event date)' : undefined),
           note: logData.retrospectiveContext?.note,
         };
       }
@@ -278,6 +289,11 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
+      const evidenceStore = useEvidenceModeStore.getState();
+      if (evidenceStore.isLogFinalized(updatedLog.id)) {
+        throw new Error('Cannot update a finalized log. Create a revision instead.');
+      }
+
       const logWithTimestamp = {
         ...updatedLog,
         updatedAt: new Date().toISOString(),
@@ -300,6 +316,11 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
+      const evidenceStore = useEvidenceModeStore.getState();
+      if (evidenceStore.isLogFinalized(logId)) {
+        throw new Error('Cannot delete a finalized log.');
+      }
+
       const { activityLogs } = get();
       const updatedLogs = activityLogs.filter(log => log.id !== logId);
       

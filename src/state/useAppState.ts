@@ -285,6 +285,7 @@ export function useAppState(): AppState {
     addDailyLog: logStore.addDailyLog,
     updateDailyLog: logStore.updateDailyLog,
     addActivityLog: logStore.addActivityLog,
+    updateActivityLog: logStore.updateActivityLog,
     addLimitation: logStore.addLimitation,
     updateLimitation: logStore.updateLimitation,
     deleteLimitation: logStore.deleteLimitation,

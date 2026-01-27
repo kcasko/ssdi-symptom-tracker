@@ -1,18 +1,17 @@
-import { Buffer } from 'buffer';
 import { EncryptionManager } from '../encryption';
 
-const secureStore: Record<string, string> = {};
-let byteCounter = 1;
+const mockSecureStore: Record<string, string> = {};
+let mockByteCounter = 1;
 
 jest.mock('expo-secure-store', () => ({
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
   setItemAsync: jest.fn((key: string, value: string) => {
-    secureStore[key] = value;
+    mockSecureStore[key] = value;
     return Promise.resolve();
   }),
-  getItemAsync: jest.fn((key: string) => Promise.resolve(secureStore[key] ?? null)),
+  getItemAsync: jest.fn((key: string) => Promise.resolve(mockSecureStore[key] ?? null)),
   deleteItemAsync: jest.fn((key: string) => {
-    delete secureStore[key];
+    delete mockSecureStore[key];
     return Promise.resolve();
   }),
 }));
@@ -31,37 +30,40 @@ jest.mock('expo-local-authentication', () => ({
 
 jest.mock('expo-crypto', () => ({
   getRandomBytesAsync: jest.fn((size: number) => {
-    const value = byteCounter++ % 255 || 1;
+    const value = mockByteCounter++ % 255 || 1;
     return Promise.resolve(new Uint8Array(size).fill(value));
   }),
 }));
 
-const cipherMap = new Map<string, string>();
+const mockCipherMap = new Map<string, string>();
 
-jest.mock('react-native-aes-crypto', () => ({
-  __esModule: true,
-  default: {
-    encrypt: jest.fn(async (text: string, keyHex: string, ivHex: string) => {
-      const cipher = Buffer.from(text, 'utf8').toString('base64');
-      cipherMap.set(`${keyHex}:${ivHex}:${cipher}`, text);
-      return cipher;
-    }),
-    decrypt: jest.fn(async (cipher: string, keyHex: string, ivHex: string) => {
-      const key = `${keyHex}:${ivHex}:${cipher}`;
-      const plaintext = cipherMap.get(key);
-      if (!plaintext) {
-        throw new Error('Invalid authentication tag');
-      }
-      return plaintext;
-    }),
-  },
-}));
+jest.mock('react-native-aes-crypto', () => {
+  const { Buffer } = require('buffer');
+  return {
+    __esModule: true,
+    default: {
+      encrypt: jest.fn(async (text: string, keyHex: string, ivHex: string) => {
+        const cipher = Buffer.from(text, 'utf8').toString('base64');
+        mockCipherMap.set(`${keyHex}:${ivHex}:${cipher}`, text);
+        return cipher;
+      }),
+      decrypt: jest.fn(async (cipher: string, keyHex: string, ivHex: string) => {
+        const key = `${keyHex}:${ivHex}:${cipher}`;
+        const plaintext = mockCipherMap.get(key);
+        if (!plaintext) {
+          throw new Error('Invalid authentication tag');
+        }
+        return plaintext;
+      }),
+    },
+  };
+});
 
 describe('EncryptionManager', () => {
   beforeEach(() => {
-    Object.keys(secureStore).forEach((key) => delete secureStore[key]);
-    cipherMap.clear();
-    byteCounter = 1;
+    Object.keys(mockSecureStore).forEach((key) => delete mockSecureStore[key]);
+    mockCipherMap.clear();
+    mockByteCounter = 1;
     EncryptionManager.updateConfig({ enabled: false, useDeviceAuth: false });
   });
 

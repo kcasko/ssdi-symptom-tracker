@@ -25,7 +25,7 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Daymark – Daily Symptom Documentation</Text>
-        <Text style={styles.subtitle}>Structured record system for medical and disability evidence</Text>
+        <Text style={styles.subtitle}>Structured record system for medical and disability documentation</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What This App Does</Text>

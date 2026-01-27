@@ -19,7 +19,7 @@ import { useLogStore, useAppState } from '../state/useAppState';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton } from '../components';
+import { BigButton, RevisionReasonModal } from '../components';
 import {
   Medication,
   MedicationFrequency,
@@ -34,9 +34,19 @@ import {
   getProviderTypeLabel,
   getPurposeLabel,
 } from '../domain/models/Appointment';
+import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
+import { createRevisionsForRecord } from '../services/EvidenceLogService';
 import { AppointmentSummaryService, AppointmentPreparationSummary } from '../services/AppointmentSummaryService';
 
 type Tab = 'medications' | 'appointments';
+
+const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
+  { id: 'typo_correction', label: 'Typo or formatting correction' },
+  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
+  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
+  { id: 'clarification_requested', label: 'Clarification requested' },
+  { id: 'other', label: 'Other (describe)' },
+];
 
 export const MedsAppointmentsScreen: React.FC = () => {
   const medications = useLogStore(state => state.medications);
@@ -49,7 +59,7 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const updateAppointment = useLogStore(state => state.updateAppointment);
   const deleteAppointment = useLogStore(state => state.deleteAppointment);
 
-  const { dailyLogs, activityLogs, limitations } = useAppState();
+  const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
 
   const [activeTab, setActiveTab] = useState<Tab>('medications');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -60,6 +70,14 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
+  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
+  const [revisionReasonNote, setRevisionReasonNote] = useState('');
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [pendingRevision, setPendingRevision] = useState<{
+    type: 'medication' | 'appointment';
+    original: Medication | Appointment;
+    updated: Medication | Appointment;
+  } | null>(null);
 
   const activeMeds = medications.filter(m => m.isActive);
   const inactiveMeds = medications.filter(m => !m.isActive);
@@ -130,6 +148,62 @@ export const MedsAppointmentsScreen: React.FC = () => {
       ]
     );
   };
+
+  const queueRevision = (
+    type: 'medication' | 'appointment',
+    original: Medication | Appointment,
+    updated: Medication | Appointment
+  ) => {
+    setPendingRevision({ type, original, updated });
+    setRevisionReasonCategory('added_detail_omitted_earlier');
+    setRevisionReasonNote('');
+    setShowRevisionModal(true);
+  };
+
+  const handleConfirmRevision = async () => {
+    if (!pendingRevision || !activeProfile) {
+      setShowRevisionModal(false);
+      return;
+    }
+
+    if (!revisionReasonNote || revisionReasonNote.trim().length < 20) {
+      Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
+      return;
+    }
+
+    try {
+      const revisionResult = await createRevisionsForRecord(
+        pendingRevision.original.id,
+        pendingRevision.type,
+        activeProfile.id,
+        pendingRevision.original,
+        pendingRevision.updated,
+        revisionReasonCategory,
+        revisionReasonNote.trim(),
+        `${pendingRevision.type} updated`
+      );
+
+      if (!revisionResult.success) {
+        throw new Error(revisionResult.error || 'Failed to create revision');
+      }
+
+      if (pendingRevision.type === 'medication') {
+        await updateMedication(pendingRevision.updated as Medication);
+        setShowAddModal(false);
+        setShowSideEffectsModal(false);
+      } else {
+        await updateAppointment(pendingRevision.updated as Appointment);
+        setShowAppointmentModal(false);
+      }
+
+      setPendingRevision(null);
+      setShowRevisionModal(false);
+      setRevisionReasonCategory('added_detail_omitted_earlier');
+      setRevisionReasonNote('');
+    } catch (error) {
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save revision');
+    }
+  };
   
   const handleViewSummary = (appt: Appointment) => {
     const summary = AppointmentSummaryService.generatePreparationSummary(
@@ -196,11 +270,12 @@ export const MedsAppointmentsScreen: React.FC = () => {
         onClose={() => setShowAddModal(false)}
         onSave={async (medData) => {
           if (editingMed) {
-            await updateMedication({ ...editingMed, ...medData, updatedAt: new Date().toISOString() });
+            const updatedMedication = { ...editingMed, ...medData, updatedAt: new Date().toISOString() };
+            queueRevision('medication', editingMed, updatedMedication);
           } else {
             await addMedication(medData);
+            setShowAddModal(false);
           }
-          setShowAddModal(false);
         }}
       />
 
@@ -210,13 +285,13 @@ export const MedsAppointmentsScreen: React.FC = () => {
         onClose={() => setShowSideEffectsModal(false)}
         onSave={async (sideEffects) => {
           if (selectedMedForSideEffects) {
-            await updateMedication({
+            const updatedMedication = {
               ...selectedMedForSideEffects,
               sideEffects,
               updatedAt: new Date().toISOString(),
-            });
+            };
+            queueRevision('medication', selectedMedForSideEffects, updatedMedication);
           }
-          setShowSideEffectsModal(false);
         }}
       />
       
@@ -233,12 +308,28 @@ export const MedsAppointmentsScreen: React.FC = () => {
         onClose={() => setShowAppointmentModal(false)}
         onSave={async (apptData) => {
           if (editingAppt) {
-            await updateAppointment({ ...editingAppt, ...apptData, updatedAt: new Date().toISOString() });
+            const updatedAppointment = { ...editingAppt, ...apptData, updatedAt: new Date().toISOString() };
+            queueRevision('appointment', editingAppt, updatedAppointment);
           } else {
             await addAppointment(apptData);
+            setShowAppointmentModal(false);
           }
-          setShowAppointmentModal(false);
         }}
+      />
+
+      <RevisionReasonModal
+        visible={showRevisionModal}
+        reasonOptions={REVISION_REASON_OPTIONS}
+        selectedReason={revisionReasonCategory}
+        note={revisionReasonNote}
+        onSelectReason={setRevisionReasonCategory}
+        onChangeNote={setRevisionReasonNote}
+        onCancel={() => {
+          setShowRevisionModal(false);
+          setPendingRevision(null);
+        }}
+        onConfirm={handleConfirmRevision}
+        confirmLabel="Save revision"
       />
     </View>
   );

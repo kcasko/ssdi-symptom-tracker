@@ -6,7 +6,7 @@
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
-import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
+import { RevisionReasonCategory, RevisionTargetType } from '../domain/models/EvidenceMode';
 
 /**
  * Check if a log can be modified
@@ -89,6 +89,52 @@ export async function updateLogWithRevision(
   }
   
   return { success: true, needsRevision: false };
+}
+
+/**
+ * Create revision records for non-finalized records (limitations, medications, appointments)
+ */
+export async function createRevisionsForRecord(
+  recordId: string,
+  recordType: RevisionTargetType,
+  profileId: string,
+  originalRecord: any,
+  updatedRecord: any,
+  reasonCategory: RevisionReasonCategory,
+  reasonNote: string,
+  summary?: string
+): Promise<{ success: boolean; changedFields: number; error?: string }> {
+  const evidenceStore = useEvidenceModeStore.getState();
+  const changedFields = getChangedFields(originalRecord, updatedRecord);
+
+  if (changedFields.length === 0) {
+    return { success: true, changedFields: 0 };
+  }
+
+  try {
+    for (const { fieldPath, originalValue, newValue } of changedFields) {
+      await evidenceStore.createRevision(
+        recordId,
+        recordType,
+        profileId,
+        fieldPath,
+        originalValue,
+        newValue,
+        reasonCategory,
+        reasonNote,
+        originalRecord,
+        summary
+      );
+    }
+
+    return { success: true, changedFields: changedFields.length };
+  } catch (error) {
+    return {
+      success: false,
+      changedFields: changedFields.length,
+      error: error instanceof Error ? error.message : 'Failed to create revision',
+    };
+  }
 }
 
 /**
