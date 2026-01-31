@@ -493,6 +493,28 @@ const styles = StyleSheet.create({
     color: colors.primary600,
     fontWeight: typography.weights.semibold as any,
   },
+  reasonList: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginVertical: spacing.sm,
+  },
+  reasonButton: {
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  reasonButtonSelected: {
+    backgroundColor: colors.primaryMain,
+    borderColor: colors.primaryMain,
+  },
+  reasonButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.gray900,
+  },
   footer: {
     padding: spacing.lg,
     backgroundColor: colors.white,

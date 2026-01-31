@@ -32,7 +32,7 @@ export class ICloudProvider {
       await FileSystem.writeAsStringAsync(
         cloudPath,
         JSON.stringify(backup),
-        { encoding: FileSystem.EncodingType.UTF8 }
+        { encoding: (FileSystem as any).EncodingType.UTF8 }
       );
       
       return cloudPath;
@@ -56,7 +56,7 @@ export class ICloudProvider {
       
       // Read from iCloud
       const content = await FileSystem.readAsStringAsync(cloudPath, {
-        encoding: FileSystem.EncodingType.UTF8
+        encoding: (FileSystem as any).EncodingType.UTF8
       });
       
       return JSON.parse(content);
@@ -135,7 +135,7 @@ export class ICloudProvider {
   }> {
     try {
       const dirPath = await this.getCloudDir();
-      const dirInfo = await FileSystem.getInfoAsync(dirPath, { size: true });
+      const dirInfo = await FileSystem.getInfoAsync(dirPath);
       
       if (dirInfo.exists && dirInfo.isDirectory) {
         // Calculate total size of all backups
@@ -144,7 +144,7 @@ export class ICloudProvider {
         
         for (const file of files) {
           const filePath = `${dirPath}${file}`;
-          const fileInfo = await FileSystem.getInfoAsync(filePath, { size: true });
+          const fileInfo = await FileSystem.getInfoAsync(filePath);
           if (fileInfo.exists && 'size' in fileInfo) {
             totalSize += fileInfo.size || 0;
           }
@@ -168,7 +168,7 @@ export class ICloudProvider {
   private static async getCloudDir(): Promise<string> {
     // In a real implementation, this would use the iCloud container path
     // For Expo, we'll use the document directory with a special subfolder
-    const baseDir = FileSystem.documentDirectory;
+    const baseDir = (FileSystem as any).documentDirectory;
     const cloudDir = `${baseDir}icloud/${BACKUP_DIR}`;
     
     // Ensure directory exists

@@ -24,7 +24,7 @@ export interface CapturedPhoto {
 }
 
 export class PhotoService {
-  private static readonly PHOTO_DIR = `${FileSystem.documentDirectory}photos/`;
+  private static readonly PHOTO_DIR = `${(FileSystem as any).documentDirectory}photos/`;
   
   /**
    * Ensure photo directory exists

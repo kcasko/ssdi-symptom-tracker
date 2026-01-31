@@ -57,6 +57,7 @@ interface AppState {
   addDailyLog: (log: Omit<DailyLog, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateDailyLog: (log: DailyLog) => Promise<void>;
   addActivityLog: (log: Omit<ActivityLog, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+  updateActivityLog: (log: ActivityLog) => Promise<void>;
   addLimitation: (limitation: Omit<Limitation, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
   updateLimitation: (limitation: Limitation) => Promise<void>;
   deleteLimitation: (limitationId: string) => Promise<void>;

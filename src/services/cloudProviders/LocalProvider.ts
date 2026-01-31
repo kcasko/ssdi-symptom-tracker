@@ -28,7 +28,7 @@ export class LocalProvider {
       await FileSystem.writeAsStringAsync(
         localPath,
         JSON.stringify(backup),
-        { encoding: FileSystem.EncodingType.UTF8 }
+        { encoding: (FileSystem as any).EncodingType.UTF8 }
       );
       
       return localPath;
@@ -50,7 +50,7 @@ export class LocalProvider {
       }
       
       const content = await FileSystem.readAsStringAsync(localPath, {
-        encoding: FileSystem.EncodingType.UTF8
+        encoding: (FileSystem as any).EncodingType.UTF8
       });
       
       return JSON.parse(content);
@@ -131,7 +131,7 @@ export class LocalProvider {
         
         for (const file of files) {
           const filePath = `${dirPath}${file}`;
-          const fileInfo = await FileSystem.getInfoAsync(filePath, { size: true });
+          const fileInfo = await FileSystem.getInfoAsync(filePath);
           if (fileInfo.exists && 'size' in fileInfo) {
             totalSize += fileInfo.size || 0;
           }
@@ -157,7 +157,7 @@ export class LocalProvider {
    * Get local directory path
    */
   private static async getLocalDir(): Promise<string> {
-    const baseDir = FileSystem.documentDirectory;
+    const baseDir = (FileSystem as any).documentDirectory;
     const localDir = `${baseDir}${BACKUP_DIR}`;
     
     await FileSystem.makeDirectoryAsync(localDir, { intermediates: true });

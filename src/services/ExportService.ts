@@ -139,11 +139,11 @@ export class ExportService {
   ): Promise<void> {
     try {
       // Create file URI
-      const fileUri = `${FileSystem.documentDirectory}${filename}`;
+      const fileUri = `${(FileSystem as any).documentDirectory}${filename}`;
 
       // Write file
       await FileSystem.writeAsStringAsync(fileUri, content, {
-        encoding: FileSystem.EncodingType.UTF8,
+        encoding: (FileSystem as any).EncodingType.UTF8,
       });
 
       // Check if sharing is available
@@ -393,7 +393,6 @@ export class ExportService {
    * Convert daily logs to CSV
    */
   private static dailyLogsToCSV(logs: DailyLog[], context?: ExportContextOptions): string {
-    const metadataRows = this.generateMetadataSection('daily-logs', logs, context, headers.length);
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -418,6 +417,8 @@ export class ExportService {
       'Sleep_Quality',
       'Notes',
     ];
+
+    const metadataRows = this.generateMetadataSection('daily-logs', logs, context, headers.length);
 
     const sortedLogs = [...logs].sort((a, b) => a.logDate.localeCompare(b.logDate));
     const gapSegments = this.buildGapSegments(
@@ -517,7 +518,6 @@ export class ExportService {
    * Convert activity logs to CSV
    */
   private static activityLogsToCSV(logs: ActivityLog[], context?: ExportContextOptions): string {
-    const metadataRows = this.generateMetadataSection('activity-logs', logs, context, headers.length);
     const headers = [
       'Event_Date',
       'Created_DateTime',
@@ -540,6 +540,8 @@ export class ExportService {
       'Delayed_Impact',
       'Notes',
     ];
+
+    const metadataRows = this.generateMetadataSection('activity-logs', logs, context, headers.length);
 
     const sortedLogs = [...logs].sort((a, b) => a.activityDate.localeCompare(b.activityDate));
     const gapSegments = this.buildGapSegments(
@@ -629,7 +631,6 @@ export class ExportService {
    * Convert medications to CSV
    */
   private static medicationsToCSV(medications: Medication[]): string {
-    const metadataRows = this.generateMetadataSection('medications', medications, undefined, headers.length);
     const headers = [
       'Name',
       'Generic Name',
@@ -644,6 +645,8 @@ export class ExportService {
       'Prescriber',
       'Notes',
     ];
+
+    const metadataRows = this.generateMetadataSection('medications', medications, undefined, headers.length);
 
     const rows = medications.map(med => [
       med.name,
@@ -671,7 +674,6 @@ export class ExportService {
    * Convert limitations to CSV
    */
   private static limitationsToCSV(limitations: Limitation[]): string {
-    const metadataRows = this.generateMetadataSection('limitations', limitations, undefined, headers.length);
     const headers = [
       'Category',
       'Frequency',
@@ -679,6 +681,8 @@ export class ExportService {
       'Active',
       'Notes',
     ];
+
+    const metadataRows = this.generateMetadataSection('limitations', limitations, undefined, headers.length);
 
     const rows = limitations.map(lim => [
       lim.category,

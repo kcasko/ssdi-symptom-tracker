@@ -66,7 +66,7 @@ export class BackupRestoreService {
 
     const json = JSON.stringify(backup, null, 2);
     const filename = this.generateBackupFilename();
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const fileUri = `${(FileSystem as any).documentDirectory}${filename}`;
 
     await FileSystem.writeAsStringAsync(fileUri, json);
     return fileUri;
@@ -292,7 +292,7 @@ export class BackupRestoreService {
 
     const json = JSON.stringify(backup, null, 2);
     const filename = `ssdi-minimal-backup-${new Date().toISOString().split('T')[0]}.json`;
-    const fileUri = `${FileSystem.documentDirectory}${filename}`;
+    const fileUri = `${(FileSystem as any).documentDirectory}${filename}`;
 
     await FileSystem.writeAsStringAsync(fileUri, json);
     return fileUri;
