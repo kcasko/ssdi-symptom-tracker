@@ -164,25 +164,25 @@ describe('Immutability Enforcement - Integration', () => {
 
     // ATTEMPT: Modify createdAt
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen timestamp
       log.createdAt = createTestTimestamp();
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
     // ATTEMPT: Modify updatedAt
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen timestamp
       log.updatedAt = createTestTimestamp();
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
     // ATTEMPT: Modify evidenceModeActivatedAt
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen timestamp
       log.evidenceModeActivatedAt = createTestTimestamp();
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
@@ -253,25 +253,25 @@ describe('Immutability Enforcement - Integration', () => {
 
     // ATTEMPT: Modify memorySource
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen context property
       frozenContext.memorySource = 'hacked_source';
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
     // ATTEMPT: Modify capturedAt
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen timestamp
       frozenContext.capturedAt = createTestTimestamp();
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
     // ATTEMPT: Modify delay
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen property
       frozenContext.delay = 999999;
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
@@ -307,17 +307,17 @@ describe('Immutability Enforcement - Integration', () => {
 
     // ATTEMPT: Modify reasonCategory
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen revision
       revision.reasonCategory = 'other';
-    } catch (e) {
+    } catch (_e) {
       // Expected
     }
 
     // ATTEMPT: Modify originalValue (CRITICAL - this would destroy audit trail)
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: preventing audit trail tampering
       revision.originalValue = 'Altered history!';
-    } catch (e) {
+    } catch (_e) {
       // Expected
     }
 
@@ -381,31 +381,31 @@ describe('Immutability Enforcement - Integration', () => {
 
     // ATTEMPT: Modify log timestamp
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: intentionally modifying frozen timestamp
       completeLog.createdAt = createTestTimestamp();
-    } catch (e) {
+    } catch (_e) {
       // Expected
     }
 
     // ATTEMPT: Modify retrospective context
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: preventing context fabrication
       completeLog.retrospectiveContext.memorySource = 'fabricated';
-    } catch (e) {
+    } catch (_e) {
       // Expected
     }
 
     // ATTEMPT: Modify revision
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: preventing audit trail tampering
       completeLog.revisions[0].originalValue = 'altered history';
-    } catch (e) {
+    } catch (_e) {
       // Expected
     }
 
     // ATTEMPT: Add new revision to frozen array
     const addRevision = () => {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: preventing array mutation
       completeLog.revisions.push(createRevision({
         logId: 'daily-005',
         logType: 'daily',
@@ -461,9 +461,9 @@ describe('Immutability Enforcement - Integration', () => {
 
     // ATTEMPT: Modify nested symptom severity
     try {
-      // @ts-expect-error
+      // @ts-expect-error - Testing deep freeze: intentionally modifying nested property
       frozenLog.symptoms[0].severity = 10;
-    } catch (e) {
+    } catch (_e) {
       // Expected in strict mode
     }
 
@@ -483,15 +483,15 @@ describe('Immutability Enforcement - Integration', () => {
 
     // READ operations should work normally
     expect(() => {
-      const id = log.id;
-      const date = log.date;
-      const createdAt = log.createdAt;
-      const period = log.period;
+      const _id = log.id;
+      const _date = log.date;
+      const _createdAt = log.createdAt;
+      const _period = log.period;
     }).not.toThrow();
 
     // WRITE operations should fail
     const attemptWrite = () => {
-      // @ts-expect-error
+      // @ts-expect-error - Testing immutability: write should fail on frozen object
       log.id = 'hacked-id';
     };
 
