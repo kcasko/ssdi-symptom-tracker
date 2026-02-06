@@ -3,9 +3,7 @@
  * Tests REQ-FM-005: Invalid data rejected at creation for ALL log types
  */
 
-import { createDailyLog } from '../../src/domain/models/DailyLog';
-import { createActivityLog } from '../../src/domain/models/ActivityLog';
-import { createTestProfileId, createTestTimestamp, createTestResult } from '../test-utils';
+import { createTestResult } from '../test-utils';
 
 describe('REQ-FM-005: Comprehensive Validation for All Log Types', () => {
   const testResults: any[] = [];

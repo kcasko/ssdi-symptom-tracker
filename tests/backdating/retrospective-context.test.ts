@@ -8,7 +8,6 @@
 
 import {
   createBackdatedLog,
-  createTestTimestamp,
   daysBetween,
   assertValidRetrospectiveContext,
   assertISO8601,

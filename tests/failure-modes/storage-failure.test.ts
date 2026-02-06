@@ -3,7 +3,7 @@
  * Tests REQ-FM-006: Storage failures leave data intact across all operations
  */
 
-import { createTestProfileId, createTestTimestamp, createTestResult } from '../test-utils';
+import { createTestResult } from '../test-utils';
 
 describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
   const testResults: any[] = [];
@@ -23,15 +23,13 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
       ];
 
       // Simulate storage failure during new log creation
-      const newLogAttempt = { id: 'log-3', profileId: 'profile-1', logDate: '2026-02-03' };
-      
       let didFail = false;
       let logsAfterFailure = [...existingLogs];
 
       try {
         // Simulate storage write failure
         throw new Error('Storage write failed: disk full');
-      } catch (error) {
+      } catch (_error) {
         didFail = true;
         // On failure, existing logs should remain unchanged
         // No partial writes, no corruption
@@ -71,15 +69,13 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
       updatedAt: '2026-02-01T10:00:00Z',
     };
 
-    const updateAttempt = { notes: 'Updated notes', updatedAt: '2026-02-01T11:00:00Z' };
-
     let didFail = false;
     let logAfterFailure = { ...originalLog };
 
     try {
       // Simulate update failure before commit
       throw new Error('Storage update failed: unable to write');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Transaction rolled back, original data preserved
     }
@@ -103,7 +99,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
       // Simulate deletion failure
       // Should not leave partial deletes or orphaned references
       throw new Error('Storage delete failed');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // All logs still intact
     }
@@ -121,20 +117,13 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
       revisions: [],
     };
 
-    const revisionAttempt = {
-      id: 'rev-1',
-      timestamp: '2026-02-01T12:00:00Z',
-      reasonCategory: 'correction',
-      reasonNote: 'Correcting typo in notes',
-    };
-
     let didFail = false;
     let logAfterFailure = { ...originalLog };
 
     try {
       // Simulate failure during revision creation
       throw new Error('Storage failure: unable to write revision');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Original log remains unchanged
       // No partial revision record
@@ -161,7 +150,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
     try {
       // Simulate finalization failure
       throw new Error('Storage failure during finalization');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Log remains in unfinalized state (atomic operation)
     }
@@ -186,7 +175,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
     try {
       // Simulate photo storage failure
       throw new Error('Storage failure: unable to save photo');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Log remains intact, no orphaned photo references
     }
@@ -209,7 +198,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
     try {
       // Simulate voice recording storage failure
       throw new Error('Storage failure: unable to save voice recording');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Log unchanged, no partial save
     }
@@ -232,7 +221,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
     try {
       // Simulate export storage failure
       throw new Error('Storage failure: unable to write export file');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Source data completely unaffected
     }
@@ -255,7 +244,7 @@ describe('REQ-FM-006: Storage Failures Leave Data Intact', () => {
       // Simulate batch operation failure midway
       // e.g., import of multiple logs fails on 3rd log
       throw new Error('Storage failure: batch operation failed');
-    } catch (error) {
+    } catch (_error) {
       didFail = true;
       // Entire batch rolled back, original state preserved
     }

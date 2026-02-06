@@ -13,7 +13,6 @@ describe('REQ-EX-011: PDF Content Rendering Validation', () => {
   });
 
   test('Sample PDF preserves data integrity', () => {
-    const inputData = { severity: 7, duration: 240, symptom: 'Fatigue' };
     const pdfSample = 'Fatigue: Severity 7/10, Duration 240 minutes';
     expect(pdfSample).toContain('7');
     expect(pdfSample).toContain('240');

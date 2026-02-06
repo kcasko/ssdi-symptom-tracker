@@ -34,7 +34,7 @@ describe('REQ-FM-007: Corrupt Logs Handled Gracefully', () => {
           if (!/^\d{4}-\d{2}-\d{2}$/.test(log.logDate)) {
             throw new Error('Invalid date format');
           }
-        } catch (error) {
+        } catch (_error) {
           // Error handled gracefully
           handledErrorCount++;
         }
@@ -68,7 +68,7 @@ describe('REQ-FM-007: Corrupt Logs Handled Gracefully', () => {
       try {
         JSON.parse(jsonStr);
         isValid = true;
-      } catch (error) {
+      } catch (_error) {
         // Malformed JSON detected and handled
         isValid = false;
       }
@@ -89,7 +89,7 @@ describe('REQ-FM-007: Corrupt Logs Handled Gracefully', () => {
           return false;
         }
         return true;
-      } catch (error) {
+      } catch (_error) {
         return false;
       }
     });
@@ -199,7 +199,7 @@ describe('REQ-FM-007: Corrupt Logs Handled Gracefully', () => {
           const date = new Date(timestamp);
           isValid = !isNaN(date.getTime());
         }
-      } catch (error) {
+      } catch (_error) {
         isValid = false;
       }
 

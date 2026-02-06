@@ -31,6 +31,7 @@ jest.mock('expo-sharing', () => ({
 
 // Import after mocks
 import { ExportService } from '../../src/services/ExportService';
+import * as Sharing from 'expo-sharing';
 
 describe('CSV Export File Generation - E2E', () => {
   let writtenFiles: Map<string, string> = new Map();
@@ -444,7 +445,6 @@ describe('CSV Export File Generation - E2E', () => {
     expect(dataRows.length).toBeGreaterThan(0);
 
     // Step 6: Verify sharing service was called
-    const Sharing = require('expo-sharing');
     expect(Sharing.shareAsync).toHaveBeenCalledWith(
       fileUri,
       expect.objectContaining({

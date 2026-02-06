@@ -8,7 +8,6 @@ import {
   createFinalizedDailyLog,
   createBackdatedLog,
   createTestTimestamp,
-  assertCSVHasColumns,
   createTestResult 
 } from '../test-utils';
 

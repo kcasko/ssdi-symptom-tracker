@@ -27,7 +27,7 @@ import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLog
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { GapExplanation } from '../domain/models/GapExplanation';
-import { calculateDaysDelayed, getDelayLabel, parseDate, getDaysBetween, addDays } from '../utils/dates';
+import { calculateDaysDelayed, parseDate, getDaysBetween, addDays } from '../utils/dates';
 import { ids } from '../utils/ids';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
@@ -91,19 +91,8 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
   const eventDateValid = Boolean(parseDate(date));
   const creationReference = existingLog?.createdAt || new Date().toISOString();
-  const updatedReference = existingLog?.updatedAt || existingLog?.createdAt;
   const daysDelayed = eventDateValid ? calculateDaysDelayed(date, creationReference) : 0;
-  const delayLabel = eventDateValid ? getDelayLabel(daysDelayed) : 'Event date format is invalid';
   const isBackdated = eventDateValid && daysDelayed > 0;
-  const createdTimestampDisplay = existingLog?.createdAt
-    ? new Date(existingLog.createdAt).toISOString()
-    : 'Pending (set on save)';
-  const updatedTimestampDisplay = updatedReference
-    ? new Date(updatedReference).toISOString()
-    : 'Pending (set on save)';
-  const evidenceTimestampDisplay = existingLog?.evidenceTimestamp
-    ? new Date(existingLog.evidenceTimestamp).toISOString()
-    : 'Pending (set on save)';
   const showRetrospectiveContext =
     (eventDateValid && isBackdated) || Boolean(existingLog?.retrospectiveContext);
 

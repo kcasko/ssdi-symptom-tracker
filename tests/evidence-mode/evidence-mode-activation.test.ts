@@ -75,9 +75,6 @@ describe('Evidence Mode - Activation', () => {
         evidenceTimestamp: undefined
       };
 
-      // Evidence Mode enabled at T=0
-      const evidenceModeEnabledAt = createTestTimestamp(0);
-
       // Assert: Log created before MUST NOT have evidenceTimestamp
       expect(logCreatedBefore.evidenceTimestamp).toBeUndefined();
 

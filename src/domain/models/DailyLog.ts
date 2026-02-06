@@ -119,7 +119,7 @@ export function calculateAverageSeverity(symptoms: SymptomEntry[]): number {
  */
 export function getMostSevereSymptom(log: DailyLog): SymptomEntry | null {
   if (log.symptoms.length === 0) return null;
-  return log.symptoms.reduce((max, s) => (s.severity > max.severity ? s : max));
+  return log.symptoms.reduce((max, s) => (s.severity > max.severity ? s : max), log.symptoms[0]);
 }
 
 /**

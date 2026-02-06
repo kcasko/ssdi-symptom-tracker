@@ -7,8 +7,6 @@
  */
 
 import {
-  createTestDailyLogWithEvidence,
-  createTestTimestamp,
   assertBlank,
   createTestResult,
   type RequirementTestResult
