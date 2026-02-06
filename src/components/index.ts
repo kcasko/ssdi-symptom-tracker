@@ -11,7 +11,7 @@ export * from './DurationPicker';
 export * from './NotesField';
 export * from './SummaryCard';
 export * from './DateRangePicker';
-export * from './VoiceRecorder';
+// VoiceRecorder not exported here - import directly from './VoiceRecorder' to avoid loading native Voice module
 export * from './PhotoPicker';
 export * from './PhotoGallery';
 export * from './EvidenceModeControls';
