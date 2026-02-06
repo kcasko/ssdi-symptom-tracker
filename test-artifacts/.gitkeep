@@ -1,0 +1,8 @@
+# Test Artifacts Directory
+
+Test runs generate artifacts in numbered subdirectories:
+- run-001/
+- run-002/
+- etc.
+
+Artifacts are gitignored to prevent committing large test outputs.

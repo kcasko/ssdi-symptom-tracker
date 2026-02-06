@@ -99,6 +99,9 @@ export function createDailyLog(
     timeOfDay,
     symptoms: [],
     overallSeverity: 0,
+    finalized: false,
+    finalizedAt: undefined,
+    finalizedBy: undefined,
   };
 }
 
