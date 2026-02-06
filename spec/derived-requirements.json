@@ -1,0 +1,620 @@
+{
+  "version": "1.0",
+  "specification": "Evidence-Hardened v1.0",
+  "extractedOn": "2026-02-06T00:00:00.000Z",
+  "requirementGroups": {
+    "evidenceMode": {
+      "description": "Evidence Mode activation and configuration",
+      "requirements": [
+        {
+          "id": "REQ-EM-001",
+          "assertion": "The system MUST provide an Evidence Mode toggle in Settings",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-EM-002",
+          "assertion": "Evidence Mode activation MUST apply only to logs created AFTER activation. Pre-existing logs MUST NOT receive evidence timestamps retroactively",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-EM-003",
+          "assertion": "When Evidence Mode is enabled, the system MUST record: timestamp of activation (ISO 8601) and profile ID that enabled it",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EM-004",
+          "assertion": "Evidence Mode status MUST be queryable at any time",
+          "testable": true,
+          "priority": "MEDIUM"
+        }
+      ]
+    },
+    "timestamps": {
+      "description": "Evidence timestamp application and immutability",
+      "requirements": [
+        {
+          "id": "REQ-TS-001",
+          "assertion": "When Evidence Mode is enabled, ALL newly created logs (DailyLog and ActivityLog) MUST receive an evidenceTimestamp field set to current system time in ISO 8601 format at moment of creation",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-TS-002",
+          "assertion": "Evidence timestamps MUST be immutable. Once set, they MUST NOT be modified or removed",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-TS-003",
+          "assertion": "Evidence timestamps MUST be distinct from createdAt and updatedAt fields",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-TS-004",
+          "assertion": "Logs created while Evidence Mode is disabled MUST NOT have an evidenceTimestamp field",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-TS-005",
+          "assertion": "When viewing a log with an evidence timestamp, the UI MUST display the timestamp with label 'Evidence recorded: [timestamp]' in human-readable format",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-TS-006",
+          "assertion": "Evidence timestamps MUST be included in all exports (CSV, JSON, PDF)",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    },
+    "backdating": {
+      "description": "Retrospective context and backdating detection",
+      "requirements": [
+        {
+          "id": "REQ-BD-001",
+          "assertion": "When a user creates a log where logDate differs from current date, the system MUST calculate daysDelayed",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-BD-002",
+          "assertion": "If daysDelayed > 0 (backdating), the system MAY offer the user an option to provide a RetrospectiveContext",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-BD-003",
+          "assertion": "Retrospective context MUST include: reason (optional), note (optional), flaggedAt (ISO 8601), daysDelayed (integer, non-negative)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-BD-004",
+          "assertion": "Retrospective context, once created, MUST NOT be removed. It MAY be edited through the revision system if log is finalized",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-BD-005",
+          "assertion": "CSV exports MUST include a column for daysDelayed for all logs",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-BD-006",
+          "assertion": "PDF narrative reports MUST disclose when entries are backdated by including a statement such as 'Logged [X] days after occurrence' when daysDelayed > 0",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-BD-007",
+          "assertion": "Backdated entries without retrospective context MUST NOT be suppressed or hidden. They MUST be exported with daysDelayed value visible",
+          "testable": true,
+          "priority": "CRITICAL"
+        }
+      ]
+    },
+    "finalization": {
+      "description": "Log finalization mechanism and enforcement",
+      "requirements": [
+        {
+          "id": "REQ-FN-001",
+          "assertion": "The system MUST provide a 'Finalize for Evidence' action for DailyLog and ActivityLog entries",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-FN-002",
+          "assertion": "When a log is finalized, the system MUST: set finalized=true, set finalizedAt to current ISO 8601 timestamp, set finalizedBy to active profile ID",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-FN-003",
+          "assertion": "Finalized logs MUST be marked as read-only in the UI",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-FN-004",
+          "assertion": "Direct editing of finalized logs MUST be blocked",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-FN-005",
+          "assertion": "Finalized logs MUST display a 'Finalized' badge in the UI",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-FN-006",
+          "assertion": "CSV exports MUST include a finalized column (boolean) for all logs",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-FN-007",
+          "assertion": "PDF exports MUST indicate finalized status for included logs",
+          "testable": true,
+          "priority": "MEDIUM"
+        }
+      ]
+    },
+    "revisions": {
+      "description": "Revision tracking for finalized logs",
+      "requirements": [
+        {
+          "id": "REQ-RV-001",
+          "assertion": "When a user attempts to edit a finalized log, the system MUST block direct editing and offer a 'Create Revision' option",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-RV-002",
+          "assertion": "Revision creation MUST require: reasonCategory (enum), reasonNote (optional), summary (optional)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-RV-003",
+          "assertion": "The system MUST create a RevisionRecord containing: unique revision ID, logId, logType, profileId, revisionTimestamp (ISO 8601), reasonCategory, reasonNote, summary, fieldPath, originalValue, updatedValue, originalSnapshot (optional)",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-RV-004",
+          "assertion": "Revisions MUST be immutable once created",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-RV-005",
+          "assertion": "Revision history MUST be viewable from the log detail screen",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-RV-006",
+          "assertion": "If a log has revisions, the UI MUST display 'View [X] Revisions' link or button",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-RV-007",
+          "assertion": "Revision history view MUST display revisions in chronological order with: revision timestamp, reason category, summary (if provided), field changed, original value → updated value",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-RV-008",
+          "assertion": "PDF submission packs MUST include a 'Revision Audit Trail' section listing all revisions for included logs",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-RV-009",
+          "assertion": "CSV exports MUST include a separate 'revisions.csv' file when exporting data with revisions",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-RV-010",
+          "assertion": "JSON exports MUST include full revision records in the data structure",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    },
+    "gaps": {
+      "description": "Data gap detection and disclosure",
+      "requirements": [
+        {
+          "id": "REQ-GAP-001",
+          "assertion": "The system MUST identify gaps in logging defined as: periods of 3 or more consecutive days with no DailyLog entries",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-GAP-002",
+          "assertion": "Gap detection MUST be performed during report generation and export",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-GAP-003",
+          "assertion": "Gaps MUST be explicitly disclosed in PDF narrative reports with: start date of gap, end date of gap, duration (number of days)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-GAP-004",
+          "assertion": "The system MUST NOT infer or extrapolate data for gap periods",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-GAP-005",
+          "assertion": "All optional fields MUST default to blank/null/undefined",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-GAP-006",
+          "assertion": "Blank fields MUST remain blank in exports unless explicitly filled by user",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-GAP-007",
+          "assertion": "The system MUST NOT auto-populate optional fields with default values after log creation",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-GAP-008",
+          "assertion": "CSV exports MUST represent blank fields as empty cells (not 'N/A', 'null', '0', or placeholder text)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-GAP-009",
+          "assertion": "PDF narrative reports MUST NOT include placeholder text for missing data. If a field is blank, the corresponding narrative element MUST be omitted or explicitly stated as 'Not recorded'",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    },
+    "neutralLanguage": {
+      "description": "Neutral and functional language requirements",
+      "requirements": [
+        {
+          "id": "REQ-LANG-001",
+          "assertion": "All generated narratives MUST use functional language describing limitations, not emotional or diagnostic language",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-LANG-002",
+          "assertion": "The system MUST NOT generate text containing: self-diagnosis, emotional qualifiers, exaggerations, medical conclusions",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-LANG-003",
+          "assertion": "Generated language MUST use SSDI-appropriate functional terms as specified",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-LANG-004",
+          "assertion": "User-entered free text (notes fields) MUST be exported verbatim without AI modification or sanitization UNLESS user explicitly requests rephrasing",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-LANG-005",
+          "assertion": "Symptom and activity names MUST come from predefined lists in src/data/symptoms.ts and src/data/activities.ts",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-LANG-006",
+          "assertion": "Custom symptom/activity names entered by users MUST be clearly marked as custom in exports",
+          "testable": true,
+          "priority": "MEDIUM"
+        }
+      ]
+    },
+    "exports": {
+      "description": "Export format requirements (CSV, JSON, PDF, Text)",
+      "requirements": [
+        {
+          "id": "REQ-EX-001",
+          "assertion": "The system MUST provide CSV export for: daily logs, activity logs, medications, limitations, appointments",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-002",
+          "assertion": "CSV exports MUST include all fields from the data model, including: evidenceTimestamp, finalized, finalizedAt, daysDelayed, retrospectiveContext (serialized)",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-EX-003",
+          "assertion": "CSV header row MUST use clear, human-readable column names",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-EX-004",
+          "assertion": "Date/time fields MUST be exported in ISO 8601 format",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-005",
+          "assertion": "Blank fields MUST be represented as empty cells (no placeholder text)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-006",
+          "assertion": "The system MUST provide complete JSON export of all profile data",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-007",
+          "assertion": "JSON export MUST preserve exact data structure including all optional fields",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-008",
+          "assertion": "JSON export MUST validate against the defined Zod schemas",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-009",
+          "assertion": "PDF narrative reports MUST include: generation timestamp, date range, profile info, symptom summary, activity impact, limitations, medication history, appointment history, RFC assessment",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-EX-010",
+          "assertion": "PDF reports MUST disclose: Evidence Mode status, number of finalized logs, number of backdated entries, identified gaps, number of revisions",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-EX-011",
+          "assertion": "PDF reports MUST include page numbers and generation metadata on every page",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-EX-012",
+          "assertion": "PDF submissions packs MUST include a table of contents",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-EX-013",
+          "assertion": "Text export of reports MUST be copyable plain text without formatting",
+          "testable": true,
+          "priority": "LOW"
+        },
+        {
+          "id": "REQ-EX-014",
+          "assertion": "Text exports MUST preserve structural hierarchy with clear section headers",
+          "testable": true,
+          "priority": "LOW"
+        }
+      ]
+    },
+    "statistics": {
+      "description": "Statistical calculations and accuracy requirements",
+      "requirements": [
+        {
+          "id": "REQ-STAT-001",
+          "assertion": "All statistical calculations MUST be deterministic: identical input MUST produce identical output",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-STAT-002",
+          "assertion": "No randomness or AI inference MUST be used in calculations unless explicitly disclosed",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-STAT-003",
+          "assertion": "Average severity calculations MUST round to nearest integer using standard rounding (0.5 rounds up)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-004",
+          "assertion": "Percentage calculations MUST round to one decimal place",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-005",
+          "assertion": "Date range calculations MUST be inclusive of start and end dates",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-006",
+          "assertion": "Days with symptom X counts MUST only count days where symptom X has severity > 0",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-007",
+          "assertion": "Gap detection MUST use calendar days, not elapsed hours",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-008",
+          "assertion": "Every statistic in a generated report MUST be traceable to source log entries",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-STAT-009",
+          "assertion": "The system MUST be able to generate a 'source log IDs' list for any reported statistic upon request",
+          "testable": true,
+          "priority": "MEDIUM"
+        }
+      ]
+    },
+    "submissionPacks": {
+      "description": "Submission pack creation and immutability",
+      "requirements": [
+        {
+          "id": "REQ-PACK-001",
+          "assertion": "Submission packs MUST be immutable once created",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-PACK-002",
+          "assertion": "Pack metadata MUST include: pack ID, profile ID, creation timestamp, title, description (optional), start date, end date, app version, Evidence Mode status, total log count, total revision count",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-PACK-003",
+          "assertion": "Packs MUST reference included logs by ID only, not duplicate data",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-PACK-004",
+          "assertion": "Packs MUST support filtering by: date range, finalized logs only, specific symptoms, specific activities",
+          "testable": true,
+          "priority": "MEDIUM"
+        },
+        {
+          "id": "REQ-PACK-005",
+          "assertion": "Submission pack PDF MUST include: cover page, table of contents, Evidence Mode disclosure, all logs in narrative format, revision audit trail, gap disclosure, generation metadata footer",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    },
+    "defaults": {
+      "description": "Default values for new logs and fields",
+      "requirements": [
+        {
+          "id": "REQ-DEF-001",
+          "assertion": "New DailyLog MUST initialize with: symptoms=empty array, overallSeverity=0, notes=undefined, photos=undefined, triggers=undefined, finalized=false, evidenceTimestamp=current ISO 8601 IF Evidence Mode enabled otherwise undefined",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-DEF-002",
+          "assertion": "New ActivityLog MUST initialize with: stoppedEarly=false, assistanceNeeded=false, notes=undefined, photos=undefined, finalized=false, evidenceTimestamp=current ISO 8601 IF Evidence Mode enabled otherwise undefined",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-DEF-003",
+          "assertion": "Optional fields MUST NOT be initialized with placeholder text or dummy values",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    },
+    "failureModes": {
+      "description": "Failure mode handling and prohibitions",
+      "requirements": [
+        {
+          "id": "REQ-FAIL-001",
+          "assertion": "The system MUST NOT silently: drop evidence timestamps, skip revisions, suppress backdated entries, omit gaps, auto-correct user input without disclosure",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-FAIL-002",
+          "assertion": "If an export operation encounters an error, the system MUST: halt export, display error to user, NOT produce partial export without clear warning",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-FAIL-003",
+          "assertion": "Finalized logs MUST NOT be deletable. Deletion attempts MUST be blocked",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-FAIL-004",
+          "assertion": "Evidence timestamps MUST NOT be editable through any UI or API",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-FAIL-005",
+          "assertion": "Revision records MUST NOT be deletable or editable after creation",
+          "testable": true,
+          "priority": "CRITICAL"
+        }
+      ]
+    },
+    "testing": {
+      "description": "Testing requirements",
+      "requirements": [
+        {
+          "id": "REQ-TEST-001",
+          "assertion": "All requirements prefixed with REQ- MUST have at least one deterministic test case",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-TEST-002",
+          "assertion": "Tests MUST assert exact behavior, not 'approximately correct' behavior",
+          "testable": true,
+          "priority": "CRITICAL"
+        },
+        {
+          "id": "REQ-TEST-003",
+          "assertion": "Tests MUST NOT mock: evidence timestamp generation, finalization logic, revision creation logic, export file generation (except external file I/O)",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-TEST-004",
+          "assertion": "All test runs MUST produce artifacts including: generated exports, timestamps, pass/fail results",
+          "testable": true,
+          "priority": "HIGH"
+        },
+        {
+          "id": "REQ-TEST-005",
+          "assertion": "Test artifacts MUST be versioned and stored in /test-artifacts/run-###/",
+          "testable": true,
+          "priority": "HIGH"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "totalGroups": 13,
+    "totalRequirements": 108,
+    "criticalRequirements": 24,
+    "highRequirements": 56,
+    "mediumRequirements": 24,
+    "lowRequirements": 2
+  }
+}

@@ -54,6 +54,10 @@ backups/
 # Testing
 coverage/
 .nyc_output/
+test-artifacts/*/
+!test-artifacts/.gitkeep
+playwright-report/
+test-results/
 
 # Temporary scripts and one-off fixes
 fix-*.ps1
