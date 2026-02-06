@@ -12,7 +12,7 @@ import { Buffer } from 'buffer';
 import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as crypto from 'expo-crypto';
-import AES from 'react-native-aes-crypto';
+import * as aesjs from 'aes-js';
 
 export interface EncryptionConfig {
   enabled: boolean;
@@ -35,7 +35,7 @@ export interface AuthResult {
 const KEY_VERSION = 'v2';
 const KEY_PREFIX = 'ssdi_secure_';
 const ENCRYPTION_KEY = 'encryption_key';
-const IV_LENGTH = 12; // 96-bit IV for GCM
+const IV_LENGTH = 16; // 128-bit IV for CTR mode
 const VERSION_TAG = 'v2';
 
 const b64Encode = (bytes: Uint8Array) => Buffer.from(bytes).toString('base64');
@@ -203,11 +203,19 @@ export class EncryptionManager {
         return { success: false, error: 'Encryption key not available' };
       }
 
-      const keyHex = Buffer.from(b64Decode(keyResult.data)).toString('hex');
+      // Convert key and generate IV
+      const keyBytes = b64Decode(keyResult.data);
       const iv = await crypto.getRandomBytesAsync(IV_LENGTH);
-      const ivHex = Buffer.from(iv).toString('hex');
-
-      const cipherBase64 = await AES.encrypt(plaintext, keyHex, ivHex, 'aes-256-gcm');
+      
+      // Convert plaintext to bytes
+      const textBytes = aesjs.utils.utf8.toBytes(plaintext);
+      
+      // Encrypt using AES-256-CTR
+      const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(iv));
+      const encryptedBytes = aesCtr.encrypt(textBytes);
+      
+      // Encode to base64
+      const cipherBase64 = b64Encode(encryptedBytes);
       const payload = `${VERSION_TAG}:${b64Encode(iv)}:${cipherBase64}`;
 
       return { success: true, data: payload };
@@ -232,10 +240,17 @@ export class EncryptionManager {
       const ivB64 = parts[1];
       const cipherBase64 = parts[2];
 
-      const keyHex = Buffer.from(b64Decode(keyResult.data)).toString('hex');
-      const ivHex = Buffer.from(b64Decode(ivB64)).toString('hex');
-
-      const plaintext = await AES.decrypt(cipherBase64, keyHex, ivHex, 'aes-256-gcm');
+      // Convert key and IV
+      const keyBytes = b64Decode(keyResult.data);
+      const iv = b64Decode(ivB64);
+      const encryptedBytes = b64Decode(cipherBase64);
+      
+      // Decrypt using AES-256-CTR
+      const aesCtr = new aesjs.ModeOfOperation.ctr(keyBytes, new aesjs.Counter(iv));
+      const decryptedBytes = aesCtr.decrypt(encryptedBytes);
+      
+      // Convert bytes to string
+      const plaintext = aesjs.utils.utf8.fromBytes(decryptedBytes);
       return { success: true, data: plaintext };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Decryption error' };
