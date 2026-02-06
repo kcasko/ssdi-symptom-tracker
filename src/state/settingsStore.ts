@@ -76,8 +76,8 @@ interface SettingsState {
 
 const DEFAULT_SETTINGS: AppSettings = {
   // Privacy & Security
-  appLockEnabled: false,
-  encryptionEnabled: false,
+  appLockEnabled: true,  // Enable app lock by default for sensitive health data
+  encryptionEnabled: true,  // Enable encryption by default for sensitive health data
   biometricAuthEnabled: false,
   
   // Data & Backup

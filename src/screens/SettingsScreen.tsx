@@ -90,6 +90,28 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
             </View>
           </TouchableOpacity>
 
+          <TouchableOpacity 
+            style={styles.settingRow} 
+            onPress={() => updateSettings({ darkMode: !settings.darkMode })}
+          >
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Dark Mode</Text>
+              <Text style={styles.settingDescription}>
+                Switch to dark color scheme
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.toggle,
+                settings.darkMode && styles.toggleActive,
+              ]}
+            >
+              <Text style={styles.toggleText}>
+                {settings.darkMode ? 'ON' : 'OFF'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+
           <View style={styles.infoCard}>
             <Text style={styles.infoTitle}>Privacy Notice</Text>
             <Text style={styles.infoText}>

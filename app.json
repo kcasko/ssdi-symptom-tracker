@@ -25,8 +25,7 @@
       },
       "package": "com.daymark.app",
       "permissions": [
-        "android.permission.USE_BIOMETRIC",
-        "android.permission.USE_FINGERPRINT"
+        "android.permission.USE_BIOMETRIC"
       ]
     },
     "web": {

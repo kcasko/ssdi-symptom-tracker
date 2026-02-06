@@ -1,9 +1,11 @@
 /**
  * Encryption Utilities
- * AES-256-GCM via react-native-aes-crypto
+ * AES-256-CTR (Counter mode) with react-native-aes-js
+ * NOTE: This provides confidentiality but NOT authenticity/integrity protection.
+ * For full authenticated encryption, consider using AES-GCM in the future.
  *
  * Payload format (string):
- *   v2:<base64IV>:<base64CiphertextWithTag>
+ *   v2:<base64IV>:<base64Ciphertext>
  *
  * Keys are 256-bit, stored in SecureStore (base64).
  */

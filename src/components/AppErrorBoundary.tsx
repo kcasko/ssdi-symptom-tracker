@@ -23,7 +23,8 @@ export class AppErrorBoundary extends React.Component<AppErrorBoundaryProps, App
 
   componentDidCatch(error: Error, errorInfo: { componentStack: string }) {
     this.setState({ error, errorInfo });
-    // TODO: Log error to monitoring service
+    // In a production app, you might log the error to an error reporting service
+    console.error('AppErrorBoundary caught an error:', error, errorInfo);
   }
 
   handleReload = () => {
@@ -31,9 +32,15 @@ export class AppErrorBoundary extends React.Component<AppErrorBoundaryProps, App
     if (typeof window !== 'undefined' && window.location) {
       window.location.reload();
     } else {
-      // Fallback: reset state
+      // For React Native/Expo, we can't reload the app programmatically
+      // Instead, we'll reset the error state to allow the app to continue
       this.setState({ hasError: false, error: null, errorInfo: null });
     }
+  };
+
+  handleReset = () => {
+    // Reset the error boundary state to allow the app to continue
+    this.setState({ hasError: false, error: null, errorInfo: null });
   };
 
   render() {
@@ -45,7 +52,9 @@ export class AppErrorBoundary extends React.Component<AppErrorBoundaryProps, App
           {this.state.errorInfo?.componentStack ? (
             <Text style={styles.stack}>{this.state.errorInfo.componentStack}</Text>
           ) : null}
-          <Button title="Reload App" onPress={this.handleReload} />
+          <View style={styles.buttonContainer}>
+            <Button title="Try Again" onPress={this.handleReset} />
+          </View>
         </View>
       );
     }
@@ -76,5 +85,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
     marginBottom: 16,
+  },
+  buttonContainer: {
+    marginTop: 16,
+    minWidth: 120,
   },
 });

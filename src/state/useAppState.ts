@@ -90,7 +90,7 @@ export function useAppState(): AppState {
   const logStore = useLogStore();
   const reportStore = useReportStore();
   const settingsStore = useSettingsStore();
-  
+
   // Use refs to prevent infinite loops and track initialization
   const hasInitialized = useRef(false);
   const [initComplete, setInitComplete] = useState(false);
@@ -98,24 +98,24 @@ export function useAppState(): AppState {
   const lastSyncedProfileId = useRef<string | null>(null);
 
   // Derived state
-  const isLoading = 
-    profileStore.loading || 
-    logStore.loading || 
-    reportStore.loading || 
+  const isLoading =
+    profileStore.loading ||
+    logStore.loading ||
+    reportStore.loading ||
     settingsStore.loading;
 
   const hasError = Boolean(
-    profileStore.error || 
-    logStore.error || 
-    reportStore.error || 
+    profileStore.error ||
+    logStore.error ||
+    reportStore.error ||
     settingsStore.error
   );
 
-  const errorMessage = 
-    profileStore.error || 
-    logStore.error || 
-    reportStore.error || 
-    settingsStore.error || 
+  const errorMessage =
+    profileStore.error ||
+    logStore.error ||
+    reportStore.error ||
+    settingsStore.error ||
     null;
 
   // Initialize app on mount - only once
@@ -123,9 +123,9 @@ export function useAppState(): AppState {
     const initialize = async () => {
       if (hasInitialized.current) return;
       hasInitialized.current = true;
-      
+
       console.log('Starting initialization...');
-      
+
       try {
         // Check if first launch
         const firstLaunchCheck = await SettingsStorage.isFirstLaunch();
@@ -135,7 +135,7 @@ export function useAppState(): AppState {
         // Check if migration needed
         const needsMigration = await MigrationManager.needsMigration();
         console.log('Migration needed:', needsMigration);
-        
+
         if (needsMigration) {
           console.log('Running migrations...');
           const migrationResult = await MigrationManager.runMigrations();
@@ -143,19 +143,19 @@ export function useAppState(): AppState {
             console.error('Migration failed:', migrationResult.error);
           }
         }
-        
+
         // Load settings first
         console.log('Loading settings...');
         await useSettingsStore.getState().loadSettings();
-        
+
         // Load Evidence Mode configuration
         console.log('Loading Evidence Mode...');
         await useEvidenceModeStore.getState().loadEvidenceMode();
-        
+
         // Get fresh settings from store (not the stale closure value!)
         const currentSettings = useSettingsStore.getState().settings;
         console.log('Settings loaded, appLockEnabled:', currentSettings.appLockEnabled);
-        
+
         // Check app lock if enabled
         if (currentSettings.appLockEnabled) {
           const authenticated = await useSettingsStore.getState().authenticateUser();
@@ -165,15 +165,15 @@ export function useAppState(): AppState {
             return;
           }
         }
-        
+
         // Load profiles
         console.log('Loading profiles...');
         await useProfileStore.getState().loadProfiles();
-        
+
         // Get fresh profile state (not the stale closure value!)
         const currentActiveProfileId = useProfileStore.getState().activeProfileId;
         console.log('Profiles loaded, activeProfileId:', currentActiveProfileId);
-        
+
         // Load data for active profile
         if (currentActiveProfileId) {
           console.log('Loading data for active profile during initialization');
@@ -195,27 +195,38 @@ export function useAppState(): AppState {
     };
 
     initialize();
+
+    // Cleanup function to reset initialization state on unmount
+    return () => {
+      hasInitialized.current = false;
+    };
   }, []);
 
   // Keep stores in sync when active profile changes
   useEffect(() => {
     // Don't sync until initialization is complete
     if (!initComplete) return;
-    
+
     const profileId = profileStore.activeProfileId;
-    
+
     // Only sync if profile actually changed
     if (lastSyncedProfileId.current === profileId) return;
-    
+
     lastSyncedProfileId.current = profileId;
-    
+
     if (logStore.currentProfileId !== profileId) {
       logStore.setCurrentProfile(profileId);
     }
-    
+
     if (reportStore.currentProfileId !== profileId) {
       reportStore.setCurrentProfile(profileId);
     }
+    
+    // Cleanup function to reset profile sync state on unmount
+    return () => {
+      lastSyncedProfileId.current = null;
+    };
+    
     // Store objects are stable but shouldn't be in dependencies to avoid unnecessary re-runs
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initComplete, profileStore.activeProfileId]); // Don't include store objects
