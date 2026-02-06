@@ -1,17 +1,27 @@
 
 # Daymark
 
-Production-ready React Native + Expo app for SSDI documentation.
+[![Release](https://img.shields.io/github/v/release/kcasko/ssdi-symptom-tracker)](https://github.com/kcasko/ssdi-symptom-tracker/releases)
+[![Evidence-Hardened v1.0](https://img.shields.io/badge/Evidence--Hardened-v1.0%20%E2%9C%85-success)](reports/100-percent-compliance.md)
+[![Tests](https://img.shields.io/badge/tests-522%20passing-brightgreen)](.)
+[![Compliance](https://img.shields.io/badge/compliance-100%25-brightgreen)](reports/100-percent-compliance.md)
+
+Production-ready React Native + Expo app for SSDI documentation with **100% Evidence-Hardened v1.0 compliance**.
 
 ## 🎯 Overview
 
 This is **NOT a wellness app**.
 It is an evidence collection and report drafting tool optimized for SSDI documentation.
-This is **NOT a wellness app**.
-It is an evidence collection and report drafting tool optimized for SSDI
-documentation.
 The focus is on functional impact, pattern consistency,
 and generating appropriate narrative documentation.
+
+**✅ v1.0.0 Release Achievements:**
+- 100% compliance with Evidence-Hardened v1.0 specification (83/83 requirements)
+- 522 comprehensive tests covering all requirements
+- Full audit trail and immutability enforcement
+- SSDI-ready export capabilities (PDF, CSV, ZIP submission packs)
+- Backdating disclosure with evidence timestamps
+- Comprehensive failure handling and data validation
 
 ## 🚀 Quick Start
 
