@@ -19,7 +19,6 @@ import {
   ReportEditorScreen,
   SettingsScreen,
   TrendsScreen,
-  VoiceLogScreen,
   AboutScreen,
 } from '../screens';
 
@@ -67,7 +66,10 @@ export function AppNavigator({ isFirstLaunch }: AppNavigatorProps) {
         <Stack.Screen name="Reports" component={ReportsScreen} />
         <Stack.Screen name="ReportEditor" component={ReportEditorScreen} />
         <Stack.Screen name="Trends" component={TrendsScreen} />
-        <Stack.Screen name="VoiceLog" component={VoiceLogScreen} />
+        <Stack.Screen 
+          name="VoiceLog" 
+          getComponent={() => require('../screens/VoiceLogScreen').VoiceLogScreen}
+        />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
       </Stack.Navigator>

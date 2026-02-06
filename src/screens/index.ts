@@ -12,7 +12,7 @@ export { ReportsScreen } from './ReportsScreen';
 export { ReportEditorScreen } from './ReportEditorScreen';
 export { SettingsScreen } from './SettingsScreen';
 export { TrendsScreen } from './TrendsScreen';
-export { VoiceLogScreen } from './VoiceLogScreen';
+// VoiceLogScreen not exported here - import directly from './VoiceLogScreen' to avoid loading native Voice module
 export { AboutScreen } from './AboutScreen';
 
 // Placeholder exports for screens not yet implemented
