@@ -1,0 +1,447 @@
+{
+  "config": {
+    "configFile": "e:\\Repos\\symptom_tracker\\playwright.config.ts",
+    "rootDir": "e:/Repos/symptom_tracker/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "e:/Repos/symptom_tracker/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "e:/Repos/symptom_tracker/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "test-artifacts/playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-artifacts/results.json"
+        }
+      ],
+      [
+        "list",
+        null
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.1",
+    "workers": 8,
+    "webServer": {
+      "command": "npm run web",
+      "url": "http://localhost:8081",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [],
+  "errors": [
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\backdating\\retrospective-context.test.ts:18:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\backdating\\retrospective-context.test.ts",
+        "column": 1,
+        "line": 18
+      },
+      "snippet": "\u001b[90m   at \u001b[39mbackdating\\retrospective-context.test.ts:18\n\n\u001b[0m \u001b[90m 16 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 18 |\u001b[39m describe(\u001b[32m'Backdating and Retrospective Context'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 19 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\defaults\\all-optional-fields.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\defaults\\all-optional-fields.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mdefaults\\all-optional-fields.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-GAP-005: All Optional Fields Default to Blank'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   describe(\u001b[32m'DailyLog Optional Fields'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     test(\u001b[32m'symptomNotes defaults to empty string'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 9 |\u001b[39m       \u001b[36mconst\u001b[39m defaultLog \u001b[33m=\u001b[39m { symptomNotes\u001b[33m:\u001b[39m \u001b[32m''\u001b[39m }\u001b[33m;\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\defaults\\comprehensive-defaults-export.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\defaults\\comprehensive-defaults-export.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mdefaults\\comprehensive-defaults-export.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-DV-001 & REQ-DV-005: Comprehensive Default Values in Logs and Exports'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   describe(\u001b[32m'DailyLog: Default Values at Creation'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     test(\u001b[32m'Creates DailyLog with all optional fields at default values'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 9 |\u001b[39m       \u001b[36mconst\u001b[39m newLog \u001b[33m=\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\defaults\\comprehensive-defaults.test.ts:19:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\defaults\\comprehensive-defaults.test.ts",
+        "column": 1,
+        "line": 19
+      },
+      "snippet": "\u001b[90m   at \u001b[39mdefaults\\comprehensive-defaults.test.ts:19\n\n\u001b[0m \u001b[90m 17 |\u001b[39m \u001b[36mimport\u001b[39m { createDailyLog } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/DailyLog'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m describe(\u001b[32m'Comprehensive Default Values (REQ-DV-001, REQ-DV-005, REQ-GAP-005)'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m\n \u001b[90m 22 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\defaults\\default-values.test.ts:18:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\defaults\\default-values.test.ts",
+        "column": 1,
+        "line": 18
+      },
+      "snippet": "\u001b[90m   at \u001b[39mdefaults\\default-values.test.ts:18\n\n\u001b[0m \u001b[90m 16 |\u001b[39m \u001b[36mimport\u001b[39m { createDailyLog } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/DailyLog'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 18 |\u001b[39m describe(\u001b[32m'Defaults and Initialization'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 19 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\evidence-mode\\evidence-mode-activation.test.ts:18:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\evidence-mode\\evidence-mode-activation.test.ts",
+        "column": 1,
+        "line": 18
+      },
+      "snippet": "\u001b[90m   at \u001b[39mevidence-mode\\evidence-mode-activation.test.ts:18\n\n\u001b[0m \u001b[90m 16 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 17 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 18 |\u001b[39m describe(\u001b[32m'Evidence Mode - Activation'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 19 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m\n \u001b[90m 21 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\exports\\export-formats.test.ts:14:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\exports\\export-formats.test.ts",
+        "column": 1,
+        "line": 14
+      },
+      "snippet": "\u001b[90m   at \u001b[39mexports\\export-formats.test.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 13 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m describe(\u001b[32m'Export Formats'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-backdating-disclosure.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-backdating-disclosure.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mexports\\pdf-backdating-disclosure.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-BD-006: PDF Backdating Disclosure'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   test(\u001b[32m'Backdating disclosure vocabulary is defined'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     \u001b[36mconst\u001b[39m backdatingKeywords \u001b[33m=\u001b[39m [\u001b[32m'backdated'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'retrospective'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'entered on'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'recorded on'\u001b[39m]\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m     expect(backdatingKeywords\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-content-validation.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-content-validation.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mexports\\pdf-content-validation.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-EX-011: PDF Content Rendering Validation'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   test(\u001b[32m'PDF structure includes required sections'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     \u001b[36mconst\u001b[39m requiredSections \u001b[33m=\u001b[39m [\u001b[32m'Metadata'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Symptom Records'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Activity Logs'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Summary Statistics'\u001b[39m]\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m     expect(requiredSections\u001b[33m.\u001b[39mlength)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-narrative-analysis.test.ts:9:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-narrative-analysis.test.ts",
+        "column": 1,
+        "line": 9
+      },
+      "snippet": "\u001b[90m   at \u001b[39mexports\\pdf-narrative-analysis.test.ts:9\n\n\u001b[0m \u001b[90m  7 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mACTIVITIES\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/data/activities'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  8 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m describe(\u001b[32m'REQ-LANG-005: PDF Narrative Language Neutrality'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m   test(\u001b[32m'Symptom descriptions use neutral medical terminology'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 11 |\u001b[39m     \u001b[36mconst\u001b[39m prohibitedWords \u001b[33m=\u001b[39m [\u001b[35m/\\bterrible\\b/i\u001b[39m\u001b[33m,\u001b[39m \u001b[35m/\\bdevastating\\b/i\u001b[39m\u001b[33m,\u001b[39m \u001b[35m/\\bunbearable\\b/i\u001b[39m\u001b[33m,\u001b[39m \u001b[35m/\\bi feel\\b/i\u001b[39m]\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-revision-audit-trail.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\exports\\pdf-revision-audit-trail.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mexports\\pdf-revision-audit-trail.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-RV-008: PDF Revision Audit Trail'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   test(\u001b[32m'Revision audit trail structure is defined'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     \u001b[36mconst\u001b[39m trailStructure \u001b[33m=\u001b[39m {\n \u001b[90m 9 |\u001b[39m       timestamp\u001b[33m:\u001b[39m \u001b[32m'2026-01-01T12:00:00Z'\u001b[39m\u001b[33m,\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\failure-modes\\comprehensive-validation.test.ts:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\failure-modes\\comprehensive-validation.test.ts",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mfailure-modes\\comprehensive-validation.test.ts:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m { createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-FM-005: Comprehensive Validation for All Log Types'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\n \u001b[90m 11 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\failure-modes\\corrupt-data-recovery.test.ts:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\failure-modes\\corrupt-data-recovery.test.ts",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mfailure-modes\\corrupt-data-recovery.test.ts:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m { createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-FM-007: Corrupt Logs Handled Gracefully'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\n \u001b[90m 11 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\failure-modes\\failure-handling.test.ts:13:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\failure-modes\\failure-handling.test.ts",
+        "column": 1,
+        "line": 13
+      },
+      "snippet": "\u001b[90m   at \u001b[39mfailure-modes\\failure-handling.test.ts:13\n\n\u001b[0m \u001b[90m 11 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m describe(\u001b[32m'Failure Modes'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\failure-modes\\storage-failure.test.ts:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\failure-modes\\storage-failure.test.ts",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mfailure-modes\\storage-failure.test.ts:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m { createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-FM-006: Storage Failures Leave Data Intact'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\n \u001b[90m 11 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\finalization\\log-finalization.test.ts:19:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\finalization\\log-finalization.test.ts",
+        "column": 1,
+        "line": 19
+      },
+      "snippet": "\u001b[90m   at \u001b[39mfinalization\\log-finalization.test.ts:19\n\n\u001b[0m \u001b[90m 17 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m describe(\u001b[32m'Log Finalization'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m\n \u001b[90m 22 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\gaps\\gap-detection.test.ts:16:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\gaps\\gap-detection.test.ts",
+        "column": 1,
+        "line": 16
+      },
+      "snippet": "\u001b[90m   at \u001b[39mgaps\\gap-detection.test.ts:16\n\n\u001b[0m \u001b[90m 14 |\u001b[39m \u001b[36mimport\u001b[39m { createDailyLog } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/DailyLog'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m describe(\u001b[32m'Gap Detection and Blank Fields'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\n \u001b[90m 19 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "Error: Stripping types is currently unsupported for files under node_modules, for \"e:\\Repos\\symptom_tracker\\node_modules\\expo-file-system\\src\\index.ts\"",
+      "stack": "Error: Stripping types is currently unsupported for files under node_modules, for \"e:\\Repos\\symptom_tracker\\node_modules\\expo-file-system\\src\\index.ts\"\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\integration\\csv-export-generation.test.ts:15:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\integration\\csv-export-generation.test.ts",
+        "column": 1,
+        "line": 15
+      },
+      "snippet": "\u001b[90m   at \u001b[39mintegration\\csv-export-generation.test.ts:15\n\n\u001b[0m \u001b[90m 13 |\u001b[39m \u001b[36mimport\u001b[39m { createActivityLog } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/ActivityLog'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m \u001b[36mimport\u001b[39m { createTestTimestamp } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 15 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33m*\u001b[39m \u001b[36mas\u001b[39m \u001b[33mFileSystem\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'expo-file-system'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m \u001b[90m// Mock FileSystem for testing\u001b[39m\n \u001b[90m 18 |\u001b[39m jest\u001b[33m.\u001b[39mmock(\u001b[32m'expo-file-system'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m ({\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\integration\\finalization-workflow.test.ts:15:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\integration\\finalization-workflow.test.ts",
+        "column": 1,
+        "line": 15
+      },
+      "snippet": "\u001b[90m   at \u001b[39mintegration\\finalization-workflow.test.ts:15\n\n\u001b[0m \u001b[90m 13 |\u001b[39m \u001b[36mimport\u001b[39m { createTestTimestamp\u001b[33m,\u001b[39m createTestProfileId } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 14 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 15 |\u001b[39m describe(\u001b[32m'Finalization Workflow - Integration'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 16 |\u001b[39m   \u001b[90m/**\u001b[39m\n \u001b[90m 17 |\u001b[39m \u001b[90m   * REQ-FN-001: System MUST provide \"Finalize for Evidence\" action\u001b[39m\n \u001b[90m 18 |\u001b[39m \u001b[90m   * \u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\integration\\immutability-enforcement.test.ts:83:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\integration\\immutability-enforcement.test.ts",
+        "column": 1,
+        "line": 83
+      },
+      "snippet": "\u001b[90m   at \u001b[39mintegration\\immutability-enforcement.test.ts:83\n\n\u001b[0m \u001b[90m 81 |\u001b[39m }\n \u001b[90m 82 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 83 |\u001b[39m describe(\u001b[32m'Immutability Enforcement - Integration'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 84 |\u001b[39m   \u001b[90m/**\u001b[39m\n \u001b[90m 85 |\u001b[39m \u001b[90m   * REQ-TS-002: Evidence timestamps MUST be immutable\u001b[39m\n \u001b[90m 86 |\u001b[39m \u001b[90m   * \u001b[39m\u001b[0m"
+    },
+    {
+      "message": "Error: Stripping types is currently unsupported for files under node_modules, for \"e:\\Repos\\symptom_tracker\\node_modules\\expo-modules-core\\src\\index.ts\"",
+      "stack": "Error: Stripping types is currently unsupported for files under node_modules, for \"e:\\Repos\\symptom_tracker\\node_modules\\expo-modules-core\\src\\index.ts\""
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\integration\\revision-workflow.test.ts:59:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\integration\\revision-workflow.test.ts",
+        "column": 1,
+        "line": 59
+      },
+      "snippet": "\u001b[90m   at \u001b[39mintegration\\revision-workflow.test.ts:59\n\n\u001b[0m \u001b[90m 57 |\u001b[39m }\n \u001b[90m 58 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 59 |\u001b[39m describe(\u001b[32m'Revision Creation Workflow - Integration'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 60 |\u001b[39m   \u001b[90m/**\u001b[39m\n \u001b[90m 61 |\u001b[39m \u001b[90m   * REQ-RV-001: System MUST block direct editing and offer \"Create Revision\" option\u001b[39m\n \u001b[90m 62 |\u001b[39m \u001b[90m   * \u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\neutral-language\\language-requirements.test.ts:13:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\neutral-language\\language-requirements.test.ts",
+        "column": 1,
+        "line": 13
+      },
+      "snippet": "\u001b[90m   at \u001b[39mneutral-language\\language-requirements.test.ts:13\n\n\u001b[0m \u001b[90m 11 |\u001b[39m \u001b[36mconst\u001b[39m activities \u001b[33m=\u001b[39m \u001b[33mACTIVITIES\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m describe(\u001b[32m'Neutral Language Requirements'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\neutral-language\\limitation-vocabulary.test.ts:9:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\neutral-language\\limitation-vocabulary.test.ts",
+        "column": 1,
+        "line": 9
+      },
+      "snippet": "\u001b[90m   at \u001b[39mneutral-language\\limitation-vocabulary.test.ts:9\n\n\u001b[0m \u001b[90m  7 |\u001b[39m \u001b[36mimport\u001b[39m { createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  8 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m describe(\u001b[32m'REQ-LANG-004: Limitation Terms are Neutral'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m\n \u001b[90m 12 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\neutral-language\\text-scanning.test.ts:16:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\neutral-language\\text-scanning.test.ts",
+        "column": 1,
+        "line": 16
+      },
+      "snippet": "\u001b[90m   at \u001b[39mneutral-language\\text-scanning.test.ts:16\n\n\u001b[0m \u001b[90m 14 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mACTIVITIES\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/data/activities'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m describe(\u001b[32m'REQ-LANG-001: Automated UI and Export Text Scanning'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\n \u001b[90m 19 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\revisions\\revision-tracking.test.ts:24:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\revisions\\revision-tracking.test.ts",
+        "column": 1,
+        "line": 24
+      },
+      "snippet": "\u001b[90m   at \u001b[39mrevisions\\revision-tracking.test.ts:24\n\n\u001b[0m \u001b[90m 22 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/EvidenceMode'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m describe(\u001b[32m'Revision Tracking'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 26 |\u001b[39m\n \u001b[90m 27 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\statistics\\calculations.test.ts:13:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\statistics\\calculations.test.ts",
+        "column": 1,
+        "line": 13
+      },
+      "snippet": "\u001b[90m   at \u001b[39mstatistics\\calculations.test.ts:13\n\n\u001b[0m \u001b[90m 11 |\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m describe(\u001b[32m'Statistics and Calculations'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 14 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\submission-packs\\pack-creation.test.ts:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\submission-packs\\pack-creation.test.ts",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39msubmission-packs\\pack-creation.test.ts:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m { createTestTimestamp\u001b[33m,\u001b[39m createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'Submission Packs'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\n \u001b[90m 11 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\submission-packs\\zip-compression.test.ts:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\submission-packs\\zip-compression.test.ts",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39msubmission-packs\\zip-compression.test.ts:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m { createTestProfileId\u001b[33m,\u001b[39m createTestTimestamp\u001b[33m,\u001b[39m createTestResult } \u001b[36mfrom\u001b[39m \u001b[32m'../test-utils'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-SP-005: Zip Compression Verification'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m any[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\n \u001b[90m 11 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\timestamps\\evidence-timestamps.test.ts:19:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\timestamps\\evidence-timestamps.test.ts",
+        "column": 1,
+        "line": 19
+      },
+      "snippet": "\u001b[90m   at \u001b[39mtimestamps\\evidence-timestamps.test.ts:19\n\n\u001b[0m \u001b[90m 17 |\u001b[39m \u001b[36mimport\u001b[39m { createDailyLog } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/domain/models/DailyLog'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 18 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m describe(\u001b[32m'Evidence Timestamps'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m   \u001b[36mconst\u001b[39m testResults\u001b[33m:\u001b[39m \u001b[33mRequirementTestResult\u001b[39m[] \u001b[33m=\u001b[39m []\u001b[33m;\u001b[39m\n \u001b[90m 21 |\u001b[39m\n \u001b[90m 22 |\u001b[39m   afterAll(() \u001b[33m=>\u001b[39m {\u001b[0m"
+    },
+    {
+      "message": "SyntaxError: Unexpected token 'typeof'",
+      "stack": "SyntaxError: Unexpected token 'typeof'\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\helpers\\accessibility.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\to-be-busy.ts:5:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\extend-expect.ts:1:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\index.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\evidence-mode-ui.test.tsx:7:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\evidence-mode-ui.test.tsx",
+        "column": 1,
+        "line": 7
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\evidence-mode-ui.test.tsx:7\n\n\u001b[0m \u001b[90m  5 |\u001b[39m\n \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mReact\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'react'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  7 |\u001b[39m \u001b[36mimport\u001b[39m { render\u001b[33m,\u001b[39m fireEvent\u001b[33m,\u001b[39m waitFor } \u001b[36mfrom\u001b[39m \u001b[32m'@testing-library/react-native'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  8 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mEvidenceModeControls\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/components/EvidenceModeControls'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  9 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mAlert\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'react-native'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "SyntaxError: Unexpected token 'typeof'",
+      "stack": "SyntaxError: Unexpected token 'typeof'\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\helpers\\accessibility.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\to-be-busy.ts:5:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\extend-expect.ts:1:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\index.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\finalization-ui.test.tsx:7:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\finalization-ui.test.tsx",
+        "column": 1,
+        "line": 7
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\finalization-ui.test.tsx:7\n\n\u001b[0m \u001b[90m  5 |\u001b[39m\n \u001b[90m  6 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mReact\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'react'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  7 |\u001b[39m \u001b[36mimport\u001b[39m { render\u001b[33m,\u001b[39m fireEvent\u001b[33m,\u001b[39m waitFor } \u001b[36mfrom\u001b[39m \u001b[32m'@testing-library/react-native'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  8 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mLogFinalizationControls\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/components/LogFinalizationControls'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m  9 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mAlert\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'react-native'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\retrospective-context-prompt.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\retrospective-context-prompt.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\retrospective-context-prompt.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-BD-002: Retrospective Context UI Prompt'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   test(\u001b[32m'Log entry screen detects backdated logs (daysDelayed > 0)'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     \u001b[36mconst\u001b[39m today \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mDate\u001b[39m(\u001b[32m'2026-02-10'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 9 |\u001b[39m     \u001b[36mconst\u001b[39m logDate \u001b[33m=\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mDate\u001b[39m(\u001b[32m'2026-02-01'\u001b[39m)\u001b[33m;\u001b[39m \u001b[90m// 9 days ago\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\retrospective-context-ui.test.tsx:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\retrospective-context-ui.test.tsx",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\retrospective-context-ui.test.tsx:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-BD-002: Retrospective Context Prompt UI'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   it(\u001b[32m'REQ-BD-002 COMPLIANCE: Retrospective context UI field exists for backdated entries'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 10 |\u001b[39m     \u001b[90m// Verify that retrospective context field structure exists\u001b[39m\n \u001b[90m 11 |\u001b[39m     \u001b[90m// This is a structural test proving the UI capability exists\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "SyntaxError: Unexpected token 'typeof'",
+      "stack": "SyntaxError: Unexpected token 'typeof'\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\helpers\\accessibility.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\to-be-busy.ts:5:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\matchers\\extend-expect.ts:1:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\node_modules\\@testing-library\\react-native\\src\\index.ts:2:1)\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\revision-ui.test.tsx:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\revision-ui.test.tsx",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\revision-ui.test.tsx:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m\n \u001b[90m  7 |\u001b[39m \u001b[36mimport\u001b[39m \u001b[33mReact\u001b[39m \u001b[36mfrom\u001b[39m \u001b[32m'react'\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m \u001b[36mimport\u001b[39m { render\u001b[33m,\u001b[39m fireEvent } \u001b[36mfrom\u001b[39m \u001b[32m'@testing-library/react-native'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mRevisionHistoryViewer\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/components/RevisionHistoryViewer'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 10 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mRevisionReasonModal\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'../../src/components/RevisionReasonModal'\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m \u001b[36mimport\u001b[39m { \u001b[33mTouchableOpacity\u001b[39m\u001b[33m,\u001b[39m \u001b[33mText\u001b[39m\u001b[33m,\u001b[39m \u001b[33mView\u001b[39m } \u001b[36mfrom\u001b[39m \u001b[32m'react-native'\u001b[39m\u001b[33m;\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\validation-error-display.test.ts:6:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\validation-error-display.test.ts",
+        "column": 1,
+        "line": 6
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\validation-error-display.test.ts:6\n\n\u001b[0m \u001b[90m 4 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m 5 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 6 |\u001b[39m describe(\u001b[32m'REQ-FM-002: Validation Errors Displayed to User'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m   |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 7 |\u001b[39m   test(\u001b[32m'Invalid severity (out of range) shows error message'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 8 |\u001b[39m     \u001b[36mconst\u001b[39m severity \u001b[33m=\u001b[39m \u001b[35m15\u001b[39m\u001b[33m;\u001b[39m \u001b[90m// Invalid: must be 1-10\u001b[39m\n \u001b[90m 9 |\u001b[39m     \u001b[36mconst\u001b[39m isValid \u001b[33m=\u001b[39m severity \u001b[33m>=\u001b[39m \u001b[35m1\u001b[39m \u001b[33m&&\u001b[39m severity \u001b[33m<=\u001b[39m \u001b[35m10\u001b[39m\u001b[33m;\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "ReferenceError: describe is not defined",
+      "stack": "ReferenceError: describe is not defined\n    at Object.<anonymous> (e:\\Repos\\symptom_tracker\\tests\\ui\\validation-errors-ui.test.tsx:8:1)",
+      "location": {
+        "file": "e:\\Repos\\symptom_tracker\\tests\\ui\\validation-errors-ui.test.tsx",
+        "column": 1,
+        "line": 8
+      },
+      "snippet": "\u001b[90m   at \u001b[39mui\\validation-errors-ui.test.tsx:8\n\n\u001b[0m \u001b[90m  6 |\u001b[39m \u001b[90m */\u001b[39m\n \u001b[90m  7 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  8 |\u001b[39m describe(\u001b[32m'REQ-FM-002: Validation Error Display'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m    |\u001b[39m \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m  9 |\u001b[39m   describe(\u001b[32m'DailyLogScreen Validation Errors'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 10 |\u001b[39m     it(\u001b[32m'REQ-FM-002 COMPLIANCE: Validation errors are shown to user via Alert'\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m=>\u001b[39m {\n \u001b[90m 11 |\u001b[39m       \u001b[90m// Define validation error scenarios that trigger Alert.alert\u001b[39m\u001b[0m"
+    },
+    {
+      "message": "Error: No tests found",
+      "stack": "Error: No tests found"
+    }
+  ],
+  "stats": {
+    "startTime": "2026-02-06T23:59:55.385Z",
+    "duration": 923.779,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
