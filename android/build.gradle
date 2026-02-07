@@ -5,12 +5,10 @@ buildscript {
         buildToolsVersion = findProperty('android.buildToolsVersion') ?: '35.0.0'
         minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
         compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')
-        targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '35')
-        // Kotlin Compose plugin is only published for Kotlin 2.x+. Expo SDK 54 expects Kotlin 2.0.21+.
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '2.0.21'
-        kspVersion = findProperty('android.kspVersion') ?: '2.0.21-1.0.28'
+        targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
+        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.25'
 
-        ndkVersion = findProperty('android.ndkVersion') ?: "26.1.10909125"
+        ndkVersion = "26.1.10909125"
     }
     repositories {
         google()
