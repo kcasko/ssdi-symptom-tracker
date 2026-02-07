@@ -33,7 +33,7 @@ import {
 import { useAppState } from '../state/useAppState';
 import { LogService } from '../services';
 import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
-import { calculateDaysDelayed, getDelayLabel, parseDate } from '../utils/dates';
+import { calculateDaysDelayed, parseDate } from '../utils/dates';
 import { useEvidenceModeStore } from '../state/evidenceModeStore';
 import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
@@ -78,19 +78,8 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
 
   const eventDateValid = Boolean(parseDate(date));
   const creationReference = existingLog?.createdAt || new Date().toISOString();
-  const updatedReference = existingLog?.updatedAt || existingLog?.createdAt;
   const daysDelayed = eventDateValid ? calculateDaysDelayed(date, creationReference) : 0;
-  const delayLabel = eventDateValid ? getDelayLabel(daysDelayed) : 'Event date format is invalid';
   const isBackdated = eventDateValid && daysDelayed > 0;
-  const createdTimestampDisplay = existingLog?.createdAt
-    ? new Date(existingLog.createdAt).toISOString()
-    : 'Pending (set on save)';
-  const updatedTimestampDisplay = updatedReference
-    ? new Date(updatedReference).toISOString()
-    : 'Pending (set on save)';
-  const evidenceTimestampDisplay = existingLog?.evidenceTimestamp
-    ? new Date(existingLog.evidenceTimestamp).toISOString()
-    : 'None recorded';
   const showRetrospectiveContext =
     (eventDateValid && isBackdated) || Boolean(existingLog?.retrospectiveContext);
 
@@ -232,19 +221,6 @@ export const ActivityLogScreen: React.FC<ActivityLogProps> = ({ navigation }) =>
           autoCorrect={false}
           keyboardType="numbers-and-punctuation"
         />
-        <View style={styles.timelineCard}>
-          <Text style={styles.timelineLabel}>Record created timestamp (system)</Text>
-          <Text style={styles.timelineValue}>{createdTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Last modified timestamp (system)</Text>
-          <Text style={styles.timelineValue}>{updatedTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Record timestamp (system, immutable)</Text>
-          <Text style={styles.timelineValue}>{evidenceTimestampDisplay}</Text>
-          <Text style={styles.timelineLabel}>Delay between event date and creation</Text>
-          <Text style={styles.timelineValue}>
-            {eventDateValid ? `${daysDelayed} days` : 'N/A'}
-          </Text>
-          <Text style={styles.delayLabel}>{delayLabel}</Text>
-        </View>
         {showRetrospectiveContext && (
           <View style={styles.noticeBox}>
             <Text style={styles.noticeTitle}>Retrospective entry</Text>

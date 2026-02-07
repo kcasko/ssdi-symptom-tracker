@@ -44,6 +44,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     category: 'pain',
     commonLocations: ['Base of neck', 'Side of neck', 'Back of neck'],
     commonQualifiers: ['Stiff', 'Sharp', 'Aching', 'Shooting'],
+    description: 'Pain in the neck region',
     tags: ['musculoskeletal'],
   },
   {
@@ -52,6 +53,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     category: 'pain',
     commonLocations: ['Knees', 'Shoulders', 'Hips', 'Hands', 'Wrists', 'Ankles', 'Elbows'],
     commonQualifiers: ['Swollen', 'Stiff', 'Aching', 'Sharp', 'Throbbing'],
+    description: 'Pain and discomfort in joints',
     tags: ['arthritis', 'musculoskeletal'],
   },
   {
@@ -60,6 +62,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     category: 'pain',
     commonLocations: ['Temples', 'Forehead', 'Back of head', 'Entire head'],
     commonQualifiers: ['Throbbing', 'Pressure', 'Sharp', 'Pounding'],
+    description: 'Pain or pressure in the head',
     tags: ['migraine', 'tension'],
   },
   {
@@ -68,6 +71,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     category: 'pain',
     commonLocations: ['Legs', 'Arms', 'Shoulders', 'Chest', 'Abdomen'],
     commonQualifiers: ['Aching', 'Cramping', 'Sore', 'Tight'],
+    description: 'Aching or soreness in muscles',
     tags: ['fibromyalgia', 'musculoskeletal'],
   },
   {
@@ -75,6 +79,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Nerve Pain',
     category: 'pain',
     commonQualifiers: ['Burning', 'Shooting', 'Electric', 'Tingling', 'Numbness'],
+    description: 'Nerve-related pain sensations',
     tags: ['neuropathy', 'neurological'],
   },
 
@@ -144,6 +149,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Weakness',
     category: 'mobility',
     commonLocations: ['Arms', 'Legs', 'Hands', 'General'],
+    description: 'Feeling of reduced strength',
     tags: ['weakness'],
   },
 
@@ -160,6 +166,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Vision Problems',
     category: 'sensory',
     commonQualifiers: ['Blurry', 'Double vision', 'Light sensitivity'],
+    description: 'Difficulty with vision or eyesight',
     tags: ['vision', 'sensory'],
   },
   {
@@ -167,6 +174,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Hearing Problems',
     category: 'sensory',
     commonQualifiers: ['Ringing', 'Muffled', 'Loss'],
+    description: 'Hearing difficulties or changes',
     tags: ['hearing', 'tinnitus'],
   },
 
@@ -236,6 +244,7 @@ export const SYMPTOMS: SymptomDefinition[] = [
     name: 'Temperature Sensitivity',
     category: 'sensory',
     commonQualifiers: ['Hot', 'Cold', 'Both'],
+    description: 'Unusual sensitivity to temperature',
     tags: ['temperature', 'sensitivity'],
   },
   {

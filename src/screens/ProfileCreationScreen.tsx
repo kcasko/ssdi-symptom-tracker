@@ -287,7 +287,7 @@ export const ProfileCreationScreen: React.FC<ProfileCreationProps> = ({ navigati
                   {activity.name}
                 </Text>
                 <Text style={styles.optionSubtext}>
-                  {activity.category}
+                  {activity.description}
                 </Text>
               </View>
               {formData.defaultActivities.includes(activity.id) && (
