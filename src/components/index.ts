@@ -21,3 +21,4 @@ export * from './RevisionReasonModal';
 export * from './SubmissionPackBuilder';
 export * from './ThemeToggle';
 export * from './SymptomTrendChart';
+export * from './ScreenHeader';

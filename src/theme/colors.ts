@@ -7,6 +7,7 @@
  * - Low contrast but readable
  * - No alarm colors or bright accents
  * - Colors designed for clear, neutral presentation
+ * - Orange accent from brand icon used sparingly, never for "success"
  */
 
 export const colors = {
@@ -24,7 +25,17 @@ export const colors = {
     900: '#1a2128',    // Near black slate
   },
 
-  // Semantic colors - toned down, calm
+  // Brand accent - sunrise orange from app icon
+  // Use sparingly for brand moments only, NEVER for success/reward
+  accent: {
+    light: '#fef3eb',  // Very soft orange background
+    main: '#e07c42',   // Warm sunrise orange
+    dark: '#c4612e',   // Deeper orange
+    text: '#8a4f2a',   // Dark orange for text on light bg
+  },
+
+  // Semantic colors - for system states only, not data judgment
+  // These should be used sparingly for validation errors, system warnings
   success: {
     light: '#e8f4f1',  // Very soft green background
     main: '#52a68a',   // Muted sage green
@@ -60,14 +71,20 @@ export const colors = {
     900: '#1e242e',    // Near black
   },
 
-  // Severity scale colors (0-10) - less alarming
+  // Severity scale colors (0-10) - GRAYSCALE ONLY
+  // No emotional color associations - darker = higher severity
   severity: {
-    none: '#7ec299',      // 0 - Soft green
-    minimal: '#98cfac',   // 1-2 - Light sage
-    mild: '#e8d490',      // 3-4 - Soft yellow
-    moderate: '#daa978',  // 5-6 - Muted orange
-    severe: '#c9887d',    // 7-8 - Soft rose
-    extreme: '#b5726a',   // 9-10 - Muted red
+    0: '#e9ebee',   // Lightest gray
+    1: '#dce0e4',
+    2: '#dce0e4',
+    3: '#c4cbd3',
+    4: '#c4cbd3',
+    5: '#9aa4b0',
+    6: '#9aa4b0',
+    7: '#6b7684',
+    8: '#6b7684',
+    9: '#4a5361',
+    10: '#333b47',  // Darkest gray
   },
 
   // Background colors
@@ -95,12 +112,13 @@ export const colors = {
     focus: '#4a6176',     // Core slate
   },
 
-  // Status colors for logs - calm versions
+  // Status colors for logs - neutral, no judgment
+  // All use slate/gray family to avoid implying good/bad
   status: {
-    logged: '#4a6176',    // Core slate
-    pending: '#d4a574',   // Muted amber
-    exported: '#52a68a',  // Muted sage
-    draft: '#6b7684',     // Muted gray
+    logged: '#4a6176',    // Core slate - entry exists
+    pending: '#9aa4b0',   // Neutral gray - no entry yet
+    exported: '#3d4f61',  // Deep slate - exported/locked
+    draft: '#6b7684',     // Muted gray - not finalized
   },
 
   // Shorthand aliases for commonly used colors
@@ -121,23 +139,22 @@ export const colors = {
   primaryMain: '#4a6176',        // Core slate
   primary600: '#3d4f61',         // Deep slate
   primaryLight: '#f0f2f5',       // Very light slate
-  warningMain: '#d4a574',        // Muted amber
+  accentMain: '#e07c42',         // Sunrise orange (brand only)
+  accentLight: '#fef3eb',        // Very soft orange
+  warningMain: '#d4a574',        // Muted amber (system warnings only)
   warningLight: '#fef8ec',       // Very soft amber
-  errorMain: '#c17369',          // Muted rose
-  successMain: '#52a68a',        // Muted sage
+  errorMain: '#c17369',          // Muted rose (validation errors only)
+  successMain: '#52a68a',        // Muted sage (system success only)
   successLight: '#e8f4f1',       // Very soft green
 } as const;
 
 /**
  * Get severity color based on 0-10 scale
+ * Uses grayscale only - no emotional color associations
  */
 export function getSeverityColor(severity: number): string {
-  if (severity === 0) return colors.severity.none;
-  if (severity <= 2) return colors.severity.minimal;
-  if (severity <= 4) return colors.severity.mild;
-  if (severity <= 6) return colors.severity.moderate;
-  if (severity <= 8) return colors.severity.severe;
-  return colors.severity.extreme;
+  const clampedSeverity = Math.max(0, Math.min(10, Math.round(severity)));
+  return colors.severity[clampedSeverity as keyof typeof colors.severity];
 }
 
 /**

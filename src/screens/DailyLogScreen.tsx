@@ -20,7 +20,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer, RevisionReasonModal } from '../components';
+import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer, RevisionReasonModal, ScreenHeader } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService, PhotoService } from '../services';
 import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
@@ -329,9 +329,12 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Daily Log</Text>
-        <Text style={styles.timelineLabel}>Event date (user-selected)</Text>
+      <ScreenHeader
+        title="Daily Log"
+        subtitle="Record symptoms for a specific date"
+      />
+      <View style={styles.dateSection}>
+        <Text style={styles.dateLabel}>Event date</Text>
         <TextInput
           value={date}
           onChangeText={(text) => setDate(text.trim())}
@@ -509,30 +512,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.secondary,
   },
-  header: {
+  dateSection: {
     padding: spacing.lg,
     backgroundColor: colors.white,
     gap: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray200,
   },
-  title: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: typography.weights.bold as any,
-    color: colors.gray900,
-  },
-  timelineLabel: {
-    fontSize: typography.sizes.sm,
+  dateLabel: {
+    ...typography.labelMedium,
     color: colors.gray600,
-    fontWeight: typography.weights.medium as any,
   },
   dateInput: {
     borderWidth: 2,
-    borderColor: colors.gray400,
+    borderColor: colors.gray300,
     borderRadius: 4,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    fontSize: typography.sizes.md,
+    ...typography.bodyLarge,
     color: colors.gray900,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
+    backgroundColor: colors.white,
   },
   timelineCard: {
     marginTop: spacing.sm,

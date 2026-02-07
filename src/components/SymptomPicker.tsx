@@ -142,7 +142,7 @@ export const SymptomPicker: React.FC<SymptomPickerProps> = ({
                         </Text>
                       </View>
                       {selected && (
-                        <Text style={styles.checkmark}>✓</Text>
+                        <View style={styles.selectedIndicator} />
                       )}
                     </TouchableOpacity>
                   );
@@ -162,11 +162,11 @@ const styles = StyleSheet.create({
   searchInput: {
     height: 48,
     backgroundColor: colors.white,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.gray300,
     borderRadius: 4,
     paddingHorizontal: spacing.md,
-    fontSize: typography.sizes.md,
+    ...typography.bodyMedium,
     color: colors.gray900,
   },
   selectionCount: {
@@ -205,14 +205,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: spacing.md,
     backgroundColor: colors.white,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.gray200,
     borderRadius: 4,
     marginTop: spacing.xs,
   },
   symptomButtonSelected: {
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.primary[50],
     borderColor: colors.primaryMain,
+    borderWidth: 2,
   },
   symptomButtonDisabled: {
     opacity: 0.5,
@@ -233,10 +234,11 @@ const styles = StyleSheet.create({
     fontSize: typography.sizes.sm,
     color: colors.gray600,
   },
-  checkmark: {
-    fontSize: typography.sizes.xl,
-    color: colors.primaryMain,
-    fontWeight: typography.weights.bold as any,
+  selectedIndicator: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.primaryMain,
     marginLeft: spacing.sm,
   },
 });

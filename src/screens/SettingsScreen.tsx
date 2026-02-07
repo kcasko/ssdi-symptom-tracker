@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, EvidenceModeControls, SubmissionPackBuilder } from '../components';
+import { BigButton, EvidenceModeControls, SubmissionPackBuilder, ScreenHeader } from '../components';
 import { useAppState } from '../state/useAppState';
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
@@ -49,9 +49,7 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-      </View>
+      <ScreenHeader title="Settings" />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
@@ -146,11 +144,9 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
             <Text style={styles.settingLabel}>Version</Text>
             <Text style={styles.settingValue}>1.0.0</Text>
           </View>
-          <View style={styles.infoCard}>
-            <Text style={styles.infoTitle}>Daymark</Text>
-            <Text style={styles.infoText}>
-              A calm, neutral tool for marking your days. Track symptoms and patterns without judgment.
-            </Text>
+          <View style={styles.settingCard}>
+            <Text style={styles.settingLabel}>Build</Text>
+            <Text style={styles.settingValue}>Production</Text>
           </View>
         </View>
       </ScrollView>
@@ -162,15 +158,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
-  },
-  header: {
-    padding: spacing.lg,
-    backgroundColor: colors.white,
-  },
-  title: {
-    fontSize: typography.sizes.xxl,
-    fontWeight: typography.weights.bold as any,
-    color: colors.gray900,
   },
   scrollView: {
     flex: 1,

@@ -1,93 +1,102 @@
 /**
  * Dark Theme Configuration
  * Dark mode color palette optimized for accessibility
+ *
+ * Design Philosophy:
+ * - Uses same slate family as light theme for brand consistency
+ * - Lighter tints of slate for visibility on dark backgrounds
+ * - No color changes that would alter emotional associations
  */
 
 export const darkColors = {
-  // Background colors
+  // Background colors - dark slate family
   background: {
-    primary: '#121212',
-    secondary: '#1E1E1E',
-    tertiary: '#2C2C2C',
+    primary: '#121417',     // Near black with slate undertone
+    secondary: '#1a1d21',   // Dark charcoal
+    tertiary: '#252a30',    // Elevated surface
   },
 
   // Surface colors
   surface: {
-    primary: '#1E1E1E',
-    secondary: '#2C2C2C',
-    elevated: '#383838',
+    primary: '#1a1d21',
+    secondary: '#252a30',
+    elevated: '#2f353d',
   },
 
-  // Primary brand colors (adjusted for dark mode)
-  primary50: '#E3F2FD',
-  primary100: '#BBDEFB',
-  primary200: '#90CAF9',
-  primary300: '#64B5F6',
-  primary400: '#42A5F5',
-  primary500: '#2196F3',
-  primary600: '#1E88E5', // Main primary
-  primaryMain: '#1E88E5',
-  primary700: '#1976D2',
-  primary800: '#1565C0',
-  primary900: '#0D47A1',
+  // Primary brand colors - SLATE family (matching light theme)
+  primary50: '#f0f2f5',
+  primary100: '#d9dfe6',
+  primary200: '#b3bfcc',
+  primary300: '#8d9fb3',    // Good for dark mode primary
+  primary400: '#677f99',
+  primary500: '#4a6176',
+  primary600: '#8d9fb3',    // Lighter for dark mode visibility
+  primaryMain: '#8d9fb3',   // Lighter slate for dark backgrounds
+  primary700: '#b3bfcc',
+  primary800: '#d9dfe6',
+  primary900: '#f0f2f5',
 
-  // Danger/Error colors
-  danger50: '#FFEBEE',
-  danger100: '#FFCDD2',
-  danger500: '#F44336',
-  danger600: '#E53935',
-  dangerMain: '#E53935',
-  danger700: '#D32F2F',
+  // Accent - sunrise orange (brand, not reward)
+  accentMain: '#e8956a',    // Slightly lighter for dark mode
+  accentLight: '#3d2a1f',   // Dark orange-tinted surface
 
-  // Success colors
-  success50: '#E8F5E9',
-  success100: '#C8E6C9',
-  success500: '#4CAF50',
-  success600: '#43A047',
-  successMain: '#43A047',
-  success700: '#388E3C',
+  // Danger/Error colors - muted for dark mode
+  danger50: '#2a1f1f',
+  danger100: '#3d2525',
+  danger500: '#cf7f78',
+  danger600: '#c17369',
+  dangerMain: '#c17369',
+  danger700: '#a25d54',
 
-  // Warning colors
-  warning50: '#FFF3E0',
-  warning100: '#FFE0B2',
-  warning500: '#FF9800',
-  warning600: '#FB8C00',
-  warningMain: '#FB8C00',
-  warning700: '#F57C00',
+  // Success colors - muted sage
+  success50: '#1f2a24',
+  success100: '#253d2f',
+  success500: '#6bb89a',
+  success600: '#52a68a',
+  successMain: '#52a68a',
+  success700: '#3d7a66',
 
-  // Gray scale (inverted for dark mode)
+  // Warning colors - muted amber
+  warning50: '#2a251f',
+  warning100: '#3d3225',
+  warning500: '#e0b88a',
+  warning600: '#d4a574',
+  warningMain: '#d4a574',
+  warning700: '#b88a5c',
+
+  // Gray scale - warmer grays matching slate family
   white: '#FFFFFF',
   black: '#000000',
-  gray50: '#FAFAFA',
-  gray100: '#F5F5F5',
-  gray200: '#EEEEEE',
-  gray300: '#E0E0E0',
-  gray400: '#BDBDBD',
-  gray500: '#9E9E9E',
-  gray600: '#757575',
-  gray700: '#616161',
-  gray800: '#424242',
-  gray900: '#212121',
+  gray50: '#f4f5f7',
+  gray100: '#e9ebee',
+  gray200: '#dce0e4',
+  gray300: '#c4cbd3',
+  gray400: '#9aa4b0',
+  gray500: '#6b7684',
+  gray600: '#4a5361',
+  gray700: '#333b47',
+  gray800: '#252a30',
+  gray900: '#1a1d21',
 
   // Text colors (adjusted for dark backgrounds)
   text: {
-    primary: '#FFFFFF',
-    secondary: '#B3B3B3',
-    tertiary: '#808080',
-    disabled: '#5C5C5C',
-    inverse: '#000000',
+    primary: '#f4f5f7',     // Off-white, easier on eyes
+    secondary: '#9aa4b0',   // Muted gray
+    tertiary: '#6b7684',    // Darker muted
+    disabled: '#4a5361',
+    inverse: '#1a1d21',
   },
 
-  // Border colors
+  // Border colors - slate family
   border: {
-    primary: '#383838',
-    secondary: '#2C2C2C',
-    focus: '#1E88E5',
+    primary: '#333b47',
+    secondary: '#252a30',
+    focus: '#8d9fb3',       // Slate, not blue
   },
 
-  // Status colors
-  info: '#2196F3',
-  disabled: '#5C5C5C',
+  // Status colors - neutral
+  info: '#8d9fb3',          // Slate, not blue
+  disabled: '#4a5361',
 
   // Overlay
   overlay: 'rgba(0, 0, 0, 0.7)',

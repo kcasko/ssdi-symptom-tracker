@@ -60,21 +60,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold as any,
+    ...typography.labelLarge,
     color: colors.gray900,
   },
   counter: {
-    fontSize: typography.sizes.sm,
+    ...typography.labelSmall,
     color: colors.gray600,
   },
   input: {
     backgroundColor: colors.white,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.gray300,
     borderRadius: 4,
     padding: spacing.md,
-    fontSize: typography.sizes.md,
+    ...typography.bodyMedium,
     color: colors.gray900,
   },
 });

@@ -95,10 +95,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   text: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold as TextStyle['fontWeight'],
+    ...typography.buttonLarge,
   },
-  
+
   // Primary variant
   primaryButton: {
     backgroundColor: colors.primaryMain,
@@ -106,8 +105,8 @@ const styles = StyleSheet.create({
   primaryText: {
     color: colors.white,
   },
-  
-  // Secondary variant
+
+  // Secondary variant - interactive element uses 2px border
   secondaryButton: {
     backgroundColor: colors.white,
     borderWidth: 2,
@@ -116,19 +115,19 @@ const styles = StyleSheet.create({
   secondaryText: {
     color: colors.primaryMain,
   },
-  
-  // Danger variant
+
+  // Danger variant - for destructive actions only
   dangerButton: {
     backgroundColor: colors.errorMain,
   },
   dangerText: {
     color: colors.white,
   },
-  
+
   // Disabled state
   disabled: {
-    backgroundColor: colors.gray300,
-    borderColor: colors.gray300,
+    backgroundColor: colors.gray200,
+    borderColor: colors.gray200,
   },
   disabledText: {
     color: colors.gray500,

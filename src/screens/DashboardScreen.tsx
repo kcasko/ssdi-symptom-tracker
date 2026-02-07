@@ -1,9 +1,15 @@
 /**
  * Dashboard Screen
- * Main hub with quick stats and navigation
+ * Main hub showing today's status and navigation to functions
+ *
+ * Design Philosophy:
+ * - Today's status is the primary visual element
+ * - No streaks, progress bars, or trend implications
+ * - Factual data presentation without judgment
+ * - Clear hierarchy: status > actions > reference info
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -21,18 +27,17 @@ import { typography } from '../theme/typography';
 import { BigButton, SummaryCard, EvidenceModeControls } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
-import { DayQualityAnalyzer } from '../services/DayQualityAnalyzer';
 import { calculateDaysDelayed, getDaysBetween, addDays, parseDate } from '../utils/dates';
 import { getRevisionCount } from '../services/EvidenceLogService';
-// Date formatting utilities not currently used in this screen
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
 export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
   const [today, setToday] = useState(() => new Date().toISOString().split('T')[0]);
+  const [showRecordDetails, setShowRecordDetails] = useState(false);
 
-  // Refresh the date when screen comes into focus (handles day change, navigation back)
+  // Refresh the date when screen comes into focus
   useFocusEffect(
     useCallback(() => {
       setToday(new Date().toISOString().split('T')[0]);
@@ -40,7 +45,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   );
 
   // Filter logs for active profile
-  const profileDailyLogs = React.useMemo(() => 
+  const profileDailyLogs = React.useMemo(() =>
     activeProfile ? dailyLogs.filter(l => l.profileId === activeProfile.id) : [],
     [activeProfile, dailyLogs]
   );
@@ -53,20 +58,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
     [activeProfile, limitations]
   );
 
-  // Get quick stats
+  // Get stats
   const stats = activeProfile ? AnalysisService.getQuickStats(
     profileDailyLogs,
     profileActivityLogs,
     profileLimitations
   ) : null;
-
-  // Calculate day quality ratios
-  const dayAnalyzer = React.useMemo(() => new DayQualityAnalyzer(), []);
-  const timeRangeRatios = React.useMemo(() => {
-    return dayAnalyzer.calculateTimeRangeRatios(profileDailyLogs);
-  }, [dayAnalyzer, profileDailyLogs]);
-  const last7DayRatios = timeRangeRatios.last7Days;
-  const last30DayRatios = timeRangeRatios.last30Days;
 
   const sortedLogs = React.useMemo(
     () => [...profileDailyLogs].sort((a, b) => b.logDate.localeCompare(a.logDate)),
@@ -99,6 +96,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
     };
   }, [latestLog]);
 
+  // Gap calculation
   const gapSummary = React.useMemo(() => {
     if (sortedLogs.length === 0) {
       return { daysMissed: 0, longestGap: 0, lastGapRange: null as null | { start: string; end: string } };
@@ -129,7 +127,22 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
   // Check if logged today
   const loggedToday = profileDailyLogs.some(l => l.logDate === today);
 
-  useEffect(() => {
+  // Calculate days logged in last 7 and 30 days
+  const last7DaysLogged = React.useMemo(() => {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const cutoff = sevenDaysAgo.toISOString().split('T')[0];
+    return profileDailyLogs.filter(l => l.logDate >= cutoff).length;
+  }, [profileDailyLogs]);
+
+  const last30DaysLogged = React.useMemo(() => {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const cutoff = thirtyDaysAgo.toISOString().split('T')[0];
+    return profileDailyLogs.filter(l => l.logDate >= cutoff).length;
+  }, [profileDailyLogs]);
+
+  React.useEffect(() => {
     if (!activeProfile) {
       navigation.replace('ProfilePicker');
     }
@@ -144,211 +157,72 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={{ flex: 1 }}>
+          <View style={styles.headerContent}>
             <Text style={styles.profileName}>{activeProfile.name}</Text>
-            <View style={{ marginTop: spacing.sm }}>
-              <EvidenceModeControls profileId={activeProfile.id} compact={true} />
-            </View>
+            <Text style={styles.dateText}>{today}</Text>
           </View>
           <TouchableOpacity
             style={styles.settingsButton}
             onPress={() => navigation.navigate('Settings')}
+            accessibilityLabel="Open settings"
           >
-            <Text style={styles.settingsIcon} accessibilityLabel="Open settings">
-              ⚙
-            </Text>
+            <Text style={styles.settingsIcon}>&#x2699;</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Recordkeeping Notes */}
-        <View style={styles.explanationBlock}>
-          <View style={styles.explanationHeader}>
-            <Text style={styles.explanationTitle}>Recordkeeping Notes</Text>
-          </View>
-
-          <Text style={styles.explanationPrimary}>
-            Consistent logging helps keep the record clear. Gaps remain visible. Records are timestamped and locked when finalized.
-          </Text>
-
-          <View style={styles.explanationInstructions}>
-            <Text style={styles.instructionLine}>- Suggested: daily symptom entries</Text>
-            <Text style={styles.instructionLine}>- Activity impact entries when applicable</Text>
-            <Text style={styles.instructionLine}>- Consistency helps show history over time</Text>
-          </View>
-        </View>
-
-        {latestLogMeta && (
-          <View style={styles.timelineSection}>
-            <Text style={styles.sectionTitle}>Latest Entry Timeline</Text>
-            <View style={styles.timelineGrid}>
-              <View style={styles.timelineItem}>
-                <Text style={styles.timelineLabel}>Event date (user)</Text>
-                <Text style={styles.timelineValue}>{latestLogMeta.eventDate}</Text>
-              </View>
-              <View style={styles.timelineItem}>
-                <Text style={styles.timelineLabel}>Record created (system)</Text>
-                <Text style={styles.timelineValue}>{latestLogMeta.createdIso}</Text>
-              </View>
-              <View style={styles.timelineItem}>
-                <Text style={styles.timelineLabel}>Last modified (system)</Text>
-                <Text style={styles.timelineValue}>{latestLogMeta.updatedIso}</Text>
-              </View>
-              <View style={styles.timelineItem}>
-                <Text style={styles.timelineLabel}>Delay between event and creation</Text>
-                <Text style={styles.timelineValue}>{latestLogMeta.delayLabel}</Text>
-              </View>
-            </View>
-            <View style={styles.timelineFooter}>
-              <Text style={styles.timelineMeta}>Revisions: {latestLogMeta.revisionCount}</Text>
-              <Text style={styles.timelineMeta}>Finalized: {latestLogMeta.finalized ? 'Yes' : 'No'}</Text>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.gapSection}>
-          <Text style={styles.sectionTitle}>Gap Visibility</Text>
-          <View style={styles.timelineGrid}>
-            <View style={styles.timelineItem}>
-              <Text style={styles.timelineLabel}>Total missed days</Text>
-              <Text style={styles.timelineValue}>{gapSummary.daysMissed}</Text>
-            </View>
-            <View style={styles.timelineItem}>
-              <Text style={styles.timelineLabel}>Longest gap (days)</Text>
-              <Text style={styles.timelineValue}>{gapSummary.longestGap}</Text>
-            </View>
-            <View style={styles.timelineItem}>
-              <Text style={styles.timelineLabel}>Most recent gap range</Text>
-              <Text style={styles.timelineValue}>
-                {gapSummary.lastGapRange
-                  ? `${gapSummary.lastGapRange.start} to ${gapSummary.lastGapRange.end}`
-                  : 'None recorded'}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Today's Status */}
+        {/* Today's Status - Primary Focus */}
         <View style={styles.todaySection}>
-          <Text style={styles.sectionTitle}>Today's Status</Text>
+          <Text style={styles.sectionTitle}>Today</Text>
           {loggedToday ? (
             <View style={styles.statusCard}>
-              <Text style={styles.statusText}>Entry recorded</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('DailyLog')}>
-                <Text style={styles.editLink}>Modify</Text>
+              <View style={styles.statusContent}>
+                <Text style={styles.statusIndicator}>&#x25CF;</Text>
+                <Text style={styles.statusText}>Entry recorded</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('DailyLog')}
+                style={styles.modifyButton}
+              >
+                <Text style={styles.modifyLink}>View / Modify</Text>
               </TouchableOpacity>
             </View>
           ) : (
-            <BigButton
-              label={profileDailyLogs.length === 0 ? "Create Initial Log" : "Log Daily Symptoms"}
-              onPress={() => navigation.navigate('DailyLog')}
-              variant="primary"
-              fullWidth
-            />
+            <View style={styles.noEntryCard}>
+              <Text style={styles.noEntryText}>No entry for today</Text>
+              <BigButton
+                label={profileDailyLogs.length === 0 ? "Create First Entry" : "Log Today"}
+                onPress={() => navigation.navigate('DailyLog')}
+                variant="primary"
+                fullWidth
+              />
+            </View>
           )}
         </View>
 
-        {/* Quick Stats - Last 7 Days */}
-        <View style={styles.statsSection}>
-          <Text style={styles.sectionTitle}>Last 7 Days</Text>
-          <Text style={styles.sectionHelper}>Low or zero values usually mean you haven't logged yet.</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Symptoms"
-                value={stats.last7Days.symptomCount}
-                subtitle="Unique symptoms you've logged"
-                variant={stats.last7Days.symptomCount > 5 ? 'warning' : 'default'}
-              />
-            </View>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Limited Function Days"
-                value={stats.last7Days.badDays}
-                subtitle="Severity >=6"
-                variant={stats.last7Days.badDays >= 4 ? 'error' : stats.last7Days.badDays >= 2 ? 'warning' : 'success'}
-              />
-            </View>
-          </View>
-          <View style={styles.statsGrid}>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Functional Days"
-                value={`${last7DayRatios.goodDayPercentage.toFixed(0)}%`}
-                subtitle="Severity <5"
-                variant={
-                  last7DayRatios.goodDayPercentage >= 60 ? 'success' :
-                  last7DayRatios.goodDayPercentage >= 30 ? 'warning' : 'error'
-                }
-              />
-            </View>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Limited Function Days"
-                value={`${last7DayRatios.badDayPercentage.toFixed(0)}%`}
-                subtitle="Severity >=6"
-                variant={
-                  last7DayRatios.badDayPercentage >= 60 ? 'error' :
-                  last7DayRatios.badDayPercentage >= 30 ? 'warning' : 'success'
-                }
-              />
-            </View>
-          </View>
-          <View style={styles.statsGrid}>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Activities"
-                value={stats.last7Days.activitiesLogged}
-                subtitle="Logged"
-                variant="default"
-              />
-            </View>
-            <View style={styles.cardWrapper}>
-              <SummaryCard
-                title="Total Logs"
-                value={stats.allTime.totalLogs}
-                subtitle="All time"
-                variant="default"
-              />
-            </View>
-          </View>
+        {/* Evidence Mode Controls */}
+        <View style={styles.evidenceSection}>
+          <EvidenceModeControls profileId={activeProfile.id} compact={true} />
         </View>
 
-        {/* Day Quality Summary - Last 30 Days */}
-        <View style={styles.dayQualitySection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Last 30 Days - Logging Consistency</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Trends')}>
-              <Text style={styles.viewDetailsLink}>View Details →</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.capacityBar}>
-            <View style={styles.capacityBarTrack}>
-              <View
-                style={[
-                  styles.capacityBarFill,
-                  {
-                    width: `${last30DayRatios.goodDayPercentage}%`,
-                    backgroundColor:
-                      last30DayRatios.goodDayPercentage >= 60 ? colors.successMain :
-                      last30DayRatios.goodDayPercentage >= 30 ? colors.warningMain : colors.errorMain
-                  }
-                ]}
-              />
+        {/* Quick Counts - Factual, No Judgment */}
+        <View style={styles.countsSection}>
+          <Text style={styles.sectionTitle}>Record Counts</Text>
+          <View style={styles.countsGrid}>
+            <View style={styles.countCard}>
+              <Text style={styles.countValue}>{last7DaysLogged}</Text>
+              <Text style={styles.countLabel}>Entries (7 days)</Text>
             </View>
-            <Text style={styles.capacityBarLabel}>
-              {last30DayRatios.goodDayPercentage.toFixed(0)}% Functional Days (severity &lt;5)
-            </Text>
-          </View>
-
-          <View style={styles.statsGrid}>
-            <View style={styles.streakCard}>
-              <Text style={styles.streakValue}>{last30DayRatios.worstStreak}</Text>
-              <Text style={styles.streakLabel}>Consecutive High-Severity Days</Text>
+            <View style={styles.countCard}>
+              <Text style={styles.countValue}>{last30DaysLogged}</Text>
+              <Text style={styles.countLabel}>Entries (30 days)</Text>
             </View>
-            <View style={styles.streakCard}>
-              <Text style={styles.streakValue}>{last30DayRatios.bestStreak}</Text>
-              <Text style={styles.streakLabel}>Consecutive Low-Severity Days</Text>
+            <View style={styles.countCard}>
+              <Text style={styles.countValue}>{stats.allTime.totalLogs}</Text>
+              <Text style={styles.countLabel}>Total entries</Text>
+            </View>
+            <View style={styles.countCard}>
+              <Text style={styles.countValue}>{gapSummary.daysMissed}</Text>
+              <Text style={styles.countLabel}>Days not logged</Text>
             </View>
           </View>
         </View>
@@ -364,12 +238,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Record how an activity affected you afterward</Text>
+            <Text style={styles.actionHelper}>Record how an activity affected you</Text>
           </View>
 
           <View style={styles.actionItem}>
             <BigButton
-              label="Voice Entry (Accessibility Mode)"
+              label="Voice Entry"
               onPress={() => navigation.navigate('VoiceLog')}
               variant="secondary"
               fullWidth
@@ -379,12 +253,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="View Symptom Trends"
+              label="View History"
               onPress={() => navigation.navigate('Trends')}
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>View date ranges, gaps, and counts</Text>
+            <Text style={styles.actionHelper}>Browse logged entries by date</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -394,7 +268,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Track what you can and can't do</Text>
+            <Text style={styles.actionHelper}>Track functional limitations</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -404,37 +278,96 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Treatment records and provider visit preparation</Text>
+            <Text style={styles.actionHelper}>Treatment records</Text>
           </View>
 
           <View style={styles.actionItem}>
             <BigButton
-              label="View Reports"
+              label="Reports"
               onPress={() => navigation.navigate('Reports')}
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Summaries you can share or export</Text>
+            <Text style={styles.actionHelper}>Export records</Text>
           </View>
         </View>
 
-        {/* Data Summary */}
-        <View style={styles.summarySection}>
-          <Text style={styles.sectionTitle}>Data Summary</Text>
-          <View style={styles.summaryCard}>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Daily Logs:</Text>
-              <Text style={styles.summaryValue}>{stats.allTime.totalLogs}</Text>
+        {/* Record Details - Collapsible */}
+        <View style={styles.detailsSection}>
+          <TouchableOpacity
+            style={styles.detailsHeader}
+            onPress={() => setShowRecordDetails(!showRecordDetails)}
+            accessibilityLabel={showRecordDetails ? "Hide record details" : "Show record details"}
+          >
+            <Text style={styles.sectionTitle}>Record Details</Text>
+            <Text style={styles.expandIcon}>{showRecordDetails ? '−' : '+'}</Text>
+          </TouchableOpacity>
+
+          {showRecordDetails && (
+            <View style={styles.detailsContent}>
+              {latestLogMeta && (
+                <View style={styles.detailCard}>
+                  <Text style={styles.detailCardTitle}>Latest Entry</Text>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Event date</Text>
+                    <Text style={styles.detailValue}>{latestLogMeta.eventDate}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Record created</Text>
+                    <Text style={styles.detailValue}>{latestLogMeta.createdIso.split('T')[0]}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Entry timing</Text>
+                    <Text style={styles.detailValue}>{latestLogMeta.delayLabel}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Revisions</Text>
+                    <Text style={styles.detailValue}>{latestLogMeta.revisionCount}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Finalized</Text>
+                    <Text style={styles.detailValue}>{latestLogMeta.finalized ? 'Yes' : 'No'}</Text>
+                  </View>
+                </View>
+              )}
+
+              <View style={styles.detailCard}>
+                <Text style={styles.detailCardTitle}>Gap Information</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Total unlogged days</Text>
+                  <Text style={styles.detailValue}>{gapSummary.daysMissed}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Longest gap</Text>
+                  <Text style={styles.detailValue}>{gapSummary.longestGap} days</Text>
+                </View>
+                {gapSummary.lastGapRange && (
+                  <View style={styles.detailRow}>
+                    <Text style={styles.detailLabel}>Longest gap dates</Text>
+                    <Text style={styles.detailValue}>
+                      {gapSummary.lastGapRange.start} to {gapSummary.lastGapRange.end}
+                    </Text>
+                  </View>
+                )}
+              </View>
+
+              <View style={styles.detailCard}>
+                <Text style={styles.detailCardTitle}>Data Summary</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Daily logs</Text>
+                  <Text style={styles.detailValue}>{stats.allTime.totalLogs}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Unique symptoms logged</Text>
+                  <Text style={styles.detailValue}>{stats.allTime.totalSymptoms}</Text>
+                </View>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Active limitations</Text>
+                  <Text style={styles.detailValue}>{stats.allTime.totalLimitations}</Text>
+                </View>
+              </View>
             </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Unique Symptoms:</Text>
-              <Text style={styles.summaryValue}>{stats.allTime.totalSymptoms}</Text>
-            </View>
-            <View style={styles.summaryRow}>
-              <Text style={styles.summaryLabel}>Active Limitations:</Text>
-              <Text style={styles.summaryValue}>{stats.allTime.totalLimitations}</Text>
-            </View>
-          </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -455,15 +388,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.lg,
     backgroundColor: colors.white,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray200,
   },
-  greeting: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray600,
+  headerContent: {
+    flex: 1,
+    gap: spacing.xs,
   },
   profileName: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold as any,
+    ...typography.headlineLarge,
     color: colors.gray900,
+  },
+  dateText: {
+    ...typography.bodyMedium,
+    color: colors.gray600,
   },
   settingsButton: {
     width: 44,
@@ -474,158 +412,107 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   settingsIcon: {
-    fontSize: typography.sizes.xl,
-    color: colors.gray900,
-  },
-  explanationBlock: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.md,
-    marginBottom: spacing.md,
-    borderRadius: 4,
-    gap: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.primaryLight,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  explanationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  explanationIcon: {
-    fontSize: typography.sizes.lg,
-  },
-  explanationTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.semibold as any,
-    color: colors.primaryMain,
-  },
-  explanationPrimary: {
-    fontSize: typography.sizes.md,
-    lineHeight: typography.sizes.md * 1.6,
-    color: colors.gray800,
-  },
-  explanationInstructions: {
-    gap: spacing.sm,
-    paddingLeft: spacing.sm,
-    paddingVertical: spacing.xs,
-  },
-  instructionLine: {
-    fontSize: typography.sizes.md,
-    lineHeight: typography.sizes.md * 1.5,
+    fontSize: 20,
     color: colors.gray700,
   },
-  explanationFooter: {
-    backgroundColor: colors.gray50,
-    padding: spacing.md,
-    borderRadius: 4,
-    marginTop: spacing.xs,
-  },
-  explanationReassurance: {
-    fontSize: typography.sizes.sm,
-    lineHeight: typography.sizes.sm * 1.5,
-    color: colors.gray600,
-    textAlign: 'center' as any,
-  },
-  timelineSection: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    gap: spacing.md,
-  },
-  gapSection: {
-    backgroundColor: colors.white,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginBottom: spacing.md,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    gap: spacing.md,
-  },
-  timelineGrid: {
-    gap: spacing.sm,
-  },
-  timelineItem: {
-    paddingVertical: spacing.xs,
-  },
-  timelineLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray700,
-  },
-  timelineValue: {
-    fontSize: typography.sizes.md,
-    color: colors.gray900,
-    fontWeight: typography.weights.semibold as any,
-  },
-  timelineFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-  },
-  timelineMeta: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray700,
-    fontWeight: typography.weights.medium as any,
-  },
+
+  // Today's Status Section
   todaySection: {
     padding: spacing.lg,
     gap: spacing.md,
   },
   sectionTitle: {
-    fontSize: typography.sizes.lg,
-    fontWeight: typography.weights.bold as any,
+    ...typography.titleLarge,
     color: colors.gray900,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  sectionHelper: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray600,
-    marginTop: -spacing.xs,
   },
   statusCard: {
-    backgroundColor: colors.successLight,
+    backgroundColor: colors.primary[50],
     padding: spacing.md,
     borderRadius: 4,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.successMain,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primaryMain,
+    borderWidth: 1,
+    borderColor: colors.gray200,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  statusText: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold as any,
-    color: colors.successMain,
+  statusContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
-  editLink: {
-    fontSize: typography.sizes.md,
+  statusIndicator: {
+    fontSize: 12,
     color: colors.primaryMain,
-    fontWeight: typography.weights.semibold as any,
   },
-  statsSection: {
+  statusText: {
+    ...typography.bodyLarge,
+    color: colors.gray900,
+    fontWeight: typography.weights.medium,
+  },
+  modifyButton: {
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+  },
+  modifyLink: {
+    ...typography.bodyMedium,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold,
+  },
+  noEntryCard: {
+    backgroundColor: colors.gray50,
+    padding: spacing.lg,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    gap: spacing.md,
+  },
+  noEntryText: {
+    ...typography.bodyMedium,
+    color: colors.gray600,
+    textAlign: 'center',
+  },
+
+  // Evidence Section
+  evidenceSection: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+
+  // Counts Section
+  countsSection: {
     padding: spacing.lg,
     gap: spacing.md,
+    backgroundColor: colors.gray50,
   },
-  statsGrid: {
+  countsGrid: {
     flexDirection: 'row',
-    gap: spacing.md,
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
-  cardWrapper: {
+  countCard: {
     flex: 1,
+    minWidth: '45%',
+    backgroundColor: colors.white,
+    padding: spacing.md,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    alignItems: 'center',
+    gap: spacing.xs,
   },
+  countValue: {
+    ...typography.numeric,
+    color: colors.gray900,
+  },
+  countLabel: {
+    ...typography.labelSmall,
+    color: colors.gray600,
+    textAlign: 'center',
+  },
+
+  // Actions Section
   actionsSection: {
     padding: spacing.lg,
     gap: spacing.md,
@@ -634,86 +521,55 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   actionHelper: {
-    fontSize: typography.sizes.sm,
+    ...typography.bodySmall,
     color: colors.gray600,
     marginLeft: spacing.xs,
   },
-  dayQualitySection: {
-    padding: spacing.lg,
-    gap: spacing.md,
-    backgroundColor: colors.gray50,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.sm,
-  },
-  viewDetailsLink: {
-    fontSize: typography.sizes.sm,
-    color: colors.primaryMain,
-    fontWeight: typography.weights.semibold as any,
-    flexShrink: 0,
-  },
-  capacityBar: {
-    gap: spacing.xs,
-  },
-  capacityBarTrack: {
-    height: 32,
-    backgroundColor: colors.gray200,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  capacityBarFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  capacityBarLabel: {
-    fontSize: typography.sizes.sm,
-    fontWeight: typography.weights.semibold as any,
-    color: colors.gray700,
-    textAlign: 'center',
-  },
-  streakCard: {
-    flex: 1,
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: 4,
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  streakValue: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold as any,
-    color: colors.gray900,
-  },
-  streakLabel: {
-    fontSize: typography.sizes.sm,
-    color: colors.gray600,
-  },
-  summarySection: {
+
+  // Details Section
+  detailsSection: {
     padding: spacing.lg,
     gap: spacing.md,
     marginBottom: spacing.xl,
   },
-  summaryCard: {
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: 4,
-    gap: spacing.sm,
-  },
-  summaryRow: {
+  detailsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  summaryLabel: {
-    fontSize: typography.sizes.md,
+  expandIcon: {
+    fontSize: 20,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.bold,
+  },
+  detailsContent: {
+    gap: spacing.md,
+  },
+  detailCard: {
+    backgroundColor: colors.white,
+    padding: spacing.md,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    gap: spacing.sm,
+  },
+  detailCardTitle: {
+    ...typography.titleSmall,
+    color: colors.gray900,
+    marginBottom: spacing.xs,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  detailLabel: {
+    ...typography.bodySmall,
     color: colors.gray600,
   },
-  summaryValue: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.bold as any,
+  detailValue: {
+    ...typography.bodySmall,
     color: colors.gray900,
+    fontWeight: typography.weights.medium,
   },
 });

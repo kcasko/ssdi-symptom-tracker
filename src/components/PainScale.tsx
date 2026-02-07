@@ -89,8 +89,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   label: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold as any,
+    ...typography.labelLarge,
     color: colors.gray700,
   },
   scaleContainer: {
@@ -99,22 +98,21 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   scaleButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: colors.gray400,
+    width: 56,
+    height: 56,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.gray300,
     backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
   },
   scaleButtonActive: {
     borderColor: colors.gray900,
-    borderWidth: 3,
+    borderWidth: 2,
   },
   scaleButtonText: {
-    fontSize: typography.sizes.xl,
-    fontWeight: typography.weights.bold as any,
+    ...typography.titleLarge,
     color: colors.gray600,
   },
   scaleButtonTextActive: {
@@ -127,17 +125,17 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   colorIndicator: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 20,
+    height: 20,
+    borderRadius: 4,
   },
   feedbackText: {
-    fontSize: typography.sizes.md,
-    fontWeight: typography.weights.semibold as any,
+    ...typography.bodyMedium,
     color: colors.gray700,
+    fontWeight: typography.weights.medium,
   },
   unselectedText: {
-    fontSize: typography.sizes.sm,
+    ...typography.bodySmall,
     color: colors.gray600,
   },
 });

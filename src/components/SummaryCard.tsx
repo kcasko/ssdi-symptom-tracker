@@ -1,6 +1,11 @@
 /**
  * SummaryCard Component
- * High-contrast card for displaying summary information
+ * Neutral card for displaying summary information
+ *
+ * Design Philosophy:
+ * - No semantic color variants (success/warning/error)
+ * - All data presented neutrally without judgment
+ * - Slate accent color only
  */
 
 import React from 'react';
@@ -15,6 +20,10 @@ interface SummaryCardProps {
   subtitle?: string;
   icon?: React.ReactNode;
   onPress?: () => void;
+  /**
+   * @deprecated Semantic variants removed to prevent data judgment.
+   * All cards now use neutral styling. This prop is ignored.
+   */
   variant?: 'default' | 'success' | 'warning' | 'error';
 }
 
@@ -24,21 +33,8 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   subtitle,
   icon,
   onPress,
-  variant = 'default',
+  // variant is intentionally ignored - all cards are neutral
 }) => {
-  const getVariantColor = () => {
-    switch (variant) {
-      case 'success':
-        return colors.successMain;
-      case 'warning':
-        return colors.warningMain;
-      case 'error':
-        return colors.errorMain;
-      default:
-        return colors.primaryMain;
-    }
-  };
-
   const Container = (onPress ? TouchableOpacity : View) as any;
 
   const containerProps = onPress
@@ -54,13 +50,13 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
 
   return (
     <Container
-      style={[styles.card, { borderLeftColor: getVariantColor() }]}
+      style={styles.card}
       {...containerProps}
     >
       {icon && <View style={styles.iconContainer}>{icon}</View>}
       <View style={styles.content}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={[styles.value, { color: getVariantColor() }]}>{value}</Text>
+        <Text style={styles.value}>{value}</Text>
         {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
       </View>
     </Container>
@@ -72,13 +68,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 4,
     padding: spacing.md,
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primaryMain,  // Neutral slate accent
+    borderWidth: 1,
+    borderColor: colors.gray200,
     gap: spacing.sm,
-    shadowColor: colors.black,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    // Removed shadow - informational cards don't need elevation
   },
   iconContainer: {
     alignSelf: 'flex-start',
@@ -94,6 +89,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: typography.sizes.xxl,
     fontWeight: typography.weights.bold as any,
+    color: colors.gray900,  // Neutral text color, no judgment
   },
   subtitle: {
     fontSize: typography.sizes.sm,
