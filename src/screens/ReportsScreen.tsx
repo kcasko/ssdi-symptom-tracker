@@ -338,8 +338,8 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
           {profileReports.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No reports yet</Text>
-              <Text style={styles.emptySubtext}>Generate your first report above</Text>
+              <Text style={styles.emptyText}>No reports saved</Text>
+              <Text style={styles.emptySubtext}>No reports in this date range.</Text>
             </View>
           ) : (
             profileReports.map((report) => {

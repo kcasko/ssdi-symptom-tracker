@@ -187,7 +187,7 @@ export const SymptomTrendChart: React.FC<SymptomTrendChartProps> = ({
           <Text style={styles.legendText}>Severity (0-10)</Text>
         </View>
         <Text style={styles.legendSubtext}>
-          {dataPoints.length} data points over {dataPoints.length} days
+          {dataPoints.length} entries
         </Text>
       </View>
     </View>

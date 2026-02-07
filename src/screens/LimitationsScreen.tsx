@@ -500,9 +500,9 @@ export const LimitationsScreen: React.FC = () => {
 
         {activeLimitations.length === 0 && !showAddForm && (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No limitations documented yet</Text>
+            <Text style={styles.emptyText}>No limitations recorded</Text>
             <Text style={styles.emptySubtext}>
-              Add limitations to track your functional capacity over time
+              No active limitation entries.
             </Text>
           </View>
         )}

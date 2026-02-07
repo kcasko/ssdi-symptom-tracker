@@ -251,61 +251,33 @@ export function TrendsScreen() {
   function renderDayRatioInsights() {
     return (
       <View style={styles.dayRatioContainer}>
-        <Text style={styles.sectionTitle}>Day Impact Distribution</Text>
-        
+        <Text style={styles.sectionTitle}>Severity Distribution</Text>
+
         <View style={styles.ratioStatsGrid}>
           <View style={styles.ratioStatCard}>
-            <Text style={[styles.ratioValue, { color: COLORS.successMain }]}>
+            <Text style={styles.ratioValue}>
               {dayRatios.goodDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Lower-impact days (severity &lt; 5)</Text>
+            <Text style={styles.ratioLabel}>Severity 0-4</Text>
             <Text style={styles.ratioCount}>({dayRatios.goodDays} days)</Text>
           </View>
 
           <View style={styles.ratioStatCard}>
-            <Text style={[styles.ratioValue, { color: COLORS.errorMain }]}>
+            <Text style={styles.ratioValue}>
+              {dayRatios.neutralDays > 0 ? ((dayRatios.neutralDays / (dayRatios.goodDays + dayRatios.neutralDays + dayRatios.badDays + dayRatios.veryBadDays)) * 100).toFixed(0) : '0'}%
+            </Text>
+            <Text style={styles.ratioLabel}>Severity 5</Text>
+            <Text style={styles.ratioCount}>({dayRatios.neutralDays} days)</Text>
+          </View>
+
+          <View style={styles.ratioStatCard}>
+            <Text style={styles.ratioValue}>
               {dayRatios.badDayPercentage.toFixed(0)}%
             </Text>
-            <Text style={styles.ratioLabel}>Higher-impact days (severity &gt;= 6)</Text>
+            <Text style={styles.ratioLabel}>Severity 6-10</Text>
             <Text style={styles.ratioCount}>({dayRatios.badDays + dayRatios.veryBadDays} days)</Text>
           </View>
         </View>
-
-        <View style={styles.functionalCapacityCard}>
-          <Text style={styles.functionalCapacityTitle}>Impact mix</Text>
-          <View style={styles.functionalCapacityBar}>
-            <View 
-              style={[
-                styles.functionalCapacityFill, 
-                { 
-                  width: `${dayRatios.functionalDaysPercentage}%`,
-                  backgroundColor: dayRatios.functionalDaysPercentage >= 60 
-                    ? COLORS.successMain 
-                    : dayRatios.functionalDaysPercentage >= 30 
-                      ? COLORS.warningMain 
-                      : COLORS.errorMain
-                }
-              ]} 
-            />
-          </View>
-          <Text style={styles.functionalCapacityText}>
-            {dayRatios.functionalDaysPercentage.toFixed(0)}% of days with adequate function
-          </Text>
-        </View>
-
-        {dayRatios.worstStreak > 0 && (
-          <View style={styles.streakCard}>
-            <Text style={styles.streakTitle}>Consecutive Day Patterns</Text>
-            <Text style={styles.streakText}>
-              Maximum consecutive high-severity days: <Text style={styles.streakValue}>{dayRatios.worstStreak} days</Text>
-            </Text>
-            {dayRatios.bestStreak > 0 && (
-              <Text style={styles.streakText}>
-                Maximum consecutive low-severity days: <Text style={styles.streakValue}>{dayRatios.bestStreak} days</Text>
-              </Text>
-            )}
-          </View>
-        )}
       </View>
     );
   }
@@ -360,106 +332,68 @@ export function TrendsScreen() {
 
     return (
       <View style={styles.flareContainer}>
-        <Text style={styles.sectionTitle}>Flare Pattern Analysis</Text>
-        
+        <Text style={styles.sectionTitle}>High-Severity Periods (6+/10 for 3+ days)</Text>
+
         <View style={styles.flareStatsGrid}>
           <View style={styles.flareStatCard}>
-            <Text style={[styles.flareValue, { color: COLORS.errorMain }]}>
+            <Text style={styles.flareValue}>
               {flareSummary.totalFlares}
             </Text>
-            <Text style={styles.flareLabel}>Total Flares</Text>
-            <Text style={styles.flareSubtext}>in selected period</Text>
+            <Text style={styles.flareLabel}>Count</Text>
           </View>
-          
+
           <View style={styles.flareStatCard}>
-            <Text style={[styles.flareValue, { color: COLORS.warningMain }]}>
-              {flareSummary.flaresPerMonth.toFixed(1)}
+            <Text style={styles.flareValue}>
+              {flareSummary.averageDuration.toFixed(1)}
             </Text>
-            <Text style={styles.flareLabel}>Per Month</Text>
-            <Text style={styles.flareSubtext}>average frequency</Text>
+            <Text style={styles.flareLabel}>Mean Duration (days)</Text>
+          </View>
+
+          <View style={styles.flareStatCard}>
+            <Text style={styles.flareValue}>
+              {flareSummary.peakPainAverage.toFixed(1)}
+            </Text>
+            <Text style={styles.flareLabel}>Mean Peak Severity</Text>
           </View>
         </View>
 
         <View style={styles.flareDetailsGrid}>
           <View style={styles.flareDetailCard}>
-            <Text style={styles.flareDetailLabel}>Average Duration</Text>
+            <Text style={styles.flareDetailLabel}>Total Days</Text>
             <Text style={styles.flareDetailValue}>
-              {flareSummary.averageDuration.toFixed(1)} days
+              {flareSummary.totalDaysInFlare}
             </Text>
           </View>
-          
+
+          {flareSummary.longestFlare && (
+            <View style={styles.flareDetailCard}>
+              <Text style={styles.flareDetailLabel}>Max Duration</Text>
+              <Text style={styles.flareDetailValue}>
+                {flareSummary.longestFlare.durationDays} days
+              </Text>
+            </View>
+          )}
+
           <View style={styles.flareDetailCard}>
-            <Text style={styles.flareDetailLabel}>Total Days Lost</Text>
+            <Text style={styles.flareDetailLabel}>Rate</Text>
             <Text style={styles.flareDetailValue}>
-              {flareSummary.totalDaysInFlare} days
-            </Text>
-          </View>
-          
-          <View style={styles.flareDetailCard}>
-            <Text style={styles.flareDetailLabel}>Average Peak Pain</Text>
-            <Text style={styles.flareDetailValue}>
-              {flareSummary.peakPainAverage.toFixed(1)}/10
+              {flareSummary.flaresPerMonth.toFixed(1)}/month
             </Text>
           </View>
         </View>
 
-        {flareSummary.longestFlare && (
-          <View style={styles.longestFlareCard}>
-            <Text style={styles.longestFlareTitle}>Longest Flare</Text>
-            <Text style={styles.longestFlareText}>
-              Duration: <Text style={styles.longestFlareValue}>{flareSummary.longestFlare.durationDays} days</Text>
-            </Text>
-            <Text style={styles.longestFlareText}>
-              Period: <Text style={styles.longestFlareValue}>{flareSummary.longestFlare.startDate} to {flareSummary.longestFlare.endDate}</Text>
-            </Text>
-            <Text style={styles.longestFlareText}>
-              Peak Pain: <Text style={styles.longestFlareValue}>{flareSummary.longestFlare.peakPain}/10</Text>
-            </Text>
-          </View>
-        )}
-
         {flareSummary.recentFlares.length > 0 && (
           <View style={styles.recentFlaresCard}>
-            <Text style={styles.recentFlaresTitle}>Recent Flares</Text>
+            <Text style={styles.recentFlaresTitle}>Period List</Text>
             {flareSummary.recentFlares.map((flare, index) => (
               <View key={`${flare.startDate}-${index}`} style={styles.recentFlareItem}>
-                <View style={styles.recentFlareHeader}>
-                  <Text style={styles.recentFlareDate}>
-                    {flare.startDate} → {flare.endDate}
-                  </Text>
-                  <Text style={styles.recentFlareDuration}>
-                    {flare.durationDays} days
-                  </Text>
-                </View>
-                <Text style={styles.recentFlarePain}>
-                  Peak Pain: {flare.peakPain}/10
+                <Text style={styles.recentFlareDate}>
+                  {flare.startDate} to {flare.endDate} ({flare.durationDays} days, peak: {flare.peakPain}/10)
                 </Text>
               </View>
             ))}
           </View>
         )}
-
-        <View style={styles.flareNotesCard}>
-          <Text style={styles.flareNotesTitle}>Flare Impact Summary</Text>
-          <Text style={styles.flareNotesText}>
-            - Flares defined as 3+ consecutive days with pain/severity &gt;= 6/10
-          </Text>
-          {flareSummary.flaresPerMonth >= 2 && (
-            <Text style={styles.flareNotesText}>
-              - Experiencing {flareSummary.flaresPerMonth.toFixed(1)} flares per month indicates frequent severe episodes
-            </Text>
-          )}
-          {flareSummary.totalDaysInFlare > 0 && (
-            <Text style={styles.flareNotesText}>
-              - {flareSummary.totalDaysInFlare} total days lost to flares in this period
-            </Text>
-          )}
-          {flareSummary.averageDuration >= 5 && (
-            <Text style={styles.flareNotesText}>
-              - Average flare duration of {flareSummary.averageDuration.toFixed(1)} days shows prolonged episodes
-            </Text>
-          )}
-        </View>
       </View>
     );
   }
@@ -471,131 +405,76 @@ export function TrendsScreen() {
 
     return (
       <View style={styles.weatherContainer}>
-        <Text style={styles.sectionTitle}>Environmental Correlations</Text>
-        
+        <Text style={styles.sectionTitle}>Environmental Data Summary</Text>
+
         {environmentalAnalysis.weather.length > 0 && (
           <>
-            <Text style={styles.weatherSubtitle}>Weather Impact on Symptoms</Text>
+            <Text style={styles.weatherSubtitle}>Weather Conditions Logged</Text>
             <Text style={styles.weatherDataInfo}>
-              Based on {environmentalAnalysis.totalLogsWithWeather} days with weather data
+              {environmentalAnalysis.totalLogsWithWeather} entries with weather data
             </Text>
-            
+
             <View style={styles.weatherCorrelationsGrid}>
               {environmentalAnalysis.weather.map((correlation) => (
-                <View 
-                  key={correlation.weather} 
-                  style={[
-                    styles.weatherCorrelationCard,
-                    correlation.impact === 'worsens' && styles.weatherWorsensCard,
-                    correlation.impact === 'improves' && styles.weatherImprovesCard,
-                  ]}
+                <View
+                  key={correlation.weather}
+                  style={styles.weatherCorrelationCard}
                 >
-                  <View style={styles.weatherCardHeader}>
-                    <Text style={styles.weatherCondition}>
-                      {getWeatherDisplayName(correlation.weather)}
-                    </Text>
-                    <Text style={styles.weatherImpactIcon}>
-                      {getWeatherImpactIcon(correlation.impact)}
-                    </Text>
-                  </View>
-                  
+                  <Text style={styles.weatherCondition}>
+                    {getWeatherDisplayName(correlation.weather)}
+                  </Text>
+
                   <View style={styles.weatherStats}>
                     <View style={styles.weatherStat}>
-                      <Text style={styles.weatherStatLabel}>Avg Severity</Text>
+                      <Text style={styles.weatherStatLabel}>Mean Severity</Text>
                       <Text style={styles.weatherStatValue}>
-                        {correlation.averageSeverity}/10
+                        {correlation.averageSeverity.toFixed(1)}/10
                       </Text>
                     </View>
-                    
+
                     <View style={styles.weatherStat}>
-                      <Text style={styles.weatherStatLabel}>Days Logged</Text>
+                      <Text style={styles.weatherStatLabel}>Days</Text>
                       <Text style={styles.weatherStatValue}>
                         {correlation.occurrences}
                       </Text>
                     </View>
-                    
+
                     <View style={styles.weatherStat}>
-                      <Text style={styles.weatherStatLabel}>High-Severity Days</Text>
+                      <Text style={styles.weatherStatLabel}>Days 6+</Text>
                       <Text style={styles.weatherStatValue}>
                         {correlation.significantSymptomPercentage}%
                       </Text>
                     </View>
                   </View>
-                  
-                  {correlation.impact !== 'neutral' && (
-                    <Text style={styles.weatherImpactText}>
-                      {correlation.impact === 'worsens' 
-                        ? `Symptoms ${correlation.correlationStrength.toFixed(1)}pts worse than average`
-                        : `Symptoms ${correlation.correlationStrength.toFixed(1)}pts better than average`}
-                    </Text>
-                  )}
                 </View>
               ))}
             </View>
           </>
         )}
-        
+
         {environmentalAnalysis.stress.hasData && (
           <>
-            <Text style={styles.weatherSubtitle}>Stress Correlation</Text>
+            <Text style={styles.weatherSubtitle}>Stress Level Distribution</Text>
             <Text style={styles.weatherDataInfo}>
-              Based on {environmentalAnalysis.totalLogsWithStress} days with stress data
+              {environmentalAnalysis.totalLogsWithStress} entries with stress data
             </Text>
-            
-            <View style={styles.stressCorrelationCard}>
-              <View style={styles.stressHeader}>
-                <Text style={styles.stressTitle}>Stress Level Impact</Text>
-                <Text style={styles.stressCorrelationValue}>
-                  Correlation: {(environmentalAnalysis.stress.correlation * 100).toFixed(0)}%
-                </Text>
-              </View>
-              
-              <View style={styles.stressLevelsGrid}>
-                {environmentalAnalysis.stress.stressLevels.map((level) => (
-                  <View key={level.level} style={styles.stressLevelCard}>
-                    <Text style={styles.stressLevelLabel}>
-                      {level.level.charAt(0).toUpperCase() + level.level.slice(1)} Stress
-                    </Text>
-                    <Text style={styles.stressLevelValue}>
-                      {level.avgSeverity}/10
-                    </Text>
-                    <Text style={styles.stressLevelCount}>
-                      {level.count} days
-                    </Text>
-                  </View>
-                ))}
-              </View>
-              
-              {environmentalAnalysis.stress.correlation > 0.3 && (
-                <View style={styles.stressInsightCard}>
-                  <Text style={styles.stressInsightText}>
-                    {environmentalAnalysis.stress.correlation > 0.6
-                      ? 'Correlation coefficient >0.6: Higher stress correlates with increased severity'
-                      : 'Correlation coefficient 0.3-0.6: Stress level correlates with severity'}
+
+            <View style={styles.stressLevelsGrid}>
+              {environmentalAnalysis.stress.stressLevels.map((level) => (
+                <View key={level.level} style={styles.stressLevelCard}>
+                  <Text style={styles.stressLevelLabel}>
+                    {level.level.charAt(0).toUpperCase() + level.level.slice(1)}
+                  </Text>
+                  <Text style={styles.stressLevelValue}>
+                    {level.avgSeverity.toFixed(1)}/10
+                  </Text>
+                  <Text style={styles.stressLevelCount}>
+                    {level.count} days
                   </Text>
                 </View>
-              )}
+              ))}
             </View>
           </>
-        )}
-        
-        {(environmentalAnalysis.weather.length > 0 || environmentalAnalysis.stress.hasData) && (
-          <View style={styles.environmentalNotesCard}>
-            <Text style={styles.environmentalNotesTitle}>Observed Correlations</Text>
-            {environmentalAnalysis.weather.some(w => w.impact === 'worsens') && (
-              <Text style={styles.environmentalNotesText}>
-                - Weather conditions logged: {environmentalAnalysis.weather.length} types
-              </Text>
-            )}
-            {environmentalAnalysis.stress.hasData && environmentalAnalysis.stress.correlation > 0.3 && (
-              <Text style={styles.environmentalNotesText}>
-                - Stress data: {environmentalAnalysis.totalLogsWithStress} days logged
-              </Text>
-            )}
-            <Text style={styles.environmentalNotesText}>
-              - Correlation data available for review
-            </Text>
-          </View>
         )}
       </View>
     );
@@ -606,7 +485,7 @@ export function TrendsScreen() {
       return (
         <View style={styles.noDataContainer}>
           <Text style={styles.noDataText}>No data available for selected date range</Text>
-          <Text style={styles.noDataSubtext}>Start logging symptoms to see trends</Text>
+          <Text style={styles.noDataSubtext}>No entries recorded in this period.</Text>
         </View>
       );
     }
@@ -630,51 +509,37 @@ export function TrendsScreen() {
   const renderInsights = () => {
     if (trendData.length === 0) return null;
 
-    const displayTrend =
-      insights.trendDirection === 'improving'
-        ? 'Severity decreasing'
-        : insights.trendDirection === 'worsening'
-          ? 'Severity increasing'
-          : 'Severity stable';
-
     return (
       <View style={styles.insightsContainer}>
-        <Text style={styles.sectionTitle}>Summary Metrics</Text>
+        <Text style={styles.sectionTitle}>Summary Statistics</Text>
         <View style={styles.insightGrid}>
           <View style={styles.insightCard}>
             <Text style={styles.insightValue}>{insights.averageSeverity.toFixed(1)}</Text>
-            <Text style={styles.insightLabel}>Avg Severity</Text>
+            <Text style={styles.insightLabel}>Mean Severity</Text>
           </View>
           <View style={styles.insightCard}>
             <Text style={styles.insightValue}>{insights.averageSymptomCount.toFixed(1)}</Text>
-            <Text style={styles.insightLabel}>Avg Symptoms/Day</Text>
+            <Text style={styles.insightLabel}>Mean Symptoms/Day</Text>
           </View>
           <View style={styles.insightCard}>
             <Text style={styles.insightValue}>{insights.symptomsPercentage.toFixed(0)}%</Text>
             <Text style={styles.insightLabel}>Days w/ Symptoms</Text>
           </View>
         </View>
-        
-        {/* Additional insights */}
+
+        {/* Additional statistics */}
         <View style={styles.additionalInsights}>
-          <Text style={styles.insightText}>
-            <Text style={styles.insightLabel}>Change direction: </Text>
-            <Text style={[styles.trendText]}>
-              {displayTrend}
-            </Text>
-          </Text>
-          
           {insights.mostCommonSymptom && (
             <Text style={styles.insightText}>
-              <Text style={styles.insightLabel}>Most Common: </Text>
+              <Text style={styles.insightLabel}>Most frequent symptom: </Text>
               {insights.mostCommonSymptom}
             </Text>
           )}
 
           {insights.worstDay && (
             <Text style={styles.insightText}>
-              <Text style={styles.insightLabel}>Highest recorded severity day: </Text>
-              {insights.worstDay.date} (severity: {insights.worstDay.severity.toFixed(1)})
+              <Text style={styles.insightLabel}>Maximum severity recorded: </Text>
+              {insights.worstDay.date} ({insights.worstDay.severity.toFixed(1)}/10)
             </Text>
           )}
         </View>
@@ -689,39 +554,28 @@ export function TrendsScreen() {
 
     return (
       <View style={styles.medicationContainer}>
-        <Text style={styles.sectionTitle}>Medication Correlation Analysis</Text>
-        
+        <Text style={styles.sectionTitle}>Medication Data Summary</Text>
+
         <View style={styles.medicationSummaryGrid}>
           <View style={styles.medicationSummaryCard}>
             <Text style={styles.medicationSummaryValue}>
               {medicationAnalysis.totalMedications}
             </Text>
-            <Text style={styles.medicationSummaryLabel}>Total Meds</Text>
+            <Text style={styles.medicationSummaryLabel}>Medications Logged</Text>
           </View>
-          
+
           <View style={styles.medicationSummaryCard}>
-            <Text style={[styles.medicationSummaryValue, { color: COLORS.success.main }]}>
-              {medicationAnalysis.effectiveMedications}
+            <Text style={styles.medicationSummaryValue}>
+              {medicationAnalysis.activeMedications}
             </Text>
-            <Text style={styles.medicationSummaryLabel}>Reduced impact</Text>
-          </View>
-          
-          <View style={styles.medicationSummaryCard}>
-            <Text style={[styles.medicationSummaryValue, { color: COLORS.error.main }]}>
-              {medicationAnalysis.ineffectiveMedications}
-            </Text>
-            <Text style={styles.medicationSummaryLabel}>No Effect</Text>
+            <Text style={styles.medicationSummaryLabel}>Currently Active</Text>
           </View>
         </View>
 
         {medicationAnalysis.correlations.map((correlation) => (
-          <View 
-            key={correlation.medicationId} 
-            style={[
-              styles.medicationCorrelationCard,
-              correlation.impact === 'improved' && styles.medicationImprovedCard,
-              correlation.impact === 'worsened' && styles.medicationWorsenedCard,
-            ]}
+          <View
+            key={correlation.medicationId}
+            style={styles.medicationCorrelationCard}
           >
             <View style={styles.medicationCardHeader}>
               <View style={styles.medicationNameSection}>
@@ -732,74 +586,44 @@ export function TrendsScreen() {
                   {correlation.dosage}
                 </Text>
               </View>
-              <Text style={styles.medicationImpactIcon}>
-                {getMedicationImpactIcon(correlation.impact)}
-              </Text>
             </View>
 
             {correlation.purpose.length > 0 && (
               <Text style={styles.medicationPurpose}>
-                For: {correlation.purpose.join(', ')}
+                Logged for: {correlation.purpose.join(', ')}
               </Text>
             )}
 
             <View style={styles.medicationStatsGrid}>
               {correlation.averageSeverityBefore !== undefined && (
                 <View style={styles.medicationStatItem}>
-                  <Text style={styles.medicationStatLabel}>Before</Text>
+                  <Text style={styles.medicationStatLabel}>Mean Before</Text>
                   <Text style={styles.medicationStatValue}>
-                    {correlation.averageSeverityBefore}/10
+                    {correlation.averageSeverityBefore.toFixed(1)}/10
                   </Text>
                 </View>
               )}
-              
+
               <View style={styles.medicationStatItem}>
-                <Text style={styles.medicationStatLabel}>During</Text>
+                <Text style={styles.medicationStatLabel}>Mean During</Text>
                 <Text style={styles.medicationStatValue}>
-                  {correlation.averageSeverityDuring}/10
+                  {correlation.averageSeverityDuring.toFixed(1)}/10
                 </Text>
               </View>
 
               {correlation.severityChange !== undefined && (
                 <View style={styles.medicationStatItem}>
-                  <Text style={styles.medicationStatLabel}>Change</Text>
-                  <Text style={[
-                    styles.medicationStatValue,
-                    correlation.severityChange > 0 && { color: COLORS.success.main },
-                    correlation.severityChange < 0 && { color: COLORS.error.main },
-                  ]}>
-                    {correlation.severityChange > 0 ? '+' : ''}{correlation.severityChange}
+                  <Text style={styles.medicationStatLabel}>Difference</Text>
+                  <Text style={styles.medicationStatValue}>
+                    {correlation.severityChange > 0 ? '+' : ''}{correlation.severityChange.toFixed(1)}
                   </Text>
                 </View>
               )}
             </View>
 
-            {correlation.impact !== 'insufficient_data' && correlation.severityChange !== undefined && (
-              <View style={styles.medicationImpactSection}>
-                <Text style={styles.medicationImpactText}>
-                  {correlation.impact === 'improved' 
-                    ? `✓ Symptoms improved by ${Math.abs(correlation.severityChange)} points (${correlation.changePercentage}%)`
-                    : correlation.impact === 'worsened'
-                      ? `⚠️ Symptoms worsened by ${Math.abs(correlation.severityChange)} points (${Math.abs(correlation.changePercentage || 0)}%)`
-                      : '− No significant change in symptoms'}
-                </Text>
-              </View>
-            )}
-
-            {correlation.effectiveness && (
-              <View style={styles.medicationEffectivenessSection}>
-                <Text style={styles.medicationEffectivenessLabel}>
-                  User Rating:
-                </Text>
-                <Text style={styles.medicationEffectivenessValue}>
-                  {getEffectivenessText(correlation.effectiveness)}
-                </Text>
-              </View>
-            )}
-
             <View style={styles.medicationDataQuality}>
               <Text style={styles.medicationDataQualityLabel}>
-                Data Quality: {correlation.dataQuality.toUpperCase()}
+                Sample size:
               </Text>
               <Text style={styles.medicationDataQualityDetail}>
                 {correlation.daysOfDataBefore > 0 && `${correlation.daysOfDataBefore} days before, `}
@@ -807,36 +631,8 @@ export function TrendsScreen() {
                 {correlation.daysOfDataAfter > 0 && `, ${correlation.daysOfDataAfter} days after`}
               </Text>
             </View>
-
-            {correlation.dataQuality === 'low' && (
-              <View style={styles.medicationWarning}>
-                <Text style={styles.medicationWarningText}>
-                  ⚠️ Limited data - correlations may not be reliable
-                </Text>
-              </View>
-            )}
           </View>
         ))}
-
-        <View style={styles.medicationNotesCard}>
-          <Text style={styles.medicationNotesTitle}>Medication Analysis Notes</Text>
-          <Text style={styles.medicationNotesText}>
-            - Analysis compares symptom severity before and during medication use
-          </Text>
-          {medicationAnalysis.effectiveMedications > 0 && (
-            <Text style={styles.medicationNotesText}>
-              - {medicationAnalysis.effectiveMedications} medication(s) show measurable symptom improvement
-            </Text>
-          )}
-          {medicationAnalysis.hasInsufficientData && (
-            <Text style={styles.medicationNotesText}>
-              - Some medications have limited data - continue logging for better analysis
-            </Text>
-          )}
-          <Text style={styles.medicationNotesText}>
-            - Correlation data supports treatment documentation and efficacy assessment
-          </Text>
-        </View>
       </View>
     );
   }
@@ -844,8 +640,8 @@ export function TrendsScreen() {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.title}>Symptom Trends</Text>
-        <Text style={styles.subtitle}>Visual analysis of your symptom patterns</Text>
+        <Text style={styles.title}>Data Summary</Text>
+        <Text style={styles.subtitle}>Statistical overview of logged entries</Text>
       </View>
 
       <View style={styles.dateRangeContainer}>
@@ -869,7 +665,7 @@ export function TrendsScreen() {
           onPress={() => setSelectedTrend('day-quality')}
         >
           <Text style={[styles.trendButtonText, selectedTrend === 'day-quality' && styles.trendButtonTextActive]}>
-            Day Quality
+            Distribution
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -877,7 +673,7 @@ export function TrendsScreen() {
           onPress={() => setSelectedTrend('symptoms')}
         >
           <Text style={[styles.trendButtonText, selectedTrend === 'symptoms' && styles.trendButtonTextActive]}>
-            Symptom Count
+            Count
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -885,7 +681,7 @@ export function TrendsScreen() {
           onPress={() => setSelectedTrend('severity')}
         >
           <Text style={[styles.trendButtonText, selectedTrend === 'severity' && styles.trendButtonTextActive]}>
-            Avg Severity
+            By Date
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -893,17 +689,17 @@ export function TrendsScreen() {
           onPress={() => setSelectedTrend('patterns')}
         >
           <Text style={[styles.trendButtonText, selectedTrend === 'patterns' && styles.trendButtonTextActive]}>
-            Top Symptoms
+            Frequency
           </Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.chartContainer}>
         <Text style={styles.sectionTitle}>
-          {selectedTrend === 'day-quality' && 'Functional vs Limited Function Day Distribution'}
-          {selectedTrend === 'symptoms' && 'Daily Symptom Count'}
-          {selectedTrend === 'severity' && 'Average Severity Over Time'}
-          {selectedTrend === 'patterns' && 'Most Common Symptoms'}
+          {selectedTrend === 'day-quality' && 'Severity Distribution by Category'}
+          {selectedTrend === 'symptoms' && 'Symptom Count per Entry'}
+          {selectedTrend === 'severity' && 'Severity Values by Date'}
+          {selectedTrend === 'patterns' && 'Symptom Frequency'}
         </Text>
         {renderChart()}
       </View>
