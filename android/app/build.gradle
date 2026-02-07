@@ -103,6 +103,11 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+// Define hermesEnabled property if not already defined
+if (!project.hasProperty('hermesEnabled')) {
+    ext.hermesEnabled = true  // Set to true to use Hermes engine, false to use JSC
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -199,6 +204,11 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+}
+
+// Define hermesEnabled property if not already defined
+if (!project.hasProperty('hermesEnabled')) {
+    ext.hermesEnabled = true  // Set to true to use Hermes engine, false to use JSC
 }
 
 if (rnVersion < versionToNumber(0, 75, 0)) {
