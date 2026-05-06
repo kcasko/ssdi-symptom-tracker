@@ -1,6 +1,6 @@
 /**
  * Report Templates
- * Structured templates for different types of SSDI reports
+ * Structured templates for health tracking reports
  */
 
 import { ReportType, SectionType } from '../domain/models/ReportDraft';
@@ -71,7 +71,7 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
     title: 'Activity Impact Summary',
     description: 'Detailed analysis of how activities affect symptoms and function',
     estimatedLength: '2-3 pages',
-    useCase: 'Work capacity evaluation and functional assessment',
+    useCase: 'Reviewing activity tolerance and symptom changes',
     sections: [
       {
         type: 'header',
@@ -91,8 +91,8 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'functional_limitations',
-        title: 'Functional Capacity',
-        description: 'What activities can be performed and for how long',
+        title: 'Activity Tolerance',
+        description: 'What activities were logged and how long they lasted',
         required: true,
         order: 3,
         contentHints: ['Sitting tolerance', 'Standing limits', 'Physical exertion capacity'],
@@ -107,26 +107,26 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'narrative',
-        title: 'Functional Narrative',
-        description: 'SSDI-appropriate functional capacity narrative',
+        title: 'Activity Notes Summary',
+        description: 'Plain-language summary of activity impact',
         required: false,
         order: 5,
-        contentHints: ['Work capacity implications', 'ADL impacts', 'Accommodation needs'],
+        contentHints: ['Daily activity impact', 'Recovery patterns', 'Helpful supports'],
       },
     ],
   },
 
   {
     type: 'functional_limitations',
-    title: 'Functional Limitations Assessment',
-    description: 'Comprehensive assessment of baseline functional limitations',
+    title: 'Capacity Limits Summary',
+    description: 'Summary of logged capacity limits',
     estimatedLength: '2-4 pages',
-    useCase: 'RFC (Residual Functional Capacity) documentation',
+    useCase: 'Preparing appointment notes or personal summaries',
     sections: [
       {
         type: 'header',
-        title: 'Assessment Overview',
-        description: 'Scope and methodology of limitation assessment',
+        title: 'Summary Overview',
+        description: 'Scope of the logged capacity limits',
         required: true,
         order: 1,
         contentHints: ['Assessment period', 'Evaluation methods', 'Data sources'],
@@ -157,25 +157,25 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'narrative',
-        title: 'Limitation Summary',
-        description: 'Overall functional capacity assessment',
+        title: 'Limit Summary',
+        description: 'Overall capacity limit summary',
         required: true,
         order: 5,
-        contentHints: ['Work capacity category', 'Accommodation needs', 'Prognosis'],
+        contentHints: ['Common limits', 'Helpful supports', 'Variability'],
       },
     ],
   },
 
   {
     type: 'full_narrative',
-    title: 'Complete SSDI Documentation',
-    description: 'Comprehensive report including all aspects for SSDI application',
+    title: 'Health Summary Report',
+    description: 'Comprehensive summary of symptoms, activities, medications, and appointments',
     estimatedLength: '4-8 pages',
-    useCase: 'Complete SSDI disability application documentation',
+    useCase: 'Personal review or appointment preparation',
     sections: [
       {
         type: 'header',
-        title: 'Medical and Functional Report',
+        title: 'Health Summary',
         description: 'Complete report header with all identifying information',
         required: true,
         order: 1,
@@ -183,15 +183,15 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'summary',
-        title: 'Disability Summary',
-        description: 'Executive summary of disability impact',
+        title: 'Overview',
+        description: 'Summary of logged health patterns',
         required: true,
         order: 2,
         contentHints: ['Primary limitations', 'Severity overview', 'Functional impact'],
       },
       {
         type: 'daily_symptoms',
-        title: 'Symptom Documentation',
+        title: 'Symptom Summary',
         description: 'Detailed symptom patterns and severity',
         required: true,
         order: 3,
@@ -199,27 +199,27 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'activity_impact',
-        title: 'Activity and Work Capacity',
-        description: 'Impact of symptoms on work-related activities',
+        title: 'Activity Impact',
+        description: 'Impact of activities on symptoms',
         required: true,
         order: 4,
         contentHints: ['Sitting capacity', 'Standing limits', 'Physical exertion', 'Cognitive demands'],
       },
       {
         type: 'day_quality',
-        title: 'Day Quality and Functional Capacity Analysis',
-        description: 'Impact band ratios showing consistent functional limitations',
+        title: 'Day Quality',
+        description: 'Impact band ratios based on logged severity',
         required: true,
         order: 5,
-        contentHints: ['Lower-impact day percentage', 'Higher-impact day percentage', 'Functional capacity trends', 'SSDI implications'],
+        contentHints: ['Lower-impact day percentage', 'Higher-impact day percentage', 'Recent trends'],
       },
       {
         type: 'functional_limitations',
-        title: 'Residual Functional Capacity',
-        description: 'Comprehensive RFC assessment',
+        title: 'Capacity Limits',
+        description: 'Summary of logged capacity limits',
         required: true,
         order: 6,
-        contentHints: ['Physical RFC', 'Mental RFC', 'Environmental limitations'],
+        contentHints: ['Physical limits', 'Cognitive limits', 'Environmental factors'],
       },
       {
         type: 'medications',
@@ -239,11 +239,11 @@ export const REPORT_TEMPLATES: ReportTemplate[] = [
       },
       {
         type: 'narrative',
-        title: 'Disability Determination Narrative',
-        description: 'Complete narrative for disability determination',
+        title: 'Daily Function Summary',
+        description: 'Plain-language summary of daily symptom impact',
         required: true,
         order: 9,
-        contentHints: ['Meets listing criteria', 'RFC limitations', 'Work capacity', 'Accommodations'],
+        contentHints: ['Symptoms', 'Activity impact', 'Capacity limits', 'Helpful supports'],
       },
     ],
   },
@@ -285,7 +285,7 @@ export const SECTION_PHRASES = {
       'This report covers the period from',
       'Documentation period:',
       'Symptom tracking report for',
-      'Functional assessment covering',
+      'Health summary covering',
     ],
     closings: [
       'Based on patient-reported data collected daily',
@@ -297,15 +297,15 @@ export const SECTION_PHRASES = {
   summary: {
     openings: [
       'Over the reporting period, the patient experienced',
-      'Summary of functional limitations during',
+      'Summary of symptoms and limits during',
       'Key findings from the assessment period include',
-      'Primary functional impacts observed:',
+      'Primary patterns observed:',
     ],
     patterns: [
       'Consistent patterns include',
       'Notable trends observed',
       'Recurring limitations identified',
-      'Primary functional restrictions',
+      'Primary capacity limits',
     ],
   },
 
@@ -327,7 +327,7 @@ export const SECTION_PHRASES = {
   activity_impact: {
     limitations: [
       'Activity tolerance is limited to',
-      'Functional capacity restricted by',
+      'Activity tolerance affected by',
       'Activity duration limited to approximately',
       'Physical exertion tolerance',
     ],
@@ -335,7 +335,7 @@ export const SECTION_PHRASES = {
       'Exceeding tolerance results in',
       'Activity-induced symptoms include',
       'Recovery time typically requires',
-      'Functional impact includes',
+      'Activity impact includes',
     ],
   },
 
@@ -349,23 +349,23 @@ export const SECTION_PHRASES = {
     ],
     variability: [
       'Limitations are consistent',
-      'Variability noted in functional capacity',
+      'Variability noted in capacity limits',
       'Impact bands reported',
       'Unpredictable functional variations',
     ],
   },
 
   narrative: {
-    work_capacity: [
-      'Based on functional limitations, work capacity is',
-      'Residual functional capacity assessment indicates',
-      'Ability to perform sustained work activity is',
-      'Work-related functional limitations include',
+    daily_capacity: [
+      'Based on logged entries, daily activity impact includes',
+      'Logged capacity limits include',
+      'Symptoms were associated with',
+      'Daily function notes include',
     ],
-    accommodations: [
-      'Reasonable accommodations would need to include',
-      'Workplace modifications required',
-      'Environmental restrictions necessary',
+    supports: [
+      'Helpful modifications include',
+      'Routine adjustments include',
+      'Environmental limits noted',
       'Functional supports needed',
     ],
   },

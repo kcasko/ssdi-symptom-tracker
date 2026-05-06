@@ -14,9 +14,7 @@ import { Medication } from '../domain/models/Medication';
 import { Appointment } from '../domain/models/Appointment';
 import { ReportDraft } from '../domain/models/ReportDraft';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
-import { LogStorage, ProfileStorage, SettingsStorage, Storage } from '../storage/storage';
-
-const EVIDENCE_MODE_CONFIG_KEY = '@ssdi/evidence_mode_config';
+import { LogStorage, ProfileStorage, SettingsStorage } from '../storage/storage';
 
 export interface BackupData {
   version: string;
@@ -30,7 +28,6 @@ export interface BackupData {
   reportDrafts: ReportDraft[];
   photos: PhotoAttachment[];
   settings?: any;
-  evidenceModeConfig?: any;
 }
 
 export interface RestoreResult {
@@ -56,7 +53,6 @@ export class BackupRestoreService {
     reportDrafts: ReportDraft[];
     photos: PhotoAttachment[];
     settings?: any;
-    evidenceModeConfig?: any;
   }): Promise<string> {
     const backup: BackupData = {
       version: this.BACKUP_VERSION,
@@ -79,7 +75,7 @@ export class BackupRestoreService {
     const now = new Date();
     const dateStr = now.toISOString().split('T')[0];
     const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-    return `ssdi-backup-${dateStr}-${timeStr}.json`;
+    return `daymark-backup-${dateStr}-${timeStr}.json`;
   }
 
   /**
@@ -234,10 +230,6 @@ export class BackupRestoreService {
         await SettingsStorage.saveSettings(backup.settings);
       }
 
-      if (backup.evidenceModeConfig) {
-        await Storage.set(EVIDENCE_MODE_CONFIG_KEY, backup.evidenceModeConfig);
-      }
-
       // Count restored items
       result.profilesRestored = backup.profiles.length;
       result.logsRestored = backup.dailyLogs.length + backup.activityLogs.length;
@@ -291,7 +283,7 @@ export class BackupRestoreService {
     };
 
     const json = JSON.stringify(backup, null, 2);
-    const filename = `ssdi-minimal-backup-${new Date().toISOString().split('T')[0]}.json`;
+    const filename = `daymark-minimal-backup-${new Date().toISOString().split('T')[0]}.json`;
     const fileUri = `${(FileSystem as any).documentDirectory}${filename}`;
 
     await FileSystem.writeAsStringAsync(fileUri, json);
@@ -331,4 +323,3 @@ export class BackupRestoreService {
     console.log('Backup ready for sharing:', fileUri);
   }
 }
-

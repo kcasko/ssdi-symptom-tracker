@@ -26,6 +26,15 @@ export function formatDate(date: Date | string, formatStr: string = DISPLAY_DATE
 }
 
 /**
+ * Format a YYYY-MM-DD date without timezone shifting.
+ */
+export function formatDateOnly(date: string): string {
+  const [year, month, day] = date.split('-').map(Number);
+  if (!year || !month || !day) return 'Invalid date';
+  return format(new Date(year, month - 1, day), DISPLAY_DATE);
+}
+
+/**
  * Format a date as relative time (e.g., "2 hours ago")
  */
 export function formatRelative(date: Date | string): string {
@@ -52,7 +61,7 @@ export function formatDuration(minutes: number): string {
 }
 
 /**
- * Format duration for SSDI narrative (e.g., "approximately 40 minutes")
+ * Format duration for report narratives (e.g., "approximately 40 minutes")
  */
 export function formatDurationForNarrative(minutes: number): string {
   if (minutes < 5) return 'a few minutes';

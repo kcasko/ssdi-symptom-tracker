@@ -20,6 +20,7 @@ import { NarrativeService } from './NarrativeService';
 import { PatternDetector } from '../engine/PatternDetector';
 import { getReportTemplate } from '../data/reportTemplates';
 import { generateId } from '../utils/ids';
+import { formatDateOnly } from '../utils/dates';
 
 export interface ReportGenerationOptions {
   profileId: string;
@@ -162,7 +163,7 @@ export class ReportService {
           content = narrative.sections.dayQuality || 'Insufficient data to assess day quality ratios.';
           break;
         case 'narrative':
-          content = narrative.sections.rfc || 'Unable to assess residual functional capacity without data.';
+          content = narrative.sections.dailyFunction || 'No daily function summary is available yet.';
           break;
         default:
           content = 'Content not available.';
@@ -273,7 +274,7 @@ export class ReportService {
         newContent = narrative.sections.patterns;
         break;
       case 'narrative':
-        newContent = narrative.sections.rfc;
+        newContent = narrative.sections.dailyFunction;
         break;
       default:
         throw new Error(`Unknown section type: ${section.sectionType}`);
@@ -337,8 +338,8 @@ export class ReportService {
 
     // Metadata
     if (options.includeMetadata) {
-      const startDate = new Date(draft.dateRange.start).toLocaleDateString();
-      const endDate = new Date(draft.dateRange.end).toLocaleDateString();
+      const startDate = formatDateOnly(draft.dateRange.start);
+      const endDate = formatDateOnly(draft.dateRange.end);
       
       lines.push(`Reporting Period: ${startDate} to ${endDate}`);
       lines.push(`Generated: ${new Date(draft.createdAt).toLocaleDateString()}`);

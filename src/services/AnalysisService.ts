@@ -8,7 +8,7 @@ import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
 import { SymptomEngine, SymptomSummary, DailyOverview } from '../engine/SymptomEngine';
 import { ActivityImpactEngine, ActivityImpactAnalysis, OverallFunctionalCapacity } from '../engine/ActivityImpactEngine';
-import { LimitationAnalyzer, LimitationSummary, RFCAssessment } from '../engine/LimitationAnalyzer';
+import { LimitationAnalyzer, LimitationSummary, CapacityAssessment } from '../engine/LimitationAnalyzer';
 import { PatternDetector, SymptomPattern, ActivityPattern, TimePattern, TriggerPattern, RecoveryPattern } from '../engine/PatternDetector';
 
 export interface ComprehensiveAnalysis {
@@ -36,7 +36,7 @@ export interface ComprehensiveAnalysis {
   // Limitation analysis
   limitations: {
     summaries: LimitationSummary[];
-    rfc: RFCAssessment;
+    capacity: CapacityAssessment;
   };
   
   // Pattern detection
@@ -52,7 +52,7 @@ export interface ComprehensiveAnalysis {
     totalSymptoms: number;
     totalActivities: number;
     totalLimitations: number;
-    workCapacity: 'full' | 'modified' | 'part-time' | 'unable';
+    activityCapacity: 'full' | 'modified' | 'part-time' | 'unable';
   };
 }
 
@@ -101,7 +101,7 @@ export class AnalysisService {
       LimitationAnalyzer.analyzeLimitation(l)
     );
 
-    const rfc = LimitationAnalyzer.generateRFCAssessment(
+    const capacity = LimitationAnalyzer.generateCapacityAssessment(
       activeLimitations,
       filteredActivityLogs,
       filteredDailyLogs
@@ -133,7 +133,7 @@ export class AnalysisService {
       },
       limitations: {
         summaries: limitationSummaries,
-        rfc,
+        capacity,
       },
       patterns: {
         timeOfDay: timeOfDayPatterns,
@@ -145,7 +145,7 @@ export class AnalysisService {
         totalSymptoms: uniqueSymptoms.length,
         totalActivities: activityIds.length,
         totalLimitations: activeLimitations.length,
-        workCapacity: functionalCapacity.sustainedWorkAbility,
+        activityCapacity: functionalCapacity.sustainedWorkAbility,
       },
     };
 

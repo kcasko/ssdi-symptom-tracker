@@ -26,7 +26,7 @@ export interface PhotoAttachment {
   tags?: string[];
   
   // Documentation indicator
-  isVisibleEvidence: boolean; // Swelling, rash, device, etc.
+  isVisibleDocumentation: boolean; // Swelling, rash, device, etc.
   
   // Optional metadata
   location?: string; // Body location if applicable
@@ -64,7 +64,7 @@ export function createPhotoAttachment(
     capturedAt: now,
     addedAt: now,
     category,
-    isVisibleEvidence: category !== 'other' && category !== 'documentation',
+    isVisibleDocumentation: category !== 'other' && category !== 'documentation',
   };
 }
 
@@ -108,7 +108,7 @@ export function getCategoryDescription(category: PhotoCategory): string {
  * Get documentation relevance rating for photo category
  * Higher value = more direct visual context
  */
-export function getEvidenceValue(category: PhotoCategory): 'high' | 'medium' | 'low' {
+export function getDocumentationValue(category: PhotoCategory): 'high' | 'medium' | 'low' {
   const highValue: PhotoCategory[] = [
     'symptom_visible',
     'medical_device',
@@ -129,7 +129,7 @@ export function getEvidenceValue(category: PhotoCategory): 'high' | 'medium' | '
 /**
  * Get documentation level label for display
  */
-export function getEvidenceValueLabel(category: PhotoCategory): string {
-  const value = getEvidenceValue(category);
+export function getDocumentationValueLabel(category: PhotoCategory): string {
+  const value = getDocumentationValue(category);
   return value.charAt(0).toUpperCase() + value.slice(1);
 }

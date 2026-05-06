@@ -36,13 +36,10 @@ import {
 import {
   analyzeEnvironmentalFactors,
   getWeatherDisplayName,
-  getWeatherImpactIcon,
   type EnvironmentalAnalysis,
 } from '../utils/weatherCorrelation';
 import {
   analyzeMedicationCorrelations,
-  getMedicationImpactIcon,
-  getEffectivenessText,
   type MedicationAnalysis,
 } from '../utils/medicationCorrelation';
 import { addDays, countInclusiveDays, findDateGaps } from '../utils/dates';
@@ -963,20 +960,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: COLORS.primary600,
   },
-  ssdiInsightsCard: {
+  healthInsightsCard: {
     backgroundColor: COLORS.primaryLight,
     padding: SPACING.lg,
     borderRadius: 4,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary600,
   },
-  ssdiInsightsTitle: {
+  healthInsightsTitle: {
     ...TYPOGRAPHY.titleLarge,
     color: COLORS.primary600,
     marginBottom: SPACING.md,
     fontWeight: 'bold',
   },
-  ssdiInsightText: {
+  healthInsightText: {
     ...TYPOGRAPHY.bodyMedium,
     color: COLORS.gray800,
     marginBottom: SPACING.sm,

@@ -36,7 +36,6 @@ export const DailyLogSchema = z.object({
   profileId: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
-  evidenceTimestamp: z.string().optional(),
   logDate: z.string(),
   timeOfDay: z.enum(['morning', 'afternoon', 'evening', 'night', 'specific']),
   specificTime: z.string().optional(),
@@ -48,9 +47,6 @@ export const DailyLogSchema = z.object({
   notes: z.string().optional(),
   retrospectiveContext: RetrospectiveContextSchema.optional(),
   photos: z.array(z.string()).optional(),
-  finalized: z.boolean().optional(),
-  finalizedAt: z.string().optional(),
-  finalizedBy: z.string().optional(),
 });
 
 export const DailyLogArraySchema = z.array(DailyLogSchema);

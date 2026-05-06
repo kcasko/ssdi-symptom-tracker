@@ -1,6 +1,6 @@
 /**
  * Appointment Model
- * Tracks medical appointments for documentation
+ * Tracks medical appointments and visit notes
  */
 
 export interface Appointment {
@@ -41,7 +41,7 @@ export interface Appointment {
   preAppointmentNotes?: string;
   postAppointmentNotes?: string;
   
-  // Photo evidence
+  // Photos
   photos?: string[]; // Photo attachment IDs
 }
 
@@ -66,7 +66,6 @@ export type AppointmentPurpose =
   | 'test_results'
   | 'treatment'
   | 'therapy_session'
-  | 'ssdi_evaluation'
   | 'paperwork'
   | 'other';
 
@@ -150,7 +149,6 @@ export function getPurposeLabel(purpose: AppointmentPurpose): string {
     test_results: 'Test Results',
     treatment: 'Treatment',
     therapy_session: 'Therapy Session',
-    ssdi_evaluation: 'SSDI Evaluation',
     paperwork: 'Paperwork/Forms',
     other: 'Other',
   };

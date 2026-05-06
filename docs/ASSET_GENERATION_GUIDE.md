@@ -214,7 +214,7 @@ After generating assets, verify:
 - [ ] `adaptive-icon.png` exists with **transparency**
 - [ ] `splash.png` replaced with new Daymark version
 - [ ] All PNGs have proper Daymark branding (dot on line)
-- [ ] No old SSDI branding remains
+- [ ] No old product branding remains
 
 ---
 

@@ -2,7 +2,7 @@
  * Flare Pattern Detection Utility
  * 
  * Simple, deterministic algorithm for detecting pain flares based on consecutive days
- * with elevated pain scores. Designed for medical and SSDI documentation review.
+ * with elevated pain scores.
  * 
  * Definition: A flare is painScore >= 6 for 3 consecutive calendar days.
  */

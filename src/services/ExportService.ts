@@ -9,8 +9,6 @@ import { Medication } from '../domain/models/Medication';
 import { Limitation } from '../domain/models/Limitation';
 import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
-import { useEvidenceModeStore } from '../state/evidenceModeStore';
-import { getRevisionCount } from './EvidenceLogService';
 import { calculateDaysDelayed, countInclusiveDays, findDateGaps } from '../utils/dates';
 import { GapExplanation } from '../domain/models/GapExplanation';
 import { Share, Alert, Platform } from 'react-native';
@@ -138,6 +136,19 @@ export class ExportService {
     mimeType: string
   ): Promise<void> {
     try {
+      if (Platform.OS === 'web' && typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        return;
+      }
+
       // Create file URI
       const fileUri = `${(FileSystem as any).documentDirectory}${filename}`;
 
@@ -182,22 +193,15 @@ export class ExportService {
    * Gather consistent temporal metadata for logs
    */
   private static getLogMetadata(log: DailyLog | ActivityLog, eventDate: string) {
-    const evidenceStore = useEvidenceModeStore.getState();
     const createdIso = this.toIsoString(log.createdAt);
     const updatedIso = this.toIsoString((log as any).updatedAt || log.createdAt);
-    const evidenceIso = this.toIsoString((log as any).evidenceTimestamp);
     const daysDelayed = calculateDaysDelayed(eventDate, log.createdAt);
-    const finalized = evidenceStore.isLogFinalized(log.id) || Boolean((log as any).finalized);
-    const revisionCount = getRevisionCount(log.id);
     const retrospectiveContext = (log as any).retrospectiveContext || {};
 
     return {
       createdIso,
       updatedIso,
-      evidenceIso,
       daysDelayed,
-      finalized,
-      revisionCount,
       retrospectiveReason: retrospectiveContext.reason || '',
       retrospectiveNote: retrospectiveContext.note || '',
       retrospectiveFlaggedAt: retrospectiveContext.flaggedAt
@@ -348,13 +352,6 @@ export class ExportService {
         return delayed > 0;
       }).length;
 
-      const finalizedCount = logs.filter(log => {
-        const evidenceStore = useEvidenceModeStore.getState();
-        return evidenceStore.isLogFinalized(log.id) || Boolean((log as any).finalized);
-      }).length;
-
-      const revisedCount = logs.filter(log => getRevisionCount(log.id) > 0).length;
-
       // Calculate gap statistics
       const sortedDates = [...logs]
         .map(log => (log as DailyLog).logDate || (log as ActivityLog).activityDate)
@@ -370,8 +367,6 @@ export class ExportService {
       metadata.push(
         this.padRow(['DATA_QUALITY_FLAGS', ''], width),
         this.padRow(['Backdated_Entries', backdatedCount.toString()], width),
-        this.padRow(['Finalized_Entries', finalizedCount.toString()], width),
-        this.padRow(['Entries_With_Revisions', revisedCount.toString()], width),
         this.padRow(['Unexplained_Gaps_Over_4_Days', unexplainedGaps.toString()], width),
         this.padRow(['Total_Gap_Days', totalGapDays.toString()], width),
         this.padRow(['Total_Gap_Segments', gapSegments.length.toString()], width),
@@ -397,10 +392,7 @@ export class ExportService {
       'Event_Date',
       'Created_DateTime',
       'Last_Modified_DateTime',
-      'Record_Timestamp',
       'Days_Delayed',
-      'Finalized',
-      'Revision_Count',
       'Retrospective_Reason',
       'Retrospective_Note',
       'Retrospective_FlaggedAt',
@@ -449,10 +441,7 @@ export class ExportService {
         log.logDate,
         meta.createdIso,
         meta.updatedIso,
-        meta.evidenceIso,
         String(meta.daysDelayed),
-        meta.finalized ? 'Yes' : 'No',
-        String(meta.revisionCount),
         this.escapeCSV(meta.retrospectiveReason),
         this.escapeCSV(meta.retrospectiveNote),
         meta.retrospectiveFlaggedAt,
@@ -522,10 +511,7 @@ export class ExportService {
       'Event_Date',
       'Created_DateTime',
       'Last_Modified_DateTime',
-      'Record_Timestamp',
       'Days_Delayed',
-      'Finalized',
-      'Revision_Count',
       'Retrospective_Reason',
       'Retrospective_Note',
       'Retrospective_FlaggedAt',
@@ -562,10 +548,7 @@ export class ExportService {
         log.activityDate,
         meta.createdIso,
         meta.updatedIso,
-        meta.evidenceIso,
         String(meta.daysDelayed),
-        meta.finalized ? 'Yes' : 'No',
-        String(meta.revisionCount),
         this.escapeCSV(meta.retrospectiveReason),
         this.escapeCSV(meta.retrospectiveNote),
         meta.retrospectiveFlaggedAt,
@@ -727,15 +710,12 @@ export class ExportService {
     limitations: Limitation[]
   ): Promise<void> {
     try {
-      const evidenceStore = useEvidenceModeStore.getState();
       const exportDate = new Date().toISOString();
       const data = {
         dailyLogs,
         activityLogs,
         medications,
         limitations,
-        revisions: evidenceStore.getAllRevisions(),
-        finalizations: evidenceStore.getFinalizedLogs(),
         metadata: {
           exportDate,
           exportVersion: EXPORT_VERSION,
@@ -743,12 +723,10 @@ export class ExportService {
           deviceOS: Platform.OS,
           deviceOSVersion: Platform.Version?.toString() || 'unknown',
           devicePlatform: Platform.select({ ios: 'iOS', android: 'Android', default: 'Other' }),
-          evidenceModeEnabled: evidenceStore.isEvidenceModeEnabled(),
-          evidenceModeEnabledAt: evidenceStore.config.enabledAt,
         },
       };
 
-      const filename = this.generateFilename('symptom_tracker_backup', 'json');
+      const filename = this.generateFilename('daymark_backup', 'json');
       await this.exportToJSON(data, filename);
     } catch (error) {
       console.error('Export all data failed:', error);

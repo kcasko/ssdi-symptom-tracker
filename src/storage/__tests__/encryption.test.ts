@@ -35,34 +35,9 @@ jest.mock('expo-crypto', () => ({
   }),
 }));
 
-const mockCipherMap = new Map<string, string>();
-
-jest.mock('react-native-aes-crypto', () => {
-  const { Buffer } = require('buffer');
-  return {
-    __esModule: true,
-    default: {
-      encrypt: jest.fn(async (text: string, keyHex: string, ivHex: string) => {
-        const cipher = Buffer.from(text, 'utf8').toString('base64');
-        mockCipherMap.set(`${keyHex}:${ivHex}:${cipher}`, text);
-        return cipher;
-      }),
-      decrypt: jest.fn(async (cipher: string, keyHex: string, ivHex: string) => {
-        const key = `${keyHex}:${ivHex}:${cipher}`;
-        const plaintext = mockCipherMap.get(key);
-        if (!plaintext) {
-          throw new Error('Invalid authentication tag');
-        }
-        return plaintext;
-      }),
-    },
-  };
-});
-
 describe('EncryptionManager', () => {
   beforeEach(() => {
     Object.keys(mockSecureStore).forEach((key) => delete mockSecureStore[key]);
-    mockCipherMap.clear();
     mockByteCounter = 1;
     EncryptionManager.updateConfig({ enabled: false, useDeviceAuth: false });
   });

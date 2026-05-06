@@ -14,11 +14,6 @@ export * from './DateRangePicker';
 // VoiceRecorder not exported here - import directly from './VoiceRecorder' to avoid loading native Voice module
 export * from './PhotoPicker';
 export * from './PhotoGallery';
-export * from './EvidenceModeControls';
-export * from './LogFinalizationControls';
-export * from './RevisionHistoryViewer';
-export * from './RevisionReasonModal';
-export * from './SubmissionPackBuilder';
 export * from './ThemeToggle';
 export * from './SymptomTrendChart';
 export * from './ScreenHeader';

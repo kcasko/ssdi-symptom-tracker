@@ -1,6 +1,6 @@
 /**
  * ReportDraft Model
- * Editable report drafts that preserve links to source evidence
+ * Editable report drafts that preserve links to source records
  */
 
 export interface ReportDraft {
@@ -219,8 +219,8 @@ export function getReportTypeLabel(type: ReportType): string {
   const labels: Record<ReportType, string> = {
     daily_summary: 'Daily Summary',
     activity_impact: 'Activity Impact Summary',
-    functional_limitations: 'Functional Limitations Summary',
-    full_narrative: 'Full SSDI Narrative',
+    functional_limitations: 'Capacity Limits Summary',
+    full_narrative: 'Health Summary Report',
   };
   return labels[type] || type;
 }

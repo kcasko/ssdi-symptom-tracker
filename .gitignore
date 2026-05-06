@@ -55,6 +55,8 @@ backups/
 coverage/
 .nyc_output/
 test-artifacts/*/
+test-artifacts/*.png
+test-artifacts/*.json
 !test-artifacts/.gitkeep
 playwright-report/
 test-results/

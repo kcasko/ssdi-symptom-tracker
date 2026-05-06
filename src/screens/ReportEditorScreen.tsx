@@ -12,6 +12,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -21,11 +22,12 @@ import { typography } from '../theme/typography';
 import { BigButton } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService } from '../services';
+import { formatDateOnly } from '../utils/dates';
 // Sharing functionality not currently used
 
 type ReportEditorProps = NativeStackScreenProps<RootStackParamList, 'ReportEditor'>;
 
-export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route }) => {
+export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route, navigation }) => {
   const { reportId } = route.params;
   const { reportDrafts, updateReportDraft } = useAppState();
   
@@ -78,11 +80,18 @@ export const ReportEditorScreen: React.FC<ReportEditorProps> = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{draft.reportType}</Text>
-        <Text style={styles.meta}>
-          {new Date(draft.dateRange.start).toLocaleDateString()} -{' '}
-          {new Date(draft.dateRange.end).toLocaleDateString()}
-        </Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>{draft.reportType}</Text>
+            <Text style={styles.meta}>
+              {formatDateOnly(draft.dateRange.start)} -{' '}
+              {formatDateOnly(draft.dateRange.end)}
+            </Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -162,6 +171,28 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     backgroundColor: colors.white,
     gap: spacing.xs,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  headerText: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   title: {
     fontSize: typography.sizes.xl,

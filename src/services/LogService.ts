@@ -179,7 +179,7 @@ export class LogService {
     if (input.impacts && input.impacts.length > 0) {
       const symptoms = input.impacts.map(impact => {
         const symptom = getSymptomById(impact.symptomId);
-        if (!symptom) {
+        if (!symptom && impact.symptomId !== 'general') {
           throw new Error(`Invalid symptom ID: ${impact.symptomId}`);
         }
         return {
@@ -247,7 +247,7 @@ export class LogService {
     if (updates.impacts) {
       const symptoms = updates.impacts.map(impact => {
         const symptom = getSymptomById(impact.symptomId);
-        if (!symptom) {
+        if (!symptom && impact.symptomId !== 'general') {
           throw new Error(`Invalid symptom ID: ${impact.symptomId}`);
         }
         return {

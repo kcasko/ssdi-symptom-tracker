@@ -1,6 +1,6 @@
 /**
  * Limitations Screen
- * Manage functional limitations
+ * Manage activity and capacity limits
  */
 
 import React, { useState } from 'react';
@@ -15,14 +15,16 @@ import {
   TextInput,
   Switch
 } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, RevisionReasonModal } from '../components';
+import { BigButton } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LimitationCategory, LimitationFrequency, VariabilityLevel, Limitation } from '../domain/models/Limitation';
-import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
-import { createRevisionsForRecord } from '../services/EvidenceLogService';
+
+type LimitationsProps = NativeStackScreenProps<RootStackParamList, 'Limitations'>;
 
 const LIMITATION_CATEGORIES: { value: LimitationCategory; label: string; description: string }[] = [
   { value: 'sitting', label: 'Sitting', description: 'Time limits for sitting' },
@@ -54,15 +56,7 @@ const VARIABILITY_OPTIONS: { value: VariabilityLevel; label: string }[] = [
   { value: 'high_variability', label: 'High Variability' },
 ];
 
-const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
-  { id: 'typo_correction', label: 'Typo or formatting correction' },
-  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
-  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
-  { id: 'clarification_requested', label: 'Clarification requested' },
-  { id: 'other', label: 'Other (describe)' },
-];
-
-export const LimitationsScreen: React.FC = () => {
+export const LimitationsScreen: React.FC<LimitationsProps> = ({ navigation }) => {
   const { activeProfile, limitations, addLimitation, updateLimitation, deleteLimitation } = useAppState();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -78,9 +72,6 @@ export const LimitationsScreen: React.FC = () => {
   const [variabilityNotes, setVariabilityNotes] = useState('');
   const [notes, setNotes] = useState('');
   const [isActive, setIsActive] = useState(true);
-  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
-  const [revisionReasonNote, setRevisionReasonNote] = useState('');
-  const [showRevisionModal, setShowRevisionModal] = useState(false);
 
   const activeLimitations = limitations.filter(
     l => l.profileId === activeProfile?.id && l.isActive
@@ -98,8 +89,6 @@ export const LimitationsScreen: React.FC = () => {
     setNotes('');
     setIsActive(true);
     setEditingId(null);
-    setRevisionReasonCategory('added_detail_omitted_earlier');
-    setRevisionReasonNote('');
   };
 
   const loadLimitationForEdit = (limitation: Limitation) => {
@@ -117,7 +106,7 @@ export const LimitationsScreen: React.FC = () => {
     setShowAddForm(true);
   };
 
-  const handleSave = async (forceRevision = false) => {
+  const handleSave = async () => {
     if (!activeProfile || !selectedCategory) {
       Alert.alert('Missing Information', 'Please select a limitation category');
       return;
@@ -171,31 +160,6 @@ export const LimitationsScreen: React.FC = () => {
             updatedAt: new Date().toISOString(),
           } as Limitation;
 
-          if (!forceRevision) {
-            setShowRevisionModal(true);
-            return;
-          }
-
-          if (!revisionReasonNote || revisionReasonNote.trim().length < 20) {
-            Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
-            return;
-          }
-
-          const revisionResult = await createRevisionsForRecord(
-            existingLimitation.id,
-            'limitation',
-            activeProfile.id,
-            existingLimitation,
-            updatedLimitation,
-            revisionReasonCategory,
-            revisionReasonNote.trim(),
-            'Limitation updated'
-          );
-
-          if (!revisionResult.success) {
-            throw new Error(revisionResult.error || 'Failed to create revision');
-          }
-
           await updateLimitation(updatedLimitation);
         }
       } else {
@@ -239,8 +203,15 @@ export const LimitationsScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Functional Limitations</Text>
-        <Text style={styles.subtitle}>Track capacity limits and impacts</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>Activity Limits</Text>
+            <Text style={styles.subtitle}>Track capacity limits and impacts</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -478,7 +449,7 @@ export const LimitationsScreen: React.FC = () => {
         ) : (
           <View style={styles.section}>
             <BigButton
-              label="+ Add Functional Limitation"
+              label="+ Add Activity Limit"
               onPress={() => setShowAddForm(true)}
               variant="primary"
               fullWidth
@@ -487,12 +458,12 @@ export const LimitationsScreen: React.FC = () => {
             <View style={styles.infoCard}>
               <Text style={styles.infoTitle}>About Limitations</Text>
               <Text style={styles.infoText}>
-                Document your functional capacity limits:{'\n\n'}
+                Document your daily activity limits:{'\n\n'}
                 • How long you can perform activities{'\n'}
                 • Weight or distance limits{'\n'}
                 • What happens when limits are exceeded{'\n'}
                 • Accommodations you use{'\n\n'}
-                This helps establish patterns for SSDI documentation.
+                This helps you notice patterns and prepare clear appointment notes.
               </Text>
             </View>
           </View>
@@ -507,21 +478,6 @@ export const LimitationsScreen: React.FC = () => {
           </View>
         )}
       </ScrollView>
-
-      <RevisionReasonModal
-        visible={showRevisionModal}
-        reasonOptions={REVISION_REASON_OPTIONS}
-        selectedReason={revisionReasonCategory}
-        note={revisionReasonNote}
-        onSelectReason={setRevisionReasonCategory}
-        onChangeNote={setRevisionReasonNote}
-        onCancel={() => setShowRevisionModal(false)}
-        onConfirm={() => {
-          setShowRevisionModal(false);
-          void handleSave(true);
-        }}
-        confirmLabel="Save revision"
-      />
     </SafeAreaView>
   );
 };
@@ -535,6 +491,28 @@ const styles = StyleSheet.create({
     padding: spacing.lg, 
     backgroundColor: colors.white, 
     gap: spacing.xs 
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  headerText: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   title: { 
     fontSize: typography.sizes.xxl, 

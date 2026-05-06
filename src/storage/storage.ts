@@ -102,7 +102,7 @@ export class Storage {
   static async clearAll(): Promise<StorageResult<null>> {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
-      const appKeys = allKeys.filter((key) => key.startsWith('@ssdi/'));
+      const appKeys = allKeys.filter((key) => key.startsWith('@daymark/'));
       if (appKeys.length > 0) {
         await AsyncStorage.multiRemove(appKeys);
       }
@@ -127,7 +127,7 @@ export class Storage {
   }> {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
-      const appKeys = allKeys.filter((key) => key.startsWith('@ssdi/'));
+      const appKeys = allKeys.filter((key) => key.startsWith('@daymark/'));
       
       return {
         keys: appKeys,
@@ -445,7 +445,7 @@ export class BackupStorage {
   }> {
     try {
       const allKeys = await AsyncStorage.getAllKeys();
-      const appKeys = allKeys.filter((key) => key.startsWith('@ssdi/'));
+      const appKeys = allKeys.filter((key) => key.startsWith('@daymark/'));
       const allData = await AsyncStorage.multiGet(appKeys);
       
       const backupData: Record<string, any> = {};

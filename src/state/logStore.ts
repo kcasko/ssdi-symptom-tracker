@@ -14,8 +14,6 @@ import { GapExplanation } from '../domain/models/GapExplanation';
 import { LogStorage } from '../storage/storage';
 import { ids } from '../utils/ids';
 import { calculateDaysDelayed, isSameDayAs } from '../utils/dates';
-import { applyEvidenceTimestamp } from '../services/EvidenceLogService';
-import { useEvidenceModeStore } from './evidenceModeStore';
 
 interface LogState {
   // Data
@@ -176,9 +174,6 @@ export const useLogStore = create<LogState>((set, get) => ({
         };
       }
       
-      // Apply evidence timestamp if Evidence Mode is enabled
-      newLog = applyEvidenceTimestamp(newLog);
-      
       const { dailyLogs } = get();
       const updatedLogs = [...dailyLogs, newLog];
       
@@ -197,11 +192,6 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
-      const evidenceStore = useEvidenceModeStore.getState();
-      if (evidenceStore.isLogFinalized(updatedLog.id)) {
-        throw new Error('Cannot update a finalized log. Create a revision instead.');
-      }
-
       const logWithTimestamp = {
         ...updatedLog,
         updatedAt: new Date().toISOString(),
@@ -224,11 +214,6 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
-      const evidenceStore = useEvidenceModeStore.getState();
-      if (evidenceStore.isLogFinalized(logId)) {
-        throw new Error('Cannot delete a finalized log.');
-      }
-
       const { dailyLogs } = get();
       const updatedLogs = dailyLogs.filter(log => log.id !== logId);
       
@@ -271,9 +256,6 @@ export const useLogStore = create<LogState>((set, get) => ({
         };
       }
       
-      // Apply evidence timestamp if Evidence Mode is enabled
-      newLog = applyEvidenceTimestamp(newLog);
-      
       const { activityLogs } = get();
       const updatedLogs = [...activityLogs, newLog];
       
@@ -289,11 +271,6 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
-      const evidenceStore = useEvidenceModeStore.getState();
-      if (evidenceStore.isLogFinalized(updatedLog.id)) {
-        throw new Error('Cannot update a finalized log. Create a revision instead.');
-      }
-
       const logWithTimestamp = {
         ...updatedLog,
         updatedAt: new Date().toISOString(),
@@ -316,11 +293,6 @@ export const useLogStore = create<LogState>((set, get) => ({
     if (!currentProfileId) return;
     
     try {
-      const evidenceStore = useEvidenceModeStore.getState();
-      if (evidenceStore.isLogFinalized(logId)) {
-        throw new Error('Cannot delete a finalized log.');
-      }
-
       const { activityLogs } = get();
       const updatedLogs = activityLogs.filter(log => log.id !== logId);
       

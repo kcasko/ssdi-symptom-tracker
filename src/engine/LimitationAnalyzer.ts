@@ -1,6 +1,6 @@
 /**
  * Limitation Analyzer
- * Analyzes functional limitations and RFC (Residual Functional Capacity)
+ * Analyzes functional limitations and daily activity capacity
  */
 
 import { Limitation, getLimitationCategoryLabel } from '../domain/models/Limitation';
@@ -28,12 +28,12 @@ export interface LimitationSummary {
   // Severity assessment
   severity: 'mild' | 'moderate' | 'marked' | 'extreme';
   
-  // Supporting evidence
+  // Supporting records
   supportingLogs: string[]; // Log IDs that support this limitation
-  evidenceCount: number;
+  supportingRecordCount: number;
 }
 
-export interface RFCAssessment {
+export interface CapacityAssessment {
   // Physical capacity
   physical: {
     exertionalLevel: 'sedentary' | 'light' | 'medium' | 'heavy' | 'very_heavy';
@@ -164,7 +164,7 @@ export class LimitationAnalyzer {
 
     // Find supporting logs for this limitation
     const supportingLogs = this.findSupportingLogs(limitation, dailyLogs, activityLogs);
-    const evidenceCount = supportingLogs.length;
+    const supportingRecordCount = supportingLogs.length;
 
     return {
       category: limitation.category,
@@ -175,18 +175,18 @@ export class LimitationAnalyzer {
       primaryConsequences: limitation.consequences.slice(0, 3),
       severity,
       supportingLogs,
-      evidenceCount,
+      supportingRecordCount,
     };
   }
 
   /**
-   * Generate comprehensive RFC assessment
+   * Generate comprehensive daily activity capacity assessment
    */
-  static generateRFCAssessment(
+  static generateCapacityAssessment(
     limitations: Limitation[],
     activityLogs: ActivityLog[],
     dailyLogs: DailyLog[]
-  ): RFCAssessment {
+  ): CapacityAssessment {
     const activeLimitations = limitations.filter(l => l.isActive);
 
     // Physical capacity
@@ -196,7 +196,7 @@ export class LimitationAnalyzer {
     const lifting = activeLimitations.find(l => l.category === 'lifting');
     const carrying = activeLimitations.find(l => l.category === 'carrying');
 
-    let exertionalLevel: RFCAssessment['physical']['exertionalLevel'] = 'sedentary';
+    let exertionalLevel: CapacityAssessment['physical']['exertionalLevel'] = 'sedentary';
     
     if (lifting?.weightThreshold) {
       const maxWeight = lifting.weightThreshold.maxPounds;
@@ -207,7 +207,7 @@ export class LimitationAnalyzer {
       else exertionalLevel = 'sedentary';
     }
 
-    const physical: RFCAssessment['physical'] = {
+    const physical: CapacityAssessment['physical'] = {
       exertionalLevel,
       sittingCapacity: sitting?.timeThreshold 
         ? `Limited to ${sitting.timeThreshold.durationMinutes} minutes before requiring position change`
@@ -234,7 +234,7 @@ export class LimitationAnalyzer {
     const bending = activeLimitations.find(l => l.category === 'bending');
     const reaching = activeLimitations.find(l => l.category === 'reaching');
 
-    const postural: RFCAssessment['postural'] = {
+    const postural: CapacityAssessment['postural'] = {
       climbing: climbing ? `${climbing.frequency}` : 'Unlimited',
       balancing: 'Not specifically documented',
       stooping: bending ? `${bending.frequency}` : 'Unlimited',
@@ -247,7 +247,7 @@ export class LimitationAnalyzer {
     const fineMotor = activeLimitations.find(l => l.category === 'fine_motor');
     const grossMotor = activeLimitations.find(l => l.category === 'gross_motor');
 
-    const manipulative: RFCAssessment['manipulative'] = {
+    const manipulative: CapacityAssessment['manipulative'] = {
       reaching: reaching ? `${reaching.frequency}` : 'Unlimited',
       handling: grossMotor ? `${grossMotor.frequency}` : 'Unlimited',
       fingering: fineMotor ? `${fineMotor.frequency}` : 'Unlimited',
@@ -259,7 +259,7 @@ export class LimitationAnalyzer {
     const memory = activeLimitations.find(l => l.category === 'memory');
     const social = activeLimitations.find(l => l.category === 'social');
 
-    const mental: RFCAssessment['mental'] = {
+    const mental: CapacityAssessment['mental'] = {
       understanding: memory 
         ? `Difficulty understanding complex instructions (${memory.frequency})`
         : 'Able to understand and remember instructions',
@@ -277,7 +277,7 @@ export class LimitationAnalyzer {
         .map(l => `${getLimitationCategoryLabel(l.category)}: ${l.frequency}`)
     };
 
-    // Work reliability assessment
+    // Activity reliability estimate
     const totalDays = dailyLogs.length;
     const badDays = dailyLogs.filter(log => log.overallSeverity >= 7).length;
     const reliability = totalDays > 0 ? Math.round(((totalDays - badDays) / totalDays) * 100) : 100;
@@ -286,13 +286,13 @@ export class LimitationAnalyzer {
       ? Math.round((badDays / totalDays) * 20) // Assuming ~20 work days per month
       : 0;
 
-    const work: RFCAssessment['work'] = {
+    const work: CapacityAssessment['work'] = {
       reliability,
       attendance: absencesPerMonth > 4
-        ? `Unpredictable absences expected (approximately ${absencesPerMonth} days/month)`
+        ? `High-impact days recorded frequently (approximately ${absencesPerMonth} days/month)`
         : absencesPerMonth > 2
-        ? 'Frequent absences expected'
-        : 'Good attendance expected',
+        ? 'Frequent high-impact days recorded'
+        : 'High-impact days were less frequent',
       pace: concentration?.timeThreshold && concentration.timeThreshold.durationMinutes < 120
         ? 'Reduced pace due to frequent breaks'
         : 'Normal pace',
@@ -326,14 +326,14 @@ export class LimitationAnalyzer {
 
     let sustainedWorkAbility: string;
     if (canPerformFullTime) {
-      sustainedWorkAbility = 'Can perform full-time work with accommodations';
+      sustainedWorkAbility = 'Likely tolerates full-day routines with modifications';
     } else if (canPerformPartTime) {
-      sustainedWorkAbility = 'May perform part-time work with significant accommodations';
+      sustainedWorkAbility = 'May tolerate shorter routines with significant modifications';
     } else {
-      sustainedWorkAbility = 'Unable to sustain competitive employment';
+      sustainedWorkAbility = 'Recorded symptoms may make sustained routines difficult';
     }
 
-    const conclusion: RFCAssessment['conclusion'] = {
+    const conclusion: CapacityAssessment['conclusion'] = {
       canPerformFullTime,
       canPerformPartTime,
       sustainedWorkAbility,

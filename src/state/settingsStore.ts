@@ -246,7 +246,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       });
       
       // Return backup filename or identifier
-      return `ssdi_backup_${backupDate.split('T')[0]}.json`;
+      return `daymark_backup_${backupDate.split('T')[0]}.json`;
     } catch (error) {
       set({ error: error instanceof Error ? error.message : 'Failed to create backup' });
       return null;

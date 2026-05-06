@@ -1,6 +1,6 @@
 /**
  * DailyLog Model
- * Captures daily symptom entries - raw evidence layer
+ * Captures daily symptom entries
  */
 
 import { RetrospectiveContext } from './RetrospectiveContext';
@@ -12,9 +12,6 @@ export interface DailyLog {
   // When this log was created/edited
   createdAt: string;
   updatedAt: string;
-  
-  // Evidence Mode: Immutable creation timestamp (set when Evidence Mode is active)
-  evidenceTimestamp?: string;
   
   // The date this log is for (may differ from createdAt)
   logDate: string;
@@ -44,13 +41,8 @@ export interface DailyLog {
   // Retrospective context for backdated entries
   retrospectiveContext?: RetrospectiveContext;
   
-  // Photo evidence
+  // Photos
   photos?: string[]; // Photo attachment IDs
-  
-  // Finalization
-  finalized?: boolean;
-  finalizedAt?: string;
-  finalizedBy?: string; // Profile ID
 }
 
 export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night' | 'specific';
@@ -99,9 +91,6 @@ export function createDailyLog(
     timeOfDay,
     symptoms: [],
     overallSeverity: 0,
-    finalized: false,
-    finalizedAt: undefined,
-    finalizedBy: undefined,
   };
 }
 

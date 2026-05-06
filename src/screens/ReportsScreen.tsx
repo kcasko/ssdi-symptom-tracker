@@ -18,10 +18,10 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, DateRangePicker, SubmissionPackBuilder } from '../components';
+import { BigButton, DateRangePicker } from '../components';
 import { useAppState } from '../state/useAppState';
 import { ReportService, ExportService, BackupRestoreService } from '../services';
-import { formatDate, DISPLAY_DATE_SHORT } from '../utils/dates';
+import { formatDate, formatDateOnly, DISPLAY_DATE_SHORT } from '../utils/dates';
 
 type ReportsProps = NativeStackScreenProps<RootStackParamList, 'Reports'>;
 
@@ -117,7 +117,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
 
       // First create an empty draft
       const draftId = await addReportDraft(
-        'SSDI Full Report',
+        'Health Summary Report',
         'full_narrative',
         { start: startDate, end: endDate }
       );
@@ -236,8 +236,15 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Reports</Text>
-        <Text style={styles.subtitle}>Summaries of your logged data</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>Reports</Text>
+            <Text style={styles.subtitle}>Summaries of your logged data</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -301,17 +308,6 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Record Submission Packs */}
-        {activeProfile && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Record Submission Packs</Text>
-            <Text style={styles.sectionDescription}>
-              Generate comprehensive record packages for review
-            </Text>
-            <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
-          </View>
-        )}
-
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Generate New Report</Text>
           
@@ -353,7 +349,7 @@ export const ReportsScreen: React.FC<ReportsProps> = ({ navigation }) => {
                   <View style={styles.reportInfo}>
                     <Text style={styles.reportTitle}>{report.reportType}</Text>
                     <Text style={styles.reportMeta}>
-                      {formatDate(report.dateRange.start, DISPLAY_DATE_SHORT)} - {formatDate(report.dateRange.end, DISPLAY_DATE_SHORT)}
+                      {formatDateOnly(report.dateRange.start)} - {formatDateOnly(report.dateRange.end)}
                     </Text>
                     <Text style={styles.reportMeta}>
                       {stats.totalSections} sections - {stats.totalWords} words
@@ -382,6 +378,28 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     backgroundColor: colors.white,
     gap: spacing.xs,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  headerText: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   title: {
     fontSize: typography.sizes.xxl,
@@ -450,31 +468,6 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: typography.sizes.xl,
     color: colors.primaryMain,
-  },
-  credibilitySection: {
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-  credibilityCard: {
-    backgroundColor: colors.white,
-    borderRadius: 4,
-    padding: spacing.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primaryMain,
-  },
-  credibilityHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: spacing.md,
-  },
-  credibilityLabel: {
-    fontSize: typography.sizes.md,
-    color: colors.gray700,
-    fontWeight: typography.weights.bold as any,
-  },
-  credibilityIndicators: {
-    gap: spacing.sm,
-    marginBottom: spacing.md,
   },
   indicatorRow: {
     flexDirection: 'row',

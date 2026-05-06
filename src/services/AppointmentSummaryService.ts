@@ -13,6 +13,7 @@ import { ActivityImpactEngine } from '../engine/ActivityImpactEngine';
 import { getSymptomById } from '../data/symptoms';
 import { getActivityById } from '../data/activities';
 import { getWorstImpact } from '../domain/models/ActivityLog';
+import { formatDateOnly } from '../utils/dates';
 
 export interface AppointmentPreparationSummary {
   appointment: Appointment;
@@ -79,7 +80,8 @@ export class AppointmentSummaryService {
     medications: Medication[],
     lookbackDays: number = 30
   ): AppointmentPreparationSummary {
-    const appointmentDate = new Date(appointment.appointmentDate);
+    const [year, month, day] = appointment.appointmentDate.split('-').map(Number);
+    const appointmentDate = new Date(year, month - 1, day);
     const endDate = new Date(appointmentDate);
     endDate.setDate(endDate.getDate() - 1); // Day before appointment
     
@@ -355,7 +357,7 @@ export class AppointmentSummaryService {
     const significantImpacts = activityLogs.filter(log => getWorstImpact(log) >= 7).length;
     if (significantImpacts > 0) {
       points.push(
-        `${significantImpacts} activities caused significant functional limitations - review work capacity`
+        `${significantImpacts} activities caused significant symptom impact - review daily activity limits`
       );
     }
     
@@ -382,12 +384,6 @@ export class AppointmentSummaryService {
       );
     }
     
-    // Appointment-specific points
-    if (appointment.purpose === 'ssdi_evaluation') {
-      points.push('Request documentation of functional limitations for SSDI application');
-      points.push('Ask provider to complete RFC (Residual Functional Capacity) forms');
-    }
-    
     if (appointment.purpose === 'medication_review') {
       points.push('Bring list of all current medications and supplements');
       points.push('Discuss any medication interactions or concerns');
@@ -411,16 +407,8 @@ export class AppointmentSummaryService {
       case 'initial_evaluation':
         questions.push(
           'What diagnostic tests or evaluations would you recommend?',
-          'What is your assessment of my functional limitations?',
+          'What is your assessment of my activity limits?',
           'Should I see any specialists for my symptoms?'
-        );
-        break;
-        
-      case 'ssdi_evaluation':
-        questions.push(
-          'Can you provide documentation of my functional limitations?',
-          'Would you be willing to complete RFC forms for my disability application?',
-          'How would you describe my ability to work in my current condition?'
         );
         break;
         
@@ -504,7 +492,7 @@ export class AppointmentSummaryService {
     
     // Appointment details
     lines.push(`Provider: ${summary.appointment.providerName}`);
-    lines.push(`Date: ${new Date(summary.appointment.appointmentDate).toLocaleDateString()}`);
+    lines.push(`Date: ${formatDateOnly(summary.appointment.appointmentDate)}`);
     if (summary.appointment.appointmentTime) {
       lines.push(`Time: ${summary.appointment.appointmentTime}`);
     }
@@ -512,7 +500,7 @@ export class AppointmentSummaryService {
     lines.push('');
     
     // Data period
-    lines.push(`Summary Period: ${new Date(summary.dateRange.start).toLocaleDateString()} - ${new Date(summary.dateRange.end).toLocaleDateString()}`);
+    lines.push(`Summary Period: ${formatDateOnly(summary.dateRange.start)} - ${formatDateOnly(summary.dateRange.end)}`);
     lines.push('');
     
     // Day quality

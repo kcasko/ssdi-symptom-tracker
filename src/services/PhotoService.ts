@@ -1,6 +1,6 @@
 /**
  * Photo Service
- * Manages photo attachments for evidence documentation
+ * Manages photo attachments for health records
  * Uses expo-image-picker and expo-file-system
  */
 
@@ -282,9 +282,9 @@ export class PhotoService {
   }
   
   /**
-   * Get evidence strength summary for a set of photos
+   * Get documentation summary for a set of photos
    */
-  static getEvidenceSummary(attachments: PhotoAttachment[]): {
+  static getDocumentationSummary(attachments: PhotoAttachment[]): {
     high: number;
     medium: number;
     low: number;
@@ -300,8 +300,8 @@ export class PhotoService {
     };
     
     attachments.forEach(attachment => {
-      // Count by evidence value
-      const value = this.getEvidenceValue(attachment.category);
+      // Count by documentation value
+      const value = this.getDocumentationValue(attachment.category);
       summary[value]++;
       
       // Count by category
@@ -313,9 +313,9 @@ export class PhotoService {
   }
   
   /**
-   * Get evidence value for a photo category
+   * Get documentation value for a photo category
    */
-  private static getEvidenceValue(category: PhotoCategory): 'high' | 'medium' | 'low' {
+  private static getDocumentationValue(category: PhotoCategory): 'high' | 'medium' | 'low' {
     const highValue: PhotoCategory[] = [
       'symptom_visible',
       'medical_device',

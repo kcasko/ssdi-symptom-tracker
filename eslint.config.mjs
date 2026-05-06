@@ -28,33 +28,30 @@ export default [
     },
     plugins: {
       '@typescript-eslint': typescript,
-      'react': react,
+      react,
       'react-hooks': reactHooks,
     },
     rules: {
       ...typescript.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
-      
-      // TypeScript specific rules
+
       '@typescript-eslint/no-unused-vars': 'warn',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-empty-function': 'off',
-      
-      // React specific rules
+
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
       'react/no-unescaped-entities': 'off',
       'react-hooks/set-state-in-effect': 'warn',
-      
-      // General rules
+
       'no-console': 'off',
       'no-debugger': 'error',
-      'no-unused-vars': 'off', // Use TypeScript version instead
-      'no-undef': 'off', // TypeScript handles this better
+      'no-unused-vars': 'off',
+      'no-undef': 'off',
     },
     settings: {
       react: {

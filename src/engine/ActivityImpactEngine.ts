@@ -1,6 +1,6 @@
 /**
  * Activity Impact Engine
- * Analyzes how activities affect symptoms and functional capacity
+ * Analyzes how activities affect symptoms and daily activity capacity
  */
 
 import { ActivityLog, getWorstImpact, getTotalRecoveryTime } from '../domain/models/ActivityLog';
@@ -164,7 +164,7 @@ export class ActivityImpactEngine {
   }
 
   /**
-   * Analyze overall functional capacity
+   * Analyze overall daily activity capacity
    */
   static analyzeFunctionalCapacity(
     activityLogs: ActivityLog[],

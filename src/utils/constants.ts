@@ -9,20 +9,20 @@ export const APP_VERSION = '1.0.0';
 
 // Storage keys
 export const STORAGE_KEYS = {
-  PROFILES: '@ssdi/profiles',
-  ACTIVE_PROFILE: '@ssdi/activeProfile',
-  DAILY_LOGS: '@ssdi/dailyLogs',
-  ACTIVITY_LOGS: '@ssdi/activityLogs',
-  LIMITATIONS: '@ssdi/limitations',
-  MEDICATIONS: '@ssdi/medications',
-  APPOINTMENTS: '@ssdi/appointments',
-  PHOTOS: '@ssdi/photos',
-  REPORT_DRAFTS: '@ssdi/reportDrafts',
-  SETTINGS: '@ssdi/settings',
-  GAP_EXPLANATIONS: '@ssdi/gapExplanations',
-  SCHEMA_VERSION: '@ssdi/schemaVersion',
-  APP_LOCK_ENABLED: '@ssdi/appLockEnabled',
-  FIRST_LAUNCH: '@ssdi/firstLaunch',
+  PROFILES: '@daymark/profiles',
+  ACTIVE_PROFILE: '@daymark/activeProfile',
+  DAILY_LOGS: '@daymark/dailyLogs',
+  ACTIVITY_LOGS: '@daymark/activityLogs',
+  LIMITATIONS: '@daymark/limitations',
+  MEDICATIONS: '@daymark/medications',
+  APPOINTMENTS: '@daymark/appointments',
+  PHOTOS: '@daymark/photos',
+  REPORT_DRAFTS: '@daymark/reportDrafts',
+  SETTINGS: '@daymark/settings',
+  GAP_EXPLANATIONS: '@daymark/gapExplanations',
+  SCHEMA_VERSION: '@daymark/schemaVersion',
+  APP_LOCK_ENABLED: '@daymark/appLockEnabled',
+  FIRST_LAUNCH: '@daymark/firstLaunch',
 } as const;
 
 // Current schema version for migrations
@@ -83,7 +83,7 @@ export const RECOVERY_ACTIONS = [
   { id: 'other', label: 'Other', icon: 'dots-horizontal' },
 ] as const;
 
-// Functional limitation categories (SSDI relevant)
+// Functional limitation categories
 export const LIMITATION_CATEGORIES = {
   SITTING: 'sitting',
   STANDING: 'standing',

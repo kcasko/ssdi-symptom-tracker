@@ -24,11 +24,10 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SummaryCard, EvidenceModeControls } from '../components';
+import { BigButton } from '../components';
 import { useAppState } from '../state/useAppState';
 import { AnalysisService } from '../services';
 import { calculateDaysDelayed, getDaysBetween, addDays, parseDate } from '../utils/dates';
-import { getRevisionCount } from '../services/EvidenceLogService';
 
 type DashboardProps = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -82,17 +81,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
       daysDelayed > 0
         ? `Logged ${daysDelayed} ${daysDelayed === 1 ? 'day' : 'days'} after event`
         : 'Logged same-day';
-    const revisionCount = getRevisionCount(latestLog.id);
-    const finalized = Boolean((latestLog as any).finalized);
-
     return {
       eventDate: latestLog.logDate,
       createdIso,
       updatedIso,
       daysDelayed,
       delayLabel,
-      revisionCount,
-      finalized,
     };
   }, [latestLog]);
 
@@ -199,11 +193,6 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
           )}
         </View>
 
-        {/* Evidence Mode Controls */}
-        <View style={styles.evidenceSection}>
-          <EvidenceModeControls profileId={activeProfile.id} compact={true} />
-        </View>
-
         {/* Quick Counts - Factual, No Judgment */}
         <View style={styles.countsSection}>
           <Text style={styles.sectionTitle}>Record Counts</Text>
@@ -233,7 +222,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="Log Activity Impact"
+              label="Log Activity"
               onPress={() => navigation.navigate('ActivityLog')}
               variant="secondary"
               fullWidth
@@ -263,12 +252,12 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
 
           <View style={styles.actionItem}>
             <BigButton
-              label="Update Limitations"
+              label="Track Limits"
               onPress={() => navigation.navigate('Limitations')}
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Track functional limitations</Text>
+            <Text style={styles.actionHelper}>Record capacity limits that affect daily life</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -278,7 +267,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Treatment records</Text>
+            <Text style={styles.actionHelper}>Track medicines, side effects, and visits</Text>
           </View>
 
           <View style={styles.actionItem}>
@@ -288,7 +277,7 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
               variant="secondary"
               fullWidth
             />
-            <Text style={styles.actionHelper}>Export records</Text>
+            <Text style={styles.actionHelper}>Create summaries or export your data</Text>
           </View>
         </View>
 
@@ -319,14 +308,6 @@ export const DashboardScreen: React.FC<DashboardProps> = ({ navigation }) => {
                   <View style={styles.detailRow}>
                     <Text style={styles.detailLabel}>Entry timing</Text>
                     <Text style={styles.detailValue}>{latestLogMeta.delayLabel}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Revisions</Text>
-                    <Text style={styles.detailValue}>{latestLogMeta.revisionCount}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Finalized</Text>
-                    <Text style={styles.detailValue}>{latestLogMeta.finalized ? 'Yes' : 'No'}</Text>
                   </View>
                 </View>
               )}
@@ -474,8 +455,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // Evidence Section
-  evidenceSection: {
+  // Records Section
+  recordsSection: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },

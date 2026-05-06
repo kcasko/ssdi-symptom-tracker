@@ -1,6 +1,6 @@
 /**
  * ActivityLog Model
- * Captures activity attempts and their impacts - raw evidence layer
+ * Captures activity attempts and their impacts
  */
 
 import { RetrospectiveContext } from './RetrospectiveContext';
@@ -12,9 +12,6 @@ export interface ActivityLog {
   // When this log was created/edited
   createdAt: string;
   updatedAt: string;
-  
-  // Evidence Mode: Immutable creation timestamp (set when Evidence Mode is active)
-  evidenceTimestamp?: string;
   
   // When the activity occurred
   activityDate: string;
@@ -52,13 +49,8 @@ export interface ActivityLog {
   // Retrospective context for backdated entries
   retrospectiveContext?: RetrospectiveContext;
   
-  // Photo evidence
+  // Photos
   photos?: string[]; // Photo attachment IDs
-  
-  // Finalization
-  finalized?: boolean;
-  finalizedAt?: string;
-  finalizedBy?: string; // Profile ID
 }
 
 export type ActivityIntensity = 'light' | 'moderate' | 'heavy';

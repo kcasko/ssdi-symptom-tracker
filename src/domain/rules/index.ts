@@ -5,4 +5,3 @@
 
 export * from './SeverityRules';
 export * from './ConsistencyRules';
-export * from './SSDILanguageRules';

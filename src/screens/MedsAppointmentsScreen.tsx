@@ -15,11 +15,13 @@ import {
   Alert,
   Share,
 } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { useLogStore, useAppState } from '../state/useAppState';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, RevisionReasonModal } from '../components';
+import { BigButton } from '../components';
 import {
   Medication,
   MedicationFrequency,
@@ -34,21 +36,13 @@ import {
   getProviderTypeLabel,
   getPurposeLabel,
 } from '../domain/models/Appointment';
-import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
-import { createRevisionsForRecord } from '../services/EvidenceLogService';
 import { AppointmentSummaryService, AppointmentPreparationSummary } from '../services/AppointmentSummaryService';
+import { formatDateOnly } from '../utils/dates';
 
 type Tab = 'medications' | 'appointments';
+type MedsAppointmentsProps = NativeStackScreenProps<RootStackParamList, 'MedsAppointments'>;
 
-const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
-  { id: 'typo_correction', label: 'Typo or formatting correction' },
-  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
-  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
-  { id: 'clarification_requested', label: 'Clarification requested' },
-  { id: 'other', label: 'Other (describe)' },
-];
-
-export const MedsAppointmentsScreen: React.FC = () => {
+export const MedsAppointmentsScreen: React.FC<MedsAppointmentsProps> = ({ navigation }) => {
   const medications = useLogStore(state => state.medications);
   const addMedication = useLogStore(state => state.addMedication);
   const updateMedication = useLogStore(state => state.updateMedication);
@@ -59,7 +53,7 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const updateAppointment = useLogStore(state => state.updateAppointment);
   const deleteAppointment = useLogStore(state => state.deleteAppointment);
 
-  const { activeProfile, dailyLogs, activityLogs, limitations } = useAppState();
+  const { dailyLogs, activityLogs, limitations } = useAppState();
 
   const [activeTab, setActiveTab] = useState<Tab>('medications');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -70,28 +64,17 @@ export const MedsAppointmentsScreen: React.FC = () => {
   const [selectedSummary, setSelectedSummary] = useState<AppointmentPreparationSummary | null>(null);
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [editingAppt, setEditingAppt] = useState<Appointment | null>(null);
-  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
-  const [revisionReasonNote, setRevisionReasonNote] = useState('');
-  const [showRevisionModal, setShowRevisionModal] = useState(false);
-  const [pendingRevision, setPendingRevision] = useState<{
-    type: 'medication' | 'appointment';
-    original: Medication | Appointment;
-    updated: Medication | Appointment;
-  } | null>(null);
 
   const activeMeds = medications.filter(m => m.isActive);
   const inactiveMeds = medications.filter(m => !m.isActive);
+  const today = new Date().toISOString().split('T')[0];
   
   const upcomingAppts = appointments.filter(a => {
-    const apptDate = new Date(a.appointmentDate);
-    const now = new Date();
-    return apptDate >= now && a.status === 'scheduled';
+    return a.appointmentDate >= today && a.status === 'scheduled';
   }).sort((a, b) => a.appointmentDate.localeCompare(b.appointmentDate));
   
   const pastAppts = appointments.filter(a => {
-    const apptDate = new Date(a.appointmentDate);
-    const now = new Date();
-    return apptDate < now || a.status !== 'scheduled';
+    return a.appointmentDate < today || a.status !== 'scheduled';
   }).sort((a, b) => b.appointmentDate.localeCompare(a.appointmentDate));
 
   const handleAddMedication = () => {
@@ -149,62 +132,6 @@ export const MedsAppointmentsScreen: React.FC = () => {
     );
   };
 
-  const queueRevision = (
-    type: 'medication' | 'appointment',
-    original: Medication | Appointment,
-    updated: Medication | Appointment
-  ) => {
-    setPendingRevision({ type, original, updated });
-    setRevisionReasonCategory('added_detail_omitted_earlier');
-    setRevisionReasonNote('');
-    setShowRevisionModal(true);
-  };
-
-  const handleConfirmRevision = async () => {
-    if (!pendingRevision || !activeProfile) {
-      setShowRevisionModal(false);
-      return;
-    }
-
-    if (!revisionReasonNote || revisionReasonNote.trim().length < 20) {
-      Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
-      return;
-    }
-
-    try {
-      const revisionResult = await createRevisionsForRecord(
-        pendingRevision.original.id,
-        pendingRevision.type,
-        activeProfile.id,
-        pendingRevision.original,
-        pendingRevision.updated,
-        revisionReasonCategory,
-        revisionReasonNote.trim(),
-        `${pendingRevision.type} updated`
-      );
-
-      if (!revisionResult.success) {
-        throw new Error(revisionResult.error || 'Failed to create revision');
-      }
-
-      if (pendingRevision.type === 'medication') {
-        await updateMedication(pendingRevision.updated as Medication);
-        setShowAddModal(false);
-        setShowSideEffectsModal(false);
-      } else {
-        await updateAppointment(pendingRevision.updated as Appointment);
-        setShowAppointmentModal(false);
-      }
-
-      setPendingRevision(null);
-      setShowRevisionModal(false);
-      setRevisionReasonCategory('added_detail_omitted_earlier');
-      setRevisionReasonNote('');
-    } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to save revision');
-    }
-  };
-  
   const handleViewSummary = (appt: Appointment) => {
     const summary = AppointmentSummaryService.generatePreparationSummary(
       appt,
@@ -235,8 +162,15 @@ export const MedsAppointmentsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Medications & Appointments</Text>
-        <Text style={styles.subtitle}>Treatment tracking for medical documentation</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerText}>
+            <Text style={styles.title}>Medications & Appointments</Text>
+            <Text style={styles.subtitle}>Track medicines, side effects, and visits</Text>
+          </View>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        </View>
         
         {/* Tabs */}
         <View style={styles.tabContainer}>
@@ -271,7 +205,8 @@ export const MedsAppointmentsScreen: React.FC = () => {
         onSave={async (medData) => {
           if (editingMed) {
             const updatedMedication = { ...editingMed, ...medData, updatedAt: new Date().toISOString() };
-            queueRevision('medication', editingMed, updatedMedication);
+            await updateMedication(updatedMedication);
+            setShowAddModal(false);
           } else {
             await addMedication(medData);
             setShowAddModal(false);
@@ -290,7 +225,8 @@ export const MedsAppointmentsScreen: React.FC = () => {
               sideEffects,
               updatedAt: new Date().toISOString(),
             };
-            queueRevision('medication', selectedMedForSideEffects, updatedMedication);
+            await updateMedication(updatedMedication);
+            setShowSideEffectsModal(false);
           }
         }}
       />
@@ -309,7 +245,8 @@ export const MedsAppointmentsScreen: React.FC = () => {
         onSave={async (apptData) => {
           if (editingAppt) {
             const updatedAppointment = { ...editingAppt, ...apptData, updatedAt: new Date().toISOString() };
-            queueRevision('appointment', editingAppt, updatedAppointment);
+            await updateAppointment(updatedAppointment);
+            setShowAppointmentModal(false);
           } else {
             await addAppointment(apptData);
             setShowAppointmentModal(false);
@@ -317,20 +254,6 @@ export const MedsAppointmentsScreen: React.FC = () => {
         }}
       />
 
-      <RevisionReasonModal
-        visible={showRevisionModal}
-        reasonOptions={REVISION_REASON_OPTIONS}
-        selectedReason={revisionReasonCategory}
-        note={revisionReasonNote}
-        onSelectReason={setRevisionReasonCategory}
-        onChangeNote={setRevisionReasonNote}
-        onCancel={() => {
-          setShowRevisionModal(false);
-          setPendingRevision(null);
-        }}
-        onConfirm={handleConfirmRevision}
-        confirmLabel="Save revision"
-      />
     </View>
   );
   
@@ -791,8 +714,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
   onViewSummary,
   showSummaryButton,
 }) => {
-  const apptDate = new Date(appointment.appointmentDate);
-  const isPast = apptDate < new Date();
+  const isPast = appointment.appointmentDate < new Date().toISOString().split('T')[0];
   
   return (
     <View style={[styles.card, isPast && styles.pastApptCard]}>
@@ -807,7 +729,7 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({
       </View>
       
       <Text style={styles.dosage}>
-        {apptDate.toLocaleDateString()} {appointment.appointmentTime && `at ${appointment.appointmentTime}`}
+        {formatDateOnly(appointment.appointmentDate)} {appointment.appointmentTime && `at ${appointment.appointmentTime}`}
       </Text>
       <Text style={styles.purpose}>Purpose: {getPurposeLabel(appointment.purpose)}</Text>
       
@@ -867,7 +789,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
           <View>
             <Text style={styles.summaryTitle}>Appointment Preparation</Text>
             <Text style={styles.summarySubtitle}>
-              {summary.appointment.providerName} - {new Date(summary.appointment.appointmentDate).toLocaleDateString()}
+              {summary.appointment.providerName} - {formatDateOnly(summary.appointment.appointmentDate)}
             </Text>
           </View>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -1074,7 +996,7 @@ const AppointmentModal: React.FC<AppointmentModalProps> = ({ visible, appointmen
 
   const purposes: AppointmentPurpose[] = [
     'initial_evaluation', 'follow_up', 'medication_review', 'test_results',
-    'treatment', 'therapy_session', 'ssdi_evaluation', 'paperwork', 'other'
+    'treatment', 'therapy_session', 'paperwork', 'other'
   ];
 
   const statuses: AppointmentStatus[] = [
@@ -1238,6 +1160,29 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray200,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  headerText: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   title: {
     ...typography.displayMedium,

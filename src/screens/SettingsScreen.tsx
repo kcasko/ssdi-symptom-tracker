@@ -18,7 +18,7 @@ import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, EvidenceModeControls, SubmissionPackBuilder, ScreenHeader } from '../components';
+import { BigButton, ScreenHeader } from '../components';
 import { useAppState } from '../state/useAppState';
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
@@ -49,7 +49,14 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScreenHeader title="Settings" />
+      <ScreenHeader
+        title="Settings"
+        rightAction={
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        }
+      />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
@@ -121,18 +128,6 @@ export const SettingsScreen: React.FC<SettingsProps> = ({ navigation }) => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Record Integrity</Text>
-          {activeProfile && (
-            <>
-              <EvidenceModeControls profileId={activeProfile.id} />
-              <View style={{ marginTop: spacing.lg }}>
-                <SubmissionPackBuilder profileId={activeProfile.id} appVersion="1.0.0" />
-              </View>
-            </>
-          )}
-        </View>
-
-        <View style={styles.section}>
           <Text style={styles.sectionTitle}>About</Text>
           <BigButton
             label="About This App"
@@ -161,6 +156,18 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   section: {
     padding: spacing.lg,

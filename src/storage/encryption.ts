@@ -35,7 +35,7 @@ export interface AuthResult {
 }
 
 const KEY_VERSION = 'v2';
-const KEY_PREFIX = 'ssdi_secure_';
+const KEY_PREFIX = 'daymark_secure_';
 const ENCRYPTION_KEY = 'encryption_key';
 const IV_LENGTH = 16; // 128-bit IV for CTR mode
 const VERSION_TAG = 'v2';
@@ -47,7 +47,7 @@ export class EncryptionManager {
   private static config: EncryptionConfig = {
     enabled: false,
     useDeviceAuth: false,
-    keyAlias: 'ssdi_master_key',
+    keyAlias: 'daymark_master_key',
   };
 
   static async initialize(config: Partial<EncryptionConfig> = {}): Promise<{
@@ -189,7 +189,7 @@ export class EncryptionManager {
   static async clearAllSecureData(): Promise<EncryptionResult> {
     try {
       await SecureStore.deleteItemAsync(`${KEY_PREFIX}${ENCRYPTION_KEY}`);
-      this.config = { enabled: false, useDeviceAuth: false, keyAlias: 'ssdi_master_key' };
+      this.config = { enabled: false, useDeviceAuth: false, keyAlias: 'daymark_master_key' };
       return { success: true };
     } catch (error) {
       return { success: false, error: error instanceof Error ? error.message : 'Clear secure data error' };

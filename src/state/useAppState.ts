@@ -8,7 +8,6 @@ import { useProfileStore } from './profileStore';
 import { useLogStore } from './logStore';
 import { useReportStore } from './reportStore';
 import { useSettingsStore } from './settingsStore';
-import { useEvidenceModeStore } from './evidenceModeStore';
 import { MigrationManager } from '../storage/migrations';
 import { SettingsStorage } from '../storage/storage';
 
@@ -147,10 +146,6 @@ export function useAppState(): AppState {
         // Load settings first
         console.log('Loading settings...');
         await useSettingsStore.getState().loadSettings();
-
-        // Load Evidence Mode configuration
-        console.log('Loading Evidence Mode...');
-        await useEvidenceModeStore.getState().loadEvidenceMode();
 
         // Get fresh settings from store (not the stale closure value!)
         const currentSettings = useSettingsStore.getState().settings;

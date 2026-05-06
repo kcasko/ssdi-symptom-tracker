@@ -1,6 +1,6 @@
 /**
  * Daymark - Main App Entry Point
- * Production-ready React Native + Expo app optimized for SSDI documentation
+ * React Native + Expo app for personal symptom, medication, and appointment tracking
  */
 
 import React from 'react';

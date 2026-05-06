@@ -7,9 +7,8 @@ import { create } from 'zustand';
 import { ReportDraft, createReportDraft, ReportType } from '../domain/models/ReportDraft';
 import { ReportService } from '../services/ReportService';
 import { ExportService } from '../services/ExportService';
-import { generateStrictPDFHtml } from '../services/EvidencePDFExportService';
 import { ids } from '../utils/ids';
-import { ProfileStorage, LogStorage } from '../storage/storage';
+import { LogStorage } from '../storage/storage';
 
 interface ReportState {
   // Data
@@ -47,6 +46,37 @@ interface ReportState {
   // Utility
   clearError: () => void;
   clearData: () => void;
+}
+
+function escapeHTML(text: string): string {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildReportHtml(title: string, reportContent: string): string {
+  return `
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>${escapeHTML(title)}</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #111827; line-height: 1.45; padding: 28px; }
+      h1 { font-size: 24px; margin-bottom: 16px; }
+      pre { white-space: pre-wrap; font-family: inherit; font-size: 13px; }
+      .note { color: #4b5563; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 24px; padding-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>${escapeHTML(title)}</h1>
+    <pre>${escapeHTML(reportContent)}</pre>
+    <p class="note">Personal health tracking summary generated from user-entered Daymark records. This is not medical advice or diagnosis.</p>
+  </body>
+</html>`;
 }
 
 export const useReportStore = create<ReportState>((set, get) => ({
@@ -324,61 +354,7 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
       // Use appropriate export service based on format
       if (format === 'pdf') {
-        // Load supporting data for strict, doctor-first PDF
-        const [profiles, dailyLogs, activityLogs, medications, appointments, gapExplanations] = await Promise.all([
-          ProfileStorage.getAllProfiles(),
-          LogStorage.getDailyLogs(currentProfileId),
-          LogStorage.getActivityLogs(currentProfileId),
-          LogStorage.getMedications(currentProfileId),
-          LogStorage.getAppointments(currentProfileId),
-          LogStorage.getGapExplanations(currentProfileId),
-        ]);
-
-        const profile = profiles.find((p: any) => p.id === currentProfileId);
-        const filteredDailyLogs = dailyLogs.filter((log: any) =>
-          log.logDate >= draft.dateRange.start && log.logDate <= draft.dateRange.end
-        );
-        const filteredActivityLogs = activityLogs.filter((log: any) =>
-          log.activityDate >= draft.dateRange.start && log.activityDate <= draft.dateRange.end
-        );
-        const filteredMeds = medications; // meds are not date-bound in data model; include all for context
-        const filteredAppointments = appointments.filter((appt: any) =>
-          appt.date ? appt.date >= draft.dateRange.start && appt.date <= draft.dateRange.end : true
-        );
-        const filteredGapExplanations = gapExplanations.filter(
-          (g: any) => g.startDate >= draft.dateRange.start && g.endDate <= draft.dateRange.end
-        );
-
-        const narrativeSections = draft.sections.filter(
-          (s) => s.included && (s.sectionType === 'narrative' || s.sectionType === 'custom')
-        );
-
-        const sourceDates = [
-          ...filteredDailyLogs.map((l: any) => l.logDate),
-          ...filteredActivityLogs.map((l: any) => l.activityDate),
-        ];
-
-        const narratives = narrativeSections.map((s) => ({
-          heading: s.title,
-          paragraphs: s.blocks.map((b) => b.content),
-          sourceDates,
-        }));
-
-        const pdfHtml = generateStrictPDFHtml({
-          title: draft.title || 'Symptom & Functional Log',
-          profileName: profile?.name || profile?.id || 'Profile',
-          dateRange: draft.dateRange,
-          exportDate: new Date().toISOString(),
-          disclaimer:
-            'This document records user-entered health and activity information. It assists review and does not make legal, medical, or disability determinations.',
-          rawDailyLogs: filteredDailyLogs,
-          rawActivityLogs: filteredActivityLogs,
-          medications: filteredMeds,
-          appointments: filteredAppointments,
-          gapExplanations: filteredGapExplanations,
-          narratives,
-        });
-
+        const pdfHtml = buildReportHtml(draft.title || 'Health Summary Report', reportContent);
         await ExportService.exportReportToPDF(pdfHtml, filename);
       } else {
         await ExportService.exportReportToText(reportContent, filename);

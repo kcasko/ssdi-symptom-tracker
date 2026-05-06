@@ -7,4 +7,4 @@ export * from './SymptomEngine';
 export * from './ActivityImpactEngine';
 export * from './LimitationAnalyzer';
 export * from './PatternDetector';
-export * from './SSDINarrativeBuilder';
+export * from './HealthNarrativeBuilder';

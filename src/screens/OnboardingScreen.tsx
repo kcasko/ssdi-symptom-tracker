@@ -24,37 +24,38 @@ export const OnboardingScreen: React.FC<OnboardingProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Daymark – Daily Symptom Documentation</Text>
-        <Text style={styles.subtitle}>Structured record system for medical and disability documentation</Text>
+        <Text style={styles.title}>Daymark</Text>
+        <Text style={styles.subtitle}>Symptom, medication, and appointment tracking</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What This App Does</Text>
           <Text style={styles.bodyText}>
-            Daymark creates timestamped records of symptom severity, activity limitations, and functional capacity. Records are organized chronologically and can be exported for medical or legal review.
+            Daymark helps you keep a clear personal record of symptoms, medications, side effects, appointments, and activity impact over time.
           </Text>
           <Text style={styles.bodyText}>
-            All entries require explicit user input. No defaults are applied. Records cannot be retroactively modified once finalized.
+            Your entries are organized by date so you can review patterns, prepare for appointments, or export a simple summary when you choose.
           </Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>What This App Doesn't Do</Text>
           <Text style={styles.bodyText}>
-            Daymark does not diagnose conditions, provide medical advice, or interpret logged data. It is a documentation tool only.
+            Daymark does not diagnose conditions, provide medical advice, or decide what your symptoms mean. It only summarizes what you enter.
           </Text>
         </View>
 
         <View style={styles.features}>
-          <Text style={styles.featureText}>• Timestamped symptom severity records</Text>
-          <Text style={styles.featureText}>• Activity limitation documentation</Text>
-          <Text style={styles.featureText}>• Structured export format for medical providers</Text>
+          <Text style={styles.featureText}>• Daily symptom and severity entries</Text>
+          <Text style={styles.featureText}>• Medication and side effect tracking</Text>
+          <Text style={styles.featureText}>• Doctor appointment notes and visit prep</Text>
+          <Text style={styles.featureText}>• Optional activity impact tracking</Text>
           <Text style={styles.featureText}>• Local storage only (no cloud transmission)</Text>
           <Text style={styles.featureText}>• Multi-profile support</Text>
         </View>
 
         <View style={styles.disclaimer}>
           <Text style={styles.disclaimerText}>
-            Documentation tool only. No diagnostic capability. No medical interpretation. User assumes full responsibility for data accuracy.
+            Personal tracking tool only. No diagnostic capability. No medical interpretation. Review your own entries for accuracy.
           </Text>
         </View>
 

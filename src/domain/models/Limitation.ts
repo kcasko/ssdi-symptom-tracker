@@ -1,6 +1,6 @@
 /**
  * Limitation Model
- * Captures baseline functional limitations - raw evidence layer
+ * Captures baseline functional limitations
  */
 
 export interface Limitation {
@@ -152,7 +152,7 @@ export function getLimitationCategoryLabel(category: LimitationCategory): string
 }
 
 /**
- * Get SSDI-friendly frequency description
+ * Get plain-language frequency description
  */
 export function getFrequencyDescription(frequency: LimitationFrequency): string {
   const descriptions: Record<LimitationFrequency, string> = {

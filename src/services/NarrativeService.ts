@@ -1,17 +1,18 @@
 /**
  * Narrative Service
- * Generates SSDI-optimized narrative text from analyzed data
+ * Generates neutral health-summary text from analyzed data
  */
 
 import { DailyLog } from '../domain/models/DailyLog';
 import { ActivityLog } from '../domain/models/ActivityLog';
 import { Limitation } from '../domain/models/Limitation';
 import { SymptomPattern, ActivityPattern, TriggerPattern, RecoveryPattern } from '../engine/PatternDetector';
-import { SSDINarrativeBuilder } from '../engine/SSDINarrativeBuilder';
+import { HealthNarrativeBuilder } from '../engine/HealthNarrativeBuilder';
 import { getSymptomById } from '../data/symptoms';
 import { SymptomEngine } from '../engine/SymptomEngine';
 // LimitationAnalyzer not currently used in this service
 import { DayQualityAnalyzer } from './DayQualityAnalyzer';
+import { formatDateOnly } from '../utils/dates';
 
 export interface DailyNarrative {
   date: string;
@@ -40,8 +41,8 @@ export interface FullNarrative {
     activities: string;
     limitations: string;
     patterns: string;
-    rfc: string;
-    dayQuality?: string; // SSDI day quality ratios
+    dailyFunction: string;
+    dayQuality?: string;
   };
   
   // Metadata
@@ -66,7 +67,7 @@ export class NarrativeService {
     const lines: string[] = [];
     
     // Date header
-    lines.push(`Date: ${new Date(date).toLocaleDateString()}`);
+    lines.push(`Date: ${formatDateOnly(date)}`);
     lines.push('');
 
     // Overall severity
@@ -133,7 +134,7 @@ export class NarrativeService {
 
     // Activity header
     lines.push(`Activity: ${activityLog.activityName}`);
-    lines.push(`Date: ${new Date(activityLog.activityDate).toLocaleDateString()}`);
+    lines.push(`Date: ${formatDateOnly(activityLog.activityDate)}`);
     lines.push(`Duration: ${activityLog.duration} minutes`);
     lines.push('');
 
@@ -223,7 +224,7 @@ export class NarrativeService {
   }
 
   /**
-   * Generate full SSDI narrative report
+   * Generate full health summary report
    */
   static async generateFullNarrative(
     dailyLogs: DailyLog[],
@@ -241,7 +242,7 @@ export class NarrativeService {
       activities: '',
       limitations: '',
       patterns: '',
-      rfc: '',
+      dailyFunction: '',
       dayQuality: '',
     };
 
@@ -250,34 +251,33 @@ export class NarrativeService {
     sections.overview = this.buildOverviewSection(dailyLogs, dateRange, dayRatio);
 
     // Symptom section
-    sections.symptoms = SSDINarrativeBuilder.buildSymptomSummary(
+    sections.symptoms = HealthNarrativeBuilder.buildSymptomSummary(
       symptomPatterns,
       dateRange,
       dailyLogs.length
     );
 
     // Activity section
-    sections.activities = SSDINarrativeBuilder.buildActivityImpactNarrative(activityPatterns);
+    sections.activities = HealthNarrativeBuilder.buildActivityImpactNarrative(activityPatterns);
 
     // Limitations section
-    sections.limitations = SSDINarrativeBuilder.buildLimitationsNarrative(limitations);
+    sections.limitations = HealthNarrativeBuilder.buildLimitationsNarrative(limitations);
 
-    // Day Quality section (SSDI-critical functional capacity metrics)
+    // Day quality section
     const dayAnalyzer = new DayQualityAnalyzer();
     const filteredLogs = dailyLogs.filter(log => {
-      const logDate = new Date(log.logDate);
-      return logDate >= new Date(dateRange.start) && logDate <= new Date(dateRange.end);
+      return log.logDate >= dateRange.start && log.logDate <= dateRange.end;
     });
     const dateRangeRatios = dayAnalyzer.calculateDayRatios(filteredLogs);
     const allTimeRangeRatios = dayAnalyzer.calculateTimeRangeRatios(dailyLogs);
-    const ssdiInsights = dayAnalyzer.generateSSIDInsights(allTimeRangeRatios);
-    sections.dayQuality = this.buildDayQualitySection(dateRangeRatios, ssdiInsights);
+    const dayInsights = dayAnalyzer.generateInsights(allTimeRangeRatios);
+    sections.dayQuality = this.buildDayQualitySection(dateRangeRatios, dayInsights);
 
     // Patterns section
     sections.patterns = this.buildPatternsSection(triggers, recovery, dayRatio);
 
-    // RFC section
-    sections.rfc = SSDINarrativeBuilder.buildRFCNarrative(
+    // Daily function section
+    sections.dailyFunction = HealthNarrativeBuilder.buildDailyFunctionSummary(
       limitations,
       activityPatterns,
       dayRatio.goodDays,
@@ -286,7 +286,7 @@ export class NarrativeService {
 
     // Combine all sections
     const fullText = [
-      'FUNCTIONAL CAPACITY DOCUMENTATION',
+      'HEALTH TRACKING SUMMARY',
       '',
       'OVERVIEW',
       sections.overview,
@@ -306,7 +306,8 @@ export class NarrativeService {
       'PATTERN ANALYSIS',
       sections.patterns,
       '',
-      sections.rfc,
+      'DAILY FUNCTION SUMMARY',
+      sections.dailyFunction,
     ].join('\n');
 
     const wordCount = fullText.split(/\s+/).filter(w => w.length > 0).length;
@@ -323,7 +324,7 @@ export class NarrativeService {
   }
 
   /**
-   * Build day quality section for SSDI documentation
+   * Build day quality section
    */
   private static buildDayQualitySection(
     ratios: ReturnType<DayQualityAnalyzer['calculateDayRatios']>,
@@ -331,7 +332,7 @@ export class NarrativeService {
   ): string {
     const lines: string[] = [];
     
-    lines.push(`During this reporting period, functional capacity analysis reveals:`);
+    lines.push('During this reporting period, logged day patterns show:');
     lines.push('');
     lines.push(`Lower-impact days (severity <5): ${ratios.goodDayPercentage.toFixed(1)}%`);
     lines.push(`Mid-range days (severity 5-6): ${((ratios.totalDays - ratios.goodDays - ratios.badDays - ratios.veryBadDays) / ratios.totalDays * 100).toFixed(1)}%`);
@@ -339,7 +340,6 @@ export class NarrativeService {
     lines.push(`Very high-impact days (severity 9-10): ${((ratios.veryBadDays / ratios.totalDays) * 100).toFixed(1)}%`);
     lines.push('');
     
-    lines.push(`Average functional capacity: ${(10 - ratios.averageSeverity).toFixed(1)}/10`);
     lines.push(`Average symptom severity: ${ratios.averageSeverity.toFixed(1)}/10`);
     lines.push(`Average symptom count per day: ${(ratios.totalDays > 0 ? (ratios.goodDays + ratios.neutralDays + ratios.badDays + ratios.veryBadDays) / ratios.totalDays : 0).toFixed(1)}`);
     lines.push('');
@@ -352,7 +352,7 @@ export class NarrativeService {
     }
     lines.push('');
     
-    lines.push('SSDI-Relevant Observations:');
+    lines.push('Observations:');
     insights.forEach(insight => {
       lines.push(`- ${insight}`);
     });
@@ -370,14 +370,14 @@ export class NarrativeService {
   ): string {
     const lines: string[] = [];
 
-    const startDate = new Date(dateRange.start).toLocaleDateString();
-    const endDate = new Date(dateRange.end).toLocaleDateString();
+    const startDate = formatDateOnly(dateRange.start);
+    const endDate = formatDateOnly(dateRange.end);
     const totalDays = dailyLogs.length;
 
-    lines.push(`This report documents functional limitations based on symptoms logged from ${startDate} to ${endDate}, covering ${totalDays} days.`);
+    lines.push(`This report summarizes symptoms, activity impact, and capacity limits logged from ${startDate} to ${endDate}, covering ${totalDays} days.`);
     lines.push('');
     
-    lines.push(SSDINarrativeBuilder.buildConsistencyNarrative(
+    lines.push(HealthNarrativeBuilder.buildConsistencyNarrative(
       dayRatio.goodDays,
       dayRatio.badDays,
       totalDays
@@ -397,7 +397,7 @@ export class NarrativeService {
     const lines: string[] = [];
 
     // Triggers
-    const triggerNarrative = SSDINarrativeBuilder.buildTriggerNarrative(triggers);
+    const triggerNarrative = HealthNarrativeBuilder.buildTriggerNarrative(triggers);
     if (triggerNarrative) {
       lines.push(triggerNarrative);
       lines.push('');
@@ -411,14 +411,14 @@ export class NarrativeService {
         duration: r.averageRecoveryDuration,
       }));
 
-      const recoveryNarrative = SSDINarrativeBuilder.buildRecoveryNarrative(recoveryActions);
+      const recoveryNarrative = HealthNarrativeBuilder.buildRecoveryNarrative(recoveryActions);
       lines.push(recoveryNarrative);
       lines.push('');
     }
 
     // Consistency
     if (dayRatio.badDayPercentage >= 20) {
-      lines.push(`The frequency and consistency of symptoms (affecting ${dayRatio.badDayPercentage}% of documented days) demonstrates a persistent pattern that would interfere with the reliability required for sustained competitive employment.`);
+      lines.push(`Higher-impact symptoms were logged on ${dayRatio.badDayPercentage}% of documented days in this range.`);
     }
 
     return lines.join('\n');
@@ -438,14 +438,14 @@ export class NarrativeService {
     const dayRatio = SymptomEngine.calculateDayRatio(dailyLogs);
 
     return {
-      'Symptom Summary': SSDINarrativeBuilder.buildSymptomSummary(
+      'Symptom Summary': HealthNarrativeBuilder.buildSymptomSummary(
         symptomPatterns,
         dateRange,
         dailyLogs.length
       ),
-      'Activity Impact': SSDINarrativeBuilder.buildActivityImpactNarrative(activityPatterns),
-      'Functional Limitations': SSDINarrativeBuilder.buildLimitationsNarrative(limitations),
-      'RFC Assessment': SSDINarrativeBuilder.buildRFCNarrative(
+      'Activity Impact': HealthNarrativeBuilder.buildActivityImpactNarrative(activityPatterns),
+      'Capacity Limits': HealthNarrativeBuilder.buildLimitationsNarrative(limitations),
+      'Daily Function Summary': HealthNarrativeBuilder.buildDailyFunctionSummary(
         limitations,
         activityPatterns,
         dayRatio.goodDays,
@@ -462,13 +462,13 @@ export class NarrativeService {
 
     // Header
     lines.push('═══════════════════════════════════════════════════════════════');
-    lines.push('           FUNCTIONAL CAPACITY DOCUMENTATION');
+    lines.push('           HEALTH TRACKING SUMMARY');
     lines.push('═══════════════════════════════════════════════════════════════');
     lines.push('');
 
     // Date range
-    const startDate = new Date(narrative.metadata.dateRange.start).toLocaleDateString();
-    const endDate = new Date(narrative.metadata.dateRange.end).toLocaleDateString();
+    const startDate = formatDateOnly(narrative.metadata.dateRange.start);
+    const endDate = formatDateOnly(narrative.metadata.dateRange.end);
     lines.push(`Reporting Period: ${startDate} to ${endDate}`);
     lines.push(`Generated: ${new Date(narrative.metadata.generatedAt).toLocaleDateString()}`);
     lines.push('');

@@ -12,7 +12,7 @@ export interface LimitationTemplate {
   typicalThresholds: ThresholdSuggestion[];
   commonConsequences: string[];
   commonAccommodations: string[];
-  ssdiRelevance: string;
+  trackingRelevance: string;
 }
 
 export interface ThresholdSuggestion {
@@ -50,7 +50,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Regular breaks',
       'Ergonomic chair',
     ],
-    ssdiRelevance: 'Critical for sedentary work capacity assessment',
+    trackingRelevance: 'Helps identify sitting tolerance and useful break patterns',
   },
   
   {
@@ -80,7 +80,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Frequent sitting breaks',
       'Alternating sitting/standing workspace',
     ],
-    ssdiRelevance: 'Important for jobs requiring prolonged standing',
+    trackingRelevance: 'Helps identify standing tolerance and support needs',
   },
 
   {
@@ -111,7 +111,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Use elevator instead of stairs',
       'Wheelchair for longer distances',
     ],
-    ssdiRelevance: 'Key factor in determining disability severity',
+    trackingRelevance: 'Helps identify walking tolerance and rest patterns',
   },
 
   {
@@ -141,7 +141,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Avoid overhead reaching',
       'Use cart or dolly when possible',
     ],
-    ssdiRelevance: 'Determines work capacity categories in RFC assessment',
+    trackingRelevance: 'Helps identify lifting limits and symptom triggers',
   },
 
   {
@@ -171,7 +171,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Minimize distractions',
       'Regular short breaks',
     ],
-    ssdiRelevance: 'Critical for mental RFC and work capacity assessment',
+    trackingRelevance: 'Helps identify focus limits and helpful task modifications',
   },
 
   {
@@ -201,7 +201,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Use memory aids and apps',
       'Reduce information overload',
     ],
-    ssdiRelevance: 'Important for cognitive work capacity evaluation',
+    trackingRelevance: 'Helps identify memory supports and reminder needs',
   },
 
   {
@@ -231,7 +231,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Flexible social requirements',
       'Regular check-ins with supervisor',
     ],
-    ssdiRelevance: 'Key component of mental health disability assessment',
+    trackingRelevance: 'Helps identify social stressors and recovery needs',
   },
 
   {
@@ -260,7 +260,7 @@ export const LIMITATION_TEMPLATES: LimitationTemplate[] = [
       'Home health aide assistance',
       'Energy conservation techniques',
     ],
-    ssdiRelevance: 'Indicates severity of functional impairment',
+    trackingRelevance: 'Helps identify self-care barriers and support needs',
   },
 ];
 

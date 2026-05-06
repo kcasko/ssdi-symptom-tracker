@@ -68,6 +68,8 @@ export function AppNavigator({ isFirstLaunch }: AppNavigatorProps) {
         <Stack.Screen name="Trends" component={TrendsScreen} />
         <Stack.Screen 
           name="VoiceLog" 
+          // Keep lazy load so the native voice module is not loaded during initial navigation setup.
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           getComponent={() => require('../screens/VoiceLogScreen').VoiceLogScreen}
         />
         <Stack.Screen name="Settings" component={SettingsScreen} />

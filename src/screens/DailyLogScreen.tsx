@@ -11,26 +11,23 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
-  TouchableOpacity,
   TextInput,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
 import { colors } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
-import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, LogFinalizationControls, RevisionHistoryViewer, RevisionReasonModal, ScreenHeader } from '../components';
+import { BigButton, SymptomPicker, PainScale, NotesField, PhotoPicker, PhotoGallery, ScreenHeader } from '../components';
 import { useAppState } from '../state/useAppState';
 import { LogService, PhotoService } from '../services';
-import { updateLogWithRevision, getRevisionCount } from '../services/EvidenceLogService';
 import { getSymptomById } from '../data/symptoms';
 import { PhotoAttachment } from '../domain/models/PhotoAttachment';
 import { GapExplanation } from '../domain/models/GapExplanation';
 import { calculateDaysDelayed, parseDate, getDaysBetween, addDays } from '../utils/dates';
 import { ids } from '../utils/ids';
-import { useEvidenceModeStore } from '../state/evidenceModeStore';
-import { RevisionReasonCategory } from '../domain/models/EvidenceMode';
 
 type DailyLogProps = NativeStackScreenProps<RootStackParamList, 'DailyLog'>;
 
@@ -40,18 +37,8 @@ interface SymptomEntry {
   notes?: string;
 }
 
-// Retrospective reasons removed - require free-form text to avoid coached language
-const REVISION_REASON_OPTIONS: Array<{ id: RevisionReasonCategory; label: string }> = [
-  { id: 'typo_correction', label: 'Typo or formatting correction' },
-  { id: 'added_detail_omitted_earlier', label: 'Added detail omitted earlier' },
-  { id: 'correction_after_reviewing_records', label: 'Correction after reviewing records' },
-  { id: 'clarification_requested', label: 'Clarification requested' },
-  { id: 'other', label: 'Other (describe)' },
-];
-
 export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const { activeProfile, dailyLogs, addDailyLog, updateDailyLog, addPhoto, deletePhoto, getPhotosByEntity, addGapExplanation } = useAppState();
-  const evidenceStore = useEvidenceModeStore();
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedSymptomIds, setSelectedSymptomIds] = useState<string[]>([]);
   const [symptomEntries, setSymptomEntries] = useState<Record<string, SymptomEntry>>({});
@@ -60,15 +47,10 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
   const [logPhotos, setLogPhotos] = useState<PhotoAttachment[]>([]);
   const [gapExplanation, setGapExplanation] = useState('');
   const [retrospectiveNote, setRetrospectiveNote] = useState('');
-  const [revisionReasonCategory, setRevisionReasonCategory] = useState<RevisionReasonCategory>('added_detail_omitted_earlier');
-  const [revisionReasonNote, setRevisionReasonNote] = useState('');
-  const [showRevisionModal, setShowRevisionModal] = useState(false);
-  const [showRevisionHistory, setShowRevisionHistory] = useState(false);
 
   const existingLog = dailyLogs.find(
     (l) => l.profileId === activeProfile?.id && l.logDate === date
   );
-  const isFinalized = existingLog ? evidenceStore.isLogFinalized(existingLog.id) : false;
   const profileDailyLogs = dailyLogs.filter((l) => l.profileId === activeProfile?.id);
   const previousLog = profileDailyLogs
     .filter((l) => l.logDate < date)
@@ -119,8 +101,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
       setRetrospectiveNote(existingLog.retrospectiveContext?.note || existingLog.retrospectiveContext?.reason || '');
       setGapExplanation('');
-      setRevisionReasonCategory('added_detail_omitted_earlier');
-      setRevisionReasonNote('');
 
       // Load photos for this log
       if (existingLog.id) {
@@ -137,8 +117,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     setLogPhotos([]);
     setRetrospectiveNote('');
     setGapExplanation('');
-    setRevisionReasonCategory('added_detail_omitted_earlier');
-    setRevisionReasonNote('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingLog?.id, date]); // Reset when the date changes
 
@@ -175,7 +153,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
     });
   };
 
-  const handleSave = async (forceRevision = false) => {
+  const handleSave = async () => {
     if (!activeProfile) return;
 
     if (selectedSymptomIds.length === 0) {
@@ -215,16 +193,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       return;
     }
 
-    if (existingLog && isFinalized && !forceRevision) {
-      setShowRevisionModal(true);
-      return;
-    }
-
-    if (existingLog && isFinalized && (!revisionReasonNote || revisionReasonNote.trim().length < 20)) {
-      Alert.alert('Revision Reason Required', 'Provide a neutral reason of at least 20 characters for this revision.');
-      return;
-    }
-
     try {
       const symptoms = selectedSymptomIds.map((id) => ({
         symptomId: id,
@@ -253,25 +221,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           retrospectiveContext,
         });
         
-        // Use revision system if log is finalized
-        if (isFinalized) {
-          const revisionResult = await updateLogWithRevision(
-            existingLog.id,
-            'daily',
-            activeProfile.id,
-            existingLog,
-            updated,
-            revisionReasonCategory,
-            revisionReasonNote.trim(),
-            'Symptom severities and notes revised'
-          );
-          if (!revisionResult.success) {
-            throw new Error(revisionResult.error || 'Failed to create revision');
-          }
-          // Original entry remains unchanged; revisions are stored separately
-        } else {
-          await updateDailyLog(updated);
-        }
+        await updateDailyLog(updated);
       } else {
         // Pass data to store, which will create the log with proper IDs and timestamps
         if (showGapExplanation && gapRange && gapExplanation.trim().length > 0) {
@@ -332,6 +282,11 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
       <ScreenHeader
         title="Daily Log"
         subtitle="Record symptoms for a specific date"
+        rightAction={
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
+        }
       />
       <View style={styles.dateSection}>
         <Text style={styles.dateLabel}>Event date</Text>
@@ -352,33 +307,6 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="none"
       >
-        {/* Record Integrity Mode Controls */}
-        {existingLog && activeProfile && (
-          <View style={styles.section}>
-            <LogFinalizationControls
-              log={existingLog}
-              logType="daily"
-              profileId={activeProfile.id}
-            />
-          </View>
-        )}
-
-        {existingLog && (
-          <View style={styles.section}>
-            <TouchableOpacity
-              style={styles.revisionButton}
-              onPress={() => setShowRevisionHistory(true)}
-            >
-              <Text style={styles.revisionButtonText}>
-                Revision history ({getRevisionCount(existingLog.id)})
-              </Text>
-            </TouchableOpacity>
-            <Text style={styles.helperText}>
-              Original entry is preserved; revisions are timestamped and counted.
-            </Text>
-          </View>
-        )}
-
         {showGapExplanation && gapRange && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Gap explanation (required for gaps &gt;7 days)</Text>
@@ -444,9 +372,7 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
 
         {/* Photo Attachments Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {isFinalized ? 'Finalized Photo Attachments' : 'Supporting Photos (draft)'}
-          </Text>
+          <Text style={styles.sectionTitle}>Photos</Text>
 
           {logPhotos.length > 0 && (
             <PhotoGallery
@@ -473,36 +399,12 @@ export const DailyLogScreen: React.FC<DailyLogProps> = ({ navigation }) => {
           style={{ marginBottom: spacing.sm }}
         />
         <BigButton
-          label={isFinalized ? 'Create Revision (original preserved)' : existingLog ? 'Replace Entry (draft mode only)' : 'Save Entry'}
+          label={existingLog ? 'Update Entry' : 'Save Entry'}
           onPress={() => handleSave()}
           variant="primary"
           fullWidth
         />
       </View>
-
-      {/* Revision History Modal */}
-      {existingLog && (
-        <RevisionHistoryViewer
-          visible={showRevisionHistory}
-          onClose={() => setShowRevisionHistory(false)}
-          logId={existingLog.id}
-        />
-      )}
-
-      <RevisionReasonModal
-        visible={showRevisionModal}
-        reasonOptions={REVISION_REASON_OPTIONS}
-        selectedReason={revisionReasonCategory}
-        note={revisionReasonNote}
-        onSelectReason={setRevisionReasonCategory}
-        onChangeNote={setRevisionReasonNote}
-        onCancel={() => setShowRevisionModal(false)}
-        onConfirm={() => {
-          setShowRevisionModal(false);
-          void handleSave(true);
-        }}
-        confirmLabel="Save revision"
-      />
     </SafeAreaView>
   );
 };
@@ -511,6 +413,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.secondary,
+  },
+  backButton: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    borderRadius: 4,
+  },
+  backButtonText: {
+    fontSize: typography.sizes.sm,
+    color: colors.primaryMain,
+    fontWeight: typography.weights.semibold as any,
   },
   dateSection: {
     padding: spacing.lg,
@@ -598,19 +512,6 @@ const styles = StyleSheet.create({
   helperText: {
     fontSize: typography.sizes.sm,
     color: colors.gray700,
-  },
-  revisionButton: {
-    borderWidth: 1,
-    borderColor: colors.gray400,
-    borderRadius: 8,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    backgroundColor: colors.white,
-  },
-  revisionButtonText: {
-    fontSize: typography.sizes.md,
-    color: colors.gray900,
-    fontWeight: typography.weights.semibold as any,
   },
   footer: {
     padding: spacing.lg,

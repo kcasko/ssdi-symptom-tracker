@@ -1,7 +1,7 @@
 /**
  * Day Quality Analyzer
  * Classifies days as lower-, mid-, or higher-impact based on symptom data
- * Critical for SSDI documentation showing functional capacity
+ * Summarizes day quality patterns from symptom logs.
  */
 
 import { DailyLog } from '../domain/models/DailyLog';
@@ -52,11 +52,11 @@ export interface DayClassificationCriteria {
   // High-impact symptoms that automatically make a day "bad"
   highImpactSymptoms: string[];
   
-  // Minimum functional capacity for lower-impact day
+  // Minimum daily function score for a lower-impact day
   minFunctionalCapacity: number;
 }
 
-// Default SSDI-focused criteria
+// Default day quality criteria
 const DEFAULT_CRITERIA: DayClassificationCriteria = {
   goodDayMaxSeverity: 3,
   badDayMinSeverity: 6,
@@ -294,9 +294,9 @@ export class DayQualityAnalyzer {
   }
 
   /**
-   * Generate SSDI-focused insights from day ratios
+   * Generate neutral insights from day ratios
    */
-  generateSSIDInsights(ratios: TimeRangeRatios): string[] {
+  generateInsights(ratios: TimeRangeRatios): string[] {
     const insights: string[] = [];
     const recent = ratios.last30Days;
 
@@ -320,13 +320,13 @@ export class DayQualityAnalyzer {
 
     // Severity patterns
     if (recent.averageSeverity >= 6) {
-      insights.push(`Average daily symptom severity of ${recent.averageSeverity.toFixed(1)}/10 indicates substantial functional limitation.`);
+      insights.push(`Average daily symptom severity was ${recent.averageSeverity.toFixed(1)}/10.`);
     }
 
     // Consistency patterns
     const variability = Math.abs(ratios.last7Days.badDayPercentage - ratios.last30Days.badDayPercentage);
     if (variability < 10) {
-      insights.push('Symptom patterns are consistent over time, indicating chronic condition stability.');
+      insights.push('Symptom impact patterns were similar across recent time ranges.');
     }
 
     return insights;

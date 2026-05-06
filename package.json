@@ -11,9 +11,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:evidence": "jest tests/ --coverage --json --outputFile=test-artifacts/latest/test-results.json",
+    "test:health": "jest tests/ --coverage --json --outputFile=test-artifacts/latest/test-results.json",
     "test:audit": "node scripts/generate-audit-report.js",
-    "test:full-audit": "npm run test:evidence && npm run test:audit",
+    "test:full-audit": "npm run test:health && npm run test:audit",
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "postinstall": "patch-package",
@@ -22,6 +22,7 @@
     "assets:validate": "node validate-assets.js"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~4.0.1",
     "@expo/vector-icons": "14.0.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/netinfo": "11.4.1",
@@ -49,10 +50,12 @@
     "expo-status-bar": "2.0.1",
     "pako": "2.1.0",
     "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-native": "0.76.9",
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "4.4.0",
     "react-native-svg": "15.8.0",
+    "react-native-web": "~0.19.13",
     "uuid": "9.0.1",
     "zustand": "4.5.2"
   },

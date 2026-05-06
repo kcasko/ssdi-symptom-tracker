@@ -16,7 +16,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { PhotoAttachment, getEvidenceValueLabel, getCategoryLabel } from '../domain/models/PhotoAttachment';
+import { PhotoAttachment, getDocumentationValueLabel, getCategoryLabel } from '../domain/models/PhotoAttachment';
 import { colors as COLORS } from '../theme/colors';
 import { spacing as SPACING } from '../theme/spacing';
 
@@ -55,10 +55,10 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   };
 
   const renderThumbnail = (photo: PhotoAttachment) => {
-    const evidenceValue = getEvidenceValueLabel(photo.category);
-    const evidenceColor = 
-      evidenceValue === 'High' ? COLORS.success.main :
-      evidenceValue === 'Medium' ? COLORS.warning.main :
+    const documentationValue = getDocumentationValueLabel(photo.category);
+    const documentationColor =
+      documentationValue === 'High' ? COLORS.success.main :
+      documentationValue === 'Medium' ? COLORS.warning.main :
       COLORS.text.secondary;
 
     return (
@@ -69,10 +69,10 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
       >
         <Image source={{ uri: photo.uri }} style={styles.thumbnail} />
         
-        {/* Evidence Badge */}
-        <View style={[styles.evidenceBadge, { backgroundColor: evidenceColor as string }]}>
-          <Text style={styles.evidenceBadgeText}>
-            {evidenceValue}
+        {/* Documentation Badge */}
+        <View style={[styles.documentationBadge, { backgroundColor: documentationColor as string }]}>
+          <Text style={styles.documentationBadgeText}>
+            {documentationValue}
           </Text>
         </View>
 
@@ -99,7 +99,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   const renderFullPhoto = () => {
     if (!selectedPhoto) return null;
 
-    const evidenceValue = getEvidenceValueLabel(selectedPhoto.category);
+    const documentationValue = getDocumentationValueLabel(selectedPhoto.category);
 
     return (
       <Modal
@@ -133,11 +133,11 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
                 <View style={styles.photoInfoRow}>
                   <Text style={styles.photoInfoLabel}>Documentation Level:</Text>
                   <Text style={[styles.photoInfoValue, { color: 
-                    evidenceValue === 'High' ? COLORS.success.main :
-                    evidenceValue === 'Medium' ? COLORS.warning.main :
+                    documentationValue === 'High' ? COLORS.success.main :
+                    documentationValue === 'Medium' ? COLORS.warning.main :
                     COLORS.text.secondary
                   }]}>
-                    {evidenceValue}
+                    {documentationValue}
                   </Text>
                 </View>
 
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  evidenceBadge: {
+  documentationBadge: {
     position: 'absolute',
     top: SPACING.xs,
     left: SPACING.xs,
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 4,
   },
-  evidenceBadgeText: {
+  documentationBadgeText: {
     fontSize: 10,
     fontWeight: '700',
     color: COLORS.white,
