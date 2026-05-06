@@ -227,12 +227,12 @@ const renderVoiceInstructions = () => (
           </View>
         )}
 
-        {currentTranscription && !isProcessing && (
+        {currentTranscription ? !isProcessing && (
           <View style={styles.transcriptionDisplay}>
             <Text style={styles.transcriptionLabel}>What you said:</Text>
             <Text style={styles.transcriptionText}>"{currentTranscription}"</Text>
           </View>
-        )}
+        ) : null}
 
         {voiceResult && voiceResult.symptoms.length > 0 && (
           <View style={styles.resultsContainer}>

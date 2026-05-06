@@ -57,6 +57,7 @@ coverage/
 test-artifacts/*/
 test-artifacts/*.png
 test-artifacts/*.json
+test-artifacts/*.log
 !test-artifacts/.gitkeep
 playwright-report/
 test-results/

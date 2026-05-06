@@ -887,7 +887,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>Key Discussion Points</Text>
               {summary.discussionPoints.map((point, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryNumber}>{i + 1}.</Text>
+                  <Text style={styles.summaryNumber}>{`${i + 1}.`}</Text>
                   <Text style={styles.summaryText}>{point}</Text>
                 </View>
               ))}
@@ -900,7 +900,7 @@ const AppointmentPreparationModal: React.FC<AppointmentPreparationModalProps> = 
               <Text style={styles.summarySectionTitle}>Questions for Provider</Text>
               {summary.suggestedQuestions.map((question, i) => (
                 <View key={i} style={styles.summaryItem}>
-                  <Text style={styles.summaryNumber}>{i + 1}.</Text>
+                  <Text style={styles.summaryNumber}>{`${i + 1}.`}</Text>
                   <Text style={styles.summaryText}>{question}</Text>
                 </View>
               ))}
